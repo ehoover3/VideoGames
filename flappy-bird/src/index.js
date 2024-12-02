@@ -30,16 +30,15 @@ let totalDelta = null;
 function create() {
   this.add.image(0, 0, "sky").setOrigin(0);
   bird = this.physics.add.sprite(config.width * 0.1, config.height / 2, "bird").setOrigin(0);
-  bird.body.velocity.y = 200;
+  bird.body.velocity.x = VELOCITY;
 }
 
 function update(time, delta) {
-  totalDelta += delta;
-
-  if (totalDelta >= 1000) {
-    return;
+  if (bird.x >= config.width - bird.width) {
+    bird.body.velocity.x = -VELOCITY;
+  } else {
+    bird.body.velocity.x = VELOCITY;
   }
-  totalDelta = 0;
 }
 
 new Phaser.Game(config);
