@@ -7,7 +7,7 @@ const config = {
   physics: {
     default: "arcade",
     arcade: {
-      gravity: { y: 200 },
+      // gravity: { y: 200 },
     },
   },
   scene: {
@@ -22,6 +22,8 @@ function preload() {
   this.load.image("bird", "assets/bird.png");
 }
 
+const VELOCITY = 200;
+
 let bird = null;
 let totalDelta = null;
 
@@ -32,10 +34,12 @@ function create() {
 }
 
 function update(time, delta) {
+  totalDelta += delta;
+
   if (totalDelta >= 1000) {
     return;
   }
-  totalDelta += delta;
+  totalDelta = 0;
 }
 
 new Phaser.Game(config);
