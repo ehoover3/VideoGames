@@ -7,7 +7,7 @@ const config = {
   physics: {
     default: "arcade",
     arcade: {
-      gravity: { y: 200 },
+      gravity: { y: 400 },
       debug: true,
     },
   },
@@ -26,6 +26,7 @@ function preload() {
 const VELOCITY = 200;
 
 let bird = null;
+let flapVelocity = 300;
 let totalDelta = null;
 
 function create() {
@@ -33,12 +34,17 @@ function create() {
   bird = this.physics.add.sprite(config.width * 0.1, config.height / 2, "bird").setOrigin(0);
 
   this.input.on("pointerdown", flap);
-
   this.input.keyboard.on("keydown_SPACE", flap);
 }
 
-function update(time, delta) {}
+function update(time, delta) {
+  if (bird.y > config.height || bird.y < -bird.height) {
+    alert("you lost");
+  }
+}
 
-function flap() {}
+function flap() {
+  bird.body.velocity.y = -flapVelocity;
+}
 
 new Phaser.Game(config);
