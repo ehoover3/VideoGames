@@ -2,7 +2,7 @@ import Phaser from "phaser";
 
 const config = {
   type: Phaser.AUTO,
-  width: 800,
+  width: 2800,
   height: 600,
   physics: {
     default: "arcade",
@@ -56,6 +56,7 @@ function update(time, delta) {
   if (bird.y > config.height || bird.y < -bird.height) {
     restartBirdPosition();
   }
+  recyclePipes();
 }
 
 function placePipe(upperPipe, lowerPipe) {
@@ -68,6 +69,18 @@ function placePipe(upperPipe, lowerPipe) {
 
   lowerPipe.x = upperPipe.x;
   lowerPipe.y = upperPipe.y + pipeVerticalDistance;
+}
+
+function recyclePipes() {
+  const tempPipes = [];
+  pipes.getChildren().forEach((pipe) => {
+    if (pipe.getBounds().right <= 0) {
+      tempPipes.push(pipe);
+      if (tempPipes.length === 2) {
+        placePipe(...tempPipes);
+      }
+    }
+  });
 }
 
 function getRightMostPipe() {}
