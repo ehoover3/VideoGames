@@ -21,6 +21,7 @@ const VELOCITY = 200;
 const PIPES_TO_RENDER = 4;
 
 let bird = null;
+let pipes = null;
 let pipeHorizontalDistance = 0;
 
 const pipeVerticalDistanceRange = [150, 250];
@@ -38,12 +39,14 @@ function create() {
   this.add.image(0, 0, "sky").setOrigin(0);
   bird = this.physics.add.sprite(initialBirdPosition.x, initialBirdPosition.y, "bird").setOrigin(0);
   bird.body.gravity.y = 400;
+  pipes = this.physics.add.group();
 
   for (let i = 0; i < PIPES_TO_RENDER; i++) {
-    const upperPipe = this.physics.add.sprite(0, 0, "pipe").setOrigin(0, 1);
-    const lowerPipe = this.physics.add.sprite(0, 0, "pipe").setOrigin(0, 0);
+    const upperPipe = pipes.create(0, 0, "pipe").setOrigin(0, 1);
+    const lowerPipe = pipes.create(0, 0, "pipe").setOrigin(0, 0);
     placePipe(upperPipe, lowerPipe);
   }
+  pipes.setVelocityX(-200);
 
   this.input.on("pointerdown", flap);
   this.input.keyboard.on("keydown_SPACE", flap);
@@ -65,10 +68,9 @@ function placePipe(upperPipe, lowerPipe) {
 
   lowerPipe.x = upperPipe.x;
   lowerPipe.y = upperPipe.y + pipeVerticalDistance;
-
-  upperPipe.body.velocity.x = -200;
-  lowerPipe.body.velocity.x = -200;
 }
+
+function getRightMostPipe() {}
 
 function restartBirdPosition() {
   bird.x = initialBirdPosition.x;
