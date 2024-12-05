@@ -14,6 +14,9 @@ const config = {
   scene: [PlayScene],
 };
 
+const WIDTH = 800;
+const HEIGHT = 600;
+const BIRD_POSITION = { x: WIDTH * 0.1, y: HEIGHT / 2 };
 const VELOCITY = 200;
 const PIPES_TO_RENDER = 4;
 
