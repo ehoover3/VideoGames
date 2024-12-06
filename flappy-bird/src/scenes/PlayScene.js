@@ -8,10 +8,10 @@ class PlayScene extends Phaser.Scene {
     this.config = config;
 
     this.bird = null;
-    let pipes = null;
+    this.pipes = null;
 
-    let pipeHorizontalDistance = 0;
-    const pipeVerticalDistanceRange = [150, 250];
+    this.pipeHorizontalDistance = 0;
+    this.pipeVerticalDistanceRange = [150, 250];
     this.pipeHorizontalDistanceRange = [500, 550];
     this.flapVelocity = 250;
   }
@@ -36,7 +36,7 @@ class PlayScene extends Phaser.Scene {
   }
 
   createBG() {
-    this.pipes = this.physics.add.group();
+    this.add.image(0, 0, "sky").setOrigin(0);
   }
 
   createBird() {
@@ -48,8 +48,8 @@ class PlayScene extends Phaser.Scene {
     this.pipes = this.physics.add.group();
 
     for (let i = 0; i < PIPES_TO_RENDER; i++) {
-      const upperPipe = this.pipes.create(0, 0, "pipe").setOrigin(0, 1);
-      const lowerPipe = this.pipes.create(0, 0, "pipe").setOrigin(0, 0);
+      const upperPipe = this.pipes.create(0, 0, "pipe").setImmovable(true).setOrigin(0, 1);
+      const lowerPipe = this.pipes.create(0, 0, "pipe").setImmovable(true).setOrigin(0, 0);
       this.placePipe(upperPipe, lowerPipe);
     }
     this.pipes.setVelocityX(-200);
@@ -85,11 +85,11 @@ class PlayScene extends Phaser.Scene {
 
   recyclePipes() {
     const tempPipes = [];
-    pipes.getChildren().forEach((pipe) => {
+    this.pipes.getChildren().forEach((pipe) => {
       if (pipe.getBounds().right <= 0) {
         tempPipes.push(pipe);
         if (tempPipes.length === 2) {
-          placePipe(...tempPipes);
+          this.placePipe(...tempPipes);
         }
       }
     });
@@ -104,9 +104,11 @@ class PlayScene extends Phaser.Scene {
   }
 
   gameOver() {
-    this.bird.x = this.config.startPosition.x;
-    this.bird.y = this.config.startPosition.y;
-    this.bird.body.velocity.y = 0;
+    // this.bird.x = this.config.startPosition.x;
+    // this.bird.y = this.config.startPosition.y;
+    // this.bird.body.velocity.y = 0;
+    this.physics.pause();
+    this.bird.setTint(0xee4824);
   }
 
   flap() {
