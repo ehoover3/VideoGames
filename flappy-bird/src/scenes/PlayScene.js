@@ -27,13 +27,13 @@ class PlayScene extends BaseScene {
       },
       hard: {
         pipeHorizontalDistanceRange: [250, 310],
-        pipeVerticalDistanceRange: [120, 150],
+        pipeVerticalDistanceRange: [50, 100],
       },
     };
   }
 
   create() {
-    this.currentDifficulty = "hard";
+    this.currentDifficulty = "easy";
     super.create();
     this.createBird();
     this.createPipes();
@@ -135,10 +135,11 @@ class PlayScene extends BaseScene {
   }
 
   placePipe(upperPipe, lowerPipe) {
+    const difficulty = this.difficulties[this.currentDifficulty];
     const rightMostX = this.getRightMostPipe();
-    const pipeVerticalDistance = Phaser.Math.Between(...this.pipeVerticalDistanceRange);
+    const pipeVerticalDistance = Phaser.Math.Between(...difficulty.pipeVerticalDistanceRange);
     const pipeVerticalPosition = Phaser.Math.Between(0 + 20, this.config.height - 20 - pipeVerticalDistance);
-    const pipeHorizontalDistance = Phaser.Math.Between(...this.pipeHorizontalDistanceRange);
+    const pipeHorizontalDistance = Phaser.Math.Between(...difficulty.pipeHorizontalDistanceRange);
 
     upperPipe.x = rightMostX + pipeHorizontalDistance;
     upperPipe.y = pipeVerticalPosition;
@@ -156,9 +157,20 @@ class PlayScene extends BaseScene {
           this.placePipe(...tempPipes);
           this.increaseScore();
           this.saveBestScore();
+          this.increaseDifficulty();
         }
       }
     });
+  }
+
+  increaseDifficulty() {
+    if (this.score === 1) {
+      this.currentDifficulty = "normal";
+    }
+
+    if (this.score === 1) {
+      this.currentDifficulty = "hard";
+    }
   }
 
   getRightMostPipe() {
