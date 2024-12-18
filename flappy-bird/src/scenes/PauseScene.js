@@ -19,19 +19,21 @@ class PauseScene extends BaseScene {
     const textGO = menuItem.textGO;
     textGO.setInteractive();
 
-    textGO("pointerover", () => {
-      textGO.setStyle({ fill: "$ff0" });
+    textGO.on("pointerover", () => {
+      textGO.setStyle({ fill: "#ff0" });
     });
 
-    textGO("pointerout", () => {
-      textGO.setStyle({ fill: "$fff" });
+    textGO.on("pointerout", () => {
+      textGO.setStyle({ fill: "#fff" });
     });
 
-    textGO("pointerup", () => {
+    textGO.on("pointerup", () => {
       if (menuItem.scene && menuItem.text === "Continue") {
+        // Shutting down the Pause Scene and resuming the Play Scene
         this.scene.stop();
         this.scene.resume(menuItem.scene);
       } else {
+        // Shutting PlayScene, PauseScene and running Menu
         this.scene.stop("PlayScene");
         this.scene.start(menuItem.scene);
       }
