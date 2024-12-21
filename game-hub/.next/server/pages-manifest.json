@@ -1,10 +1,7 @@
 {
-  "/dinoRun": "pages/dinoRun.html",
-  "/_error": "pages/_error.js",
   "/_app": "pages/_app.js",
-  "/": "pages/index.html",
-  "/3003-guessTheNumber": "pages/3003-guessTheNumber.html",
-  "/flappyBird": "pages/flappyBird.html",
+  "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/404": "pages/404.html"
+  "/flappyBird": "pages/flappyBird.js",
+  "/": "pages/index.js"
 }

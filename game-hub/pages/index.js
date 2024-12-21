@@ -16,8 +16,8 @@ export default function Home() {
           </Link>
         </li>
         <li>
-          <Link href='/3003-guessTheNumber' className='text-blue-500 underline'>
-            Play Guess the Number
+          <Link href='/platformer' className='text-blue-500 underline'>
+            Play Platformer
           </Link>
         </li>
       </ul>
