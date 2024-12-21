@@ -27,10 +27,20 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
+    "/dinoRun": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/dinoRun.js"
+    ],
     "/flappyBird": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
       "static/chunks/pages/flappyBird.js"
+    ],
+    "/platformer": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/platformer.js"
     ]
   },
   "ampFirstPages": []
