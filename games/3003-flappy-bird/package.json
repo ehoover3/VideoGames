@@ -1,5 +1,5 @@
 {
-  "name": "video-games",
+  "name": "phaser-webpack-boilerplate",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,7 +8,7 @@
     "build": "webpack --config webpack.prod.js",
     "dev": "webpack-dev-server --config webpack.common.js --watch"
   },
-  "author": "Eric Hoover",
+  "author": "",
   "license": "ISC",
   "dependencies": {
     "phaser": "^3.24.1",
