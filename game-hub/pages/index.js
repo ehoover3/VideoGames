@@ -6,18 +6,18 @@ export default function Home() {
       <h1 className='text-3xl font-bold mb-6'>🎮 Welcome to the Game Hub</h1>
       <ul className='space-y-4'>
         <li>
-          <Link href='/game1' className='text-blue-500 underline'>
-            Play Game 1
+          <Link href='/flappyBird' className='text-blue-500 underline'>
+            Play Flappy Bird
           </Link>
         </li>
         <li>
-          <Link href='/game2' className='text-blue-500 underline'>
-            Play Game 2
+          <Link href='/dinoRun' className='text-blue-500 underline'>
+            Play Dino Run
           </Link>
         </li>
         <li>
-          <Link href='/game3' className='text-blue-500 underline'>
-            Play Game 3
+          <Link href='/3003-guessTheNumber' className='text-blue-500 underline'>
+            Play Guess the Number
           </Link>
         </li>
       </ul>
