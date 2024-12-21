@@ -15,6 +15,11 @@ export default function Home() {
             Play Game 2
           </Link>
         </li>
+        <li>
+          <Link href='/game3' className='text-blue-500 underline'>
+            Play Game 3
+          </Link>
+        </li>
       </ul>
     </div>
   );

@@ -1,6 +1,6 @@
 import Layout from "../components/Layout";
 
-export default function Game1() {
+export default function Game2() {
   return (
     <Layout>
       <h2 className='text-2xl font-bold mb-4'>Game 2</h2>
