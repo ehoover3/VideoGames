@@ -1,11 +1,34 @@
-import { useRouter } from "next/router";
-import { games } from "../lib/games";
 import Layout from "../components/Layout";
+import { games } from "../lib/games";
 
-export default function GamePage() {
-  const { query } = useRouter();
-  const game = games.find((g) => g.id === query.id);
+// Fetch dynamic paths for static generation
+export async function getStaticPaths() {
+  const paths = games.map((game) => ({
+    params: { id: game.id }, // This needs to match the dynamic part of the route
+  }));
 
+  return {
+    paths,
+    fallback: false, // Show 404 for any paths not in the list
+  };
+}
+
+// Fetch data for a specific game
+export async function getStaticProps({ params }) {
+  const game = games.find((g) => g.id === params.id);
+
+  if (!game) {
+    return {
+      notFound: true, // Return 404 if the game is not found
+    };
+  }
+
+  return {
+    props: { game }, // Pass game data as props to the component
+  };
+}
+
+export default function GamePage({ game }) {
   if (!game) {
     return (
       <Layout>
