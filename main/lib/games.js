@@ -3,7 +3,7 @@ export const games = [
     id: "flappyBird",
     title: "Flappy Bird",
     instructions: "Mouse LeftClick to Flap Up",
-    iframeSrc: "flappybird.videogames.erichoover.org",
+    iframeSrc: "https://flappybird.videogames.erichoover.org",
     width: 800,
     height: 1000,
   },
