@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { games } from "./games";
+import { games } from "../lib/games";
 import Layout from "../components/Layout";
 
 export default function GamePage() {

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { games } from "./games";
+import { games } from "../lib/games";
 
 export default function Home() {
   return (
