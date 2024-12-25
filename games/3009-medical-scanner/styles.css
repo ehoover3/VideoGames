@@ -21,8 +21,8 @@ body {
     border-radius: 10px;
 }
 
-.body-skin,
-.body-bones {
+.body-clothed-view,
+.body-organs-view {
     position: absolute;
     top: 0;
     left: 0;
@@ -30,12 +30,12 @@ body {
     height: 100%;
 }
 
-.body-skin {
+.body-clothed-view {
     background: url("person.png") no-repeat center/cover;
     z-index: 1;
 }
 
-.body-bones {
+.body-organs-view {
     background: url("organs.png") no-repeat center/cover;
     z-index: 0;
     opacity: 0;

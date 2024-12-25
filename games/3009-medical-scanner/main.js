@@ -1,20 +1,26 @@
 const scanner = document.querySelector(".scanner");
-const bodySkin = document.querySelector(".body-skin");
-const bodyBones = document.querySelector(".body-bones");
+const patientClothedView = document.querySelector(".body-clothed-view");
+const patientOrgansView = document.querySelector(".body-organs-view");
+
 const startButton = document.querySelector(".start-button");
 const resetButton = document.querySelector(".reset-button");
 const progressBar = document.querySelector(".progress-bar");
 const progressLabel = document.querySelector(".progress-label");
 
-let isDragging = false;
+{
+  /* <div class="body-organs"></div>
+<div class="body-clothed"></div> */
+}
+
 let isScanning = false;
+let isDragging = false;
 let maxProgress = 0;
 
 // HELPER FUNCTIONS
 function startScan() {
   if (isScanning) return;
   isScanning = true;
-  bodyBones.style.opacity = 1;
+  patientOrgansView.style.opacity = 1;
   startButton.textContent = "SCAN RUNNING";
   startButton.classList.add("disabled");
   resetButton.disabled = true;
@@ -25,8 +31,8 @@ function startScan() {
 }
 
 function moveMachineScanWindow(scannerTop, scannerBottom) {
-  bodySkin.style.clipPath = `polygon(0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%)`;
-  bodyBones.style.clipPath = `inset(${scannerTop}px 0 ${bodySkin.offsetHeight - scannerBottom}px 0)`;
+  patientClothedView.style.clipPath = `polygon(0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%)`;
+  patientOrgansView.style.clipPath = `inset(${scannerTop}px 0 ${patientClothedView.offsetHeight - scannerBottom}px 0)`;
 }
 
 function updateProgressBar(scannerTop, scannerBottom) {
@@ -50,7 +56,7 @@ function handleScanComplete() {
 }
 
 function resetScan() {
-  bodyBones.style.opacity = 0;
+  patientOrgansView.style.opacity = 0;
   startButton.textContent = "START SCAN";
   startButton.classList.remove("disabled");
   resetButton.disabled = true;
@@ -84,7 +90,11 @@ function setCursorStyle(element, style) {
 }
 
 // EVENT LISTENERS
+startButton.addEventListener("click", startScan);
+resetButton.addEventListener("click", resetScan);
+
 scanner.addEventListener("mousedown", () => {
+  startScan();
   if (!isScanning && maxProgress < 100) return;
   isDragging = true;
   setCursorStyle(scanner, "grabbing");
@@ -101,6 +111,3 @@ document.addEventListener("mouseup", () => {
   isDragging = false;
   setCursorStyle(scanner, "grab");
 });
-
-startButton.addEventListener("click", startScan);
-resetButton.addEventListener("click", resetScan);
