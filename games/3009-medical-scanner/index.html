@@ -23,103 +23,125 @@
     </div>
 
     <script>
-      const scanner = document.querySelector(".scanner");
-      const bodySkin = document.querySelector(".body-skin");
-      const bodyBones = document.querySelector(".body-bones");
-      const startButton = document.querySelector(".start-button");
-      const resetButton = document.querySelector(".reset-button");
-      const progressBar = document.querySelector(".progress-bar");
-      const progressLabel = document.querySelector(".progress-label");
+      const elements = {
+        scanner: document.querySelector(".scanner"),
+        bodySkin: document.querySelector(".body-skin"),
+        bodyBones: document.querySelector(".body-bones"),
+        startButton: document.querySelector(".start-button"),
+        resetButton: document.querySelector(".reset-button"),
+        progressBar: document.querySelector(".progress-bar"),
+        progressLabel: document.querySelector(".progress-label"),
+        container: document.querySelector(".container"),
+      };
 
-      let isDragging = false;
-      let isScanning = false;
-      let maxProgress = 0;
+      let state = {
+        isDragging: false,
+        isScanning: false,
+        maxProgress: 0,
+      };
 
+      // Event listeners
+      elements.startButton.addEventListener("click", startScan);
+      elements.resetButton.addEventListener("click", resetScan);
+      elements.scanner.addEventListener("mousedown", startDragging);
+      document.addEventListener("mouseup", stopDragging);
+      document.addEventListener("mousemove", onMouseMove);
+
+      // Function to start the scan
       function startScan() {
-        if (isScanning) return;
-        isScanning = true;
-        bodyBones.style.opacity = 1;
-        startButton.textContent = "SCAN RUNNING";
-        startButton.classList.add("disabled");
-        resetButton.disabled = true;
-        progressBar.style.width = "0";
-        progressLabel.textContent = "0%";
-        maxProgress = 0;
-        moveScanRectangle(0, scanner.offsetHeight);
+        if (state.isScanning) return;
+
+        state.isScanning = true;
+        elements.bodyBones.style.opacity = 1;
+        elements.startButton.textContent = "SCAN RUNNING";
+        elements.startButton.classList.add("disabled");
+        elements.resetButton.disabled = true;
+
+        resetProgress();
+        moveScanRectangle(0, elements.scanner.offsetHeight);
       }
 
+      // Function to move the scanning rectangle
       function moveScanRectangle(scannerTop, scannerBottom) {
-        bodySkin.style.clipPath = `polygon(0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%)`;
-        bodyBones.style.clipPath = `inset(${scannerTop}px 0 ${bodySkin.offsetHeight - scannerBottom}px 0)`;
+        elements.bodySkin.style.clipPath = `polygon(0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%)`;
+        elements.bodyBones.style.clipPath = `inset(${scannerTop}px 0 ${elements.bodySkin.offsetHeight - scannerBottom}px 0)`;
       }
 
+      // Function to update the progress bar
       function updateProgress(scannerTop, scannerBottom) {
-        const container = document.querySelector(".container");
-        const progress = Math.min(100, (scannerBottom / container.clientHeight) * 100);
-        if (progress > maxProgress) {
-          maxProgress = progress;
-          progressBar.style.width = `${maxProgress}%`;
-          progressLabel.textContent = `${Math.round(maxProgress)}%`;
+        const progress = Math.min(100, (scannerBottom / elements.container.clientHeight) * 100);
+        if (progress > state.maxProgress) {
+          state.maxProgress = progress;
+          elements.progressBar.style.width = `${state.maxProgress}%`;
+          elements.progressLabel.textContent = `${Math.round(state.maxProgress)}%`;
         }
-        if (maxProgress >= 100) {
+        if (state.maxProgress >= 100) {
           handleScanComplete();
         }
       }
 
+      // Function to handle the scan completion
       function handleScanComplete() {
-        startButton.textContent = "SCAN COMPLETE";
-        startButton.classList.add("disabled");
-        resetButton.disabled = false;
-        isScanning = false;
+        elements.startButton.textContent = "SCAN COMPLETE";
+        elements.startButton.classList.add("disabled");
+        elements.resetButton.disabled = false;
+        state.isScanning = false;
       }
 
+      // Function to reset the scan
       function resetScan() {
-        bodyBones.style.opacity = 0;
-        startButton.textContent = "START SCAN";
-        startButton.classList.remove("disabled");
-        resetButton.disabled = true;
-        progressBar.style.width = "0";
-        progressLabel.textContent = "0%";
-        maxProgress = 0;
-        isScanning = false;
+        elements.bodyBones.style.opacity = 0;
+        elements.startButton.textContent = "START SCAN";
+        elements.startButton.classList.remove("disabled");
+        elements.resetButton.disabled = true;
+
+        resetProgress();
+        state.isScanning = false;
       }
 
+      // Reset progress-related elements
+      function resetProgress() {
+        elements.progressBar.style.width = "0";
+        elements.progressLabel.textContent = "0%";
+        state.maxProgress = 0;
+      }
+
+      // Function to calculate the scanner's position
       function calculateScannerPosition(e) {
-        const container = document.querySelector(".container");
-        const rect = container.getBoundingClientRect();
+        const rect = elements.container.getBoundingClientRect();
         const containerHeight = rect.height;
-        const scannerHeight = scanner.offsetHeight;
+        const scannerHeight = elements.scanner.offsetHeight;
         let scannerPositionY = e.clientY - rect.top - scannerHeight / 2;
         scannerPositionY = Math.max(0, Math.min(scannerPositionY, containerHeight - scannerHeight));
-        scanner.style.top = `${scannerPositionY}px`;
+        elements.scanner.style.top = `${scannerPositionY}px`;
         return {
           scannerTop: scannerPositionY,
           scannerBottom: scannerPositionY + scannerHeight,
         };
       }
 
-      scanner.addEventListener("mousedown", () => {
-        if (!isScanning && maxProgress < 100) return;
-        isDragging = true;
-        scanner.style.cursor = "grabbing";
-      });
+      // Start dragging the scanner
+      function startDragging() {
+        if (!state.isScanning && state.maxProgress < 100) return;
+        state.isDragging = true;
+        elements.scanner.style.cursor = "grabbing";
+      }
 
-      document.addEventListener("mouseup", () => {
-        isDragging = false;
-        scanner.style.cursor = "grab";
-      });
+      // Stop dragging the scanner
+      function stopDragging() {
+        state.isDragging = false;
+        elements.scanner.style.cursor = "grab";
+      }
 
-      document.addEventListener("mousemove", (e) => {
-        if (!isDragging) return;
+      // Handle mouse movements during dragging
+      function onMouseMove(e) {
+        if (!state.isDragging) return;
         const { scannerTop, scannerBottom } = calculateScannerPosition(e);
         moveScanRectangle(scannerTop, scannerBottom);
-        if (isScanning) {
+        if (state.isScanning) {
           updateProgress(scannerTop, scannerBottom);
         }
-      });
-
-      startButton.addEventListener("click", startScan);
-      resetButton.addEventListener("click", resetScan);
+      }
     </script>
   </body>
 </html>
