@@ -17,10 +17,10 @@
 
       .container {
         position: relative;
-        width: 300px; /* Width of the body image */
-        height: 600px; /* Height of the body image */
+        width: 300px;
+        height: 600px;
         overflow: hidden;
-        background: #ddd; /* Fallback background color */
+        background: #ddd;
       }
 
       .body-skin {
@@ -29,7 +29,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: url("person.png") no-repeat center/cover; /* Replace with the body skin image */
+        background: url("person.png") no-repeat center/cover;
         z-index: 1;
       }
 
@@ -39,16 +39,18 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: url("organs.png") no-repeat center/cover; /* Replace with the bones image */
+        background: url("organs.png") no-repeat center/cover;
         z-index: 0;
+        opacity: 0;
+        clip-path: inset(0 0 0 0);
       }
 
       .scanner {
         position: absolute;
-        width: 300px; /* Same width as the container */
-        height: 100px; /* Height of the scanning rectangle */
+        width: 300px;
+        height: 100px;
         border: 3px dashed purple;
-        background-color: rgba(255, 255, 255, 0.3); /* Semi-transparent white for the scanning area */
+        background-color: rgba(255, 255, 255, 0.3);
         z-index: 2;
         cursor: grab;
       }
@@ -86,40 +88,59 @@
       const scanner = document.querySelector(".scanner");
       const bodySkin = document.querySelector(".body-skin");
       const bodyBones = document.querySelector(".body-bones");
+      const startButton = document.querySelector(".start-button");
 
       let isDragging = false;
+      let isScanning = false;
 
-      // Mouse down to start dragging
       scanner.addEventListener("mousedown", () => {
+        if (!isScanning) return;
         isDragging = true;
         scanner.style.cursor = "grabbing";
       });
 
-      // Mouse up to stop dragging
       document.addEventListener("mouseup", () => {
         isDragging = false;
         scanner.style.cursor = "grab";
       });
 
-      // Mouse move to drag the scanner
       document.addEventListener("mousemove", (e) => {
-        if (!isDragging) return;
+        if (!isDragging || !isScanning) return;
 
         const container = document.querySelector(".container");
         const rect = container.getBoundingClientRect();
 
-        // Calculate the scanner's vertical position within the container bounds
         let y = e.clientY - rect.top - scanner.offsetHeight / 2;
         y = Math.max(0, Math.min(y, rect.height - scanner.offsetHeight));
 
-        // Move the scanner
         scanner.style.top = `${y}px`;
 
-        // Reveal the bones beneath the scanner by adjusting the clip-path
         const scannerTop = y;
         const scannerBottom = y + scanner.offsetHeight;
 
         bodySkin.style.clipPath = `polygon(0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%)`;
+
+        bodyBones.style.clipPath = `inset(${scannerTop}px 0 ${rect.height - scannerBottom}px 0)`;
+      });
+
+      startButton.addEventListener("click", () => {
+        if (isScanning) return;
+
+        isScanning = true;
+
+        bodyBones.style.opacity = 1;
+
+        startButton.textContent = "SCAN RUNNING";
+
+        startButton.disabled = true;
+
+        scanner.style.pointerEvents = "auto";
+
+        scanner.style.top = "0px";
+
+        bodySkin.style.clipPath = `polygon(0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%)`;
+
+        bodyBones.style.clipPath = "inset(0 0 0 0)";
       });
     </script>
   </body>
