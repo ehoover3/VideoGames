@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -98,23 +98,13 @@
         border-radius: 10px;
         overflow: hidden;
         margin-top: 15px;
-        position: relative;
       }
 
       .progress-bar {
+        width: 0;
         height: 100%;
         background-color: #4caf50;
         transition: width 0.2s ease;
-      }
-
-      .progress-label {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 14px;
-        font-weight: bold;
-        color: #000;
       }
     </style>
   </head>
@@ -130,7 +120,6 @@
       <button class="reset-button" aria-label="Reset the game" disabled>RESET</button>
       <div class="progress-bar-container">
         <div class="progress-bar"></div>
-        <div class="progress-label">0%</div>
       </div>
     </div>
 
@@ -141,7 +130,6 @@
       const startButton = document.querySelector(".start-button");
       const resetButton = document.querySelector(".reset-button");
       const progressBar = document.querySelector(".progress-bar");
-      const progressLabel = document.querySelector(".progress-label");
 
       let isDragging = false;
       let isScanning = false;
@@ -205,9 +193,6 @@
           maxProgress = progress;
           progressBar.style.width = `${maxProgress}%`;
 
-          // Update the progress label
-          progressLabel.textContent = `${Math.round(maxProgress)}%`;
-
           // Complete scan when progress reaches 100%
           if (maxProgress >= 100) {
             alert("Scan Complete!");
@@ -231,7 +216,6 @@
 
         // Reset progress bar and maxProgress
         progressBar.style.width = "0";
-        progressLabel.textContent = "0%";
         maxProgress = 0;
 
         // Reset clip-path
@@ -245,7 +229,6 @@
         startButton.classList.remove("disabled");
         resetButton.disabled = true;
         progressBar.style.width = "0";
-        progressLabel.textContent = "0%";
         maxProgress = 0;
         isScanning = false;
         scanner.style.top = "0px";
@@ -253,4 +236,4 @@
       });
     </script>
   </body>
-</html>
+</html> -->
