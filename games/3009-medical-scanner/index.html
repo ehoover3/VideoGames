@@ -4,121 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Medical Scanning Game</title>
-    <style>
-      body {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        background-color: #f0f0f0;
-        overflow: hidden;
-        font-family: Arial, sans-serif;
-      }
-
-      .container {
-        position: relative;
-        width: 300px;
-        height: 600px;
-        overflow: hidden;
-        background: #ddd;
-        border: 2px solid #ccc;
-        border-radius: 10px;
-      }
-
-      .body-skin,
-      .body-bones {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-      }
-
-      .body-skin {
-        background: url("person.png") no-repeat center/cover;
-        z-index: 1;
-      }
-
-      .body-bones {
-        background: url("organs.png") no-repeat center/cover;
-        z-index: 0;
-        opacity: 0;
-        clip-path: inset(0 0 0 0);
-        transition: opacity 0.5s ease;
-      }
-
-      .scanner {
-        position: absolute;
-        width: 300px;
-        height: 100px;
-        border: 3px dashed purple;
-        background-color: rgba(255, 255, 255, 0.3);
-        z-index: 2;
-        cursor: grab;
-        transition: height 0.3s ease;
-      }
-
-      .controls {
-        margin-top: 20px;
-        text-align: center;
-      }
-
-      .start-button,
-      .reset-button {
-        padding: 10px 20px;
-        font-size: 16px;
-        font-weight: bold;
-        color: white;
-        background-color: #4caf50;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        box-shadow: 0 4px #2e7d32;
-        transition: all 0.2s ease;
-        margin: 5px;
-      }
-
-      .start-button:active,
-      .reset-button:active {
-        box-shadow: 0 2px #2e7d32;
-        transform: translateY(2px);
-      }
-
-      .start-button.disabled {
-        background-color: #a5d6a7;
-        cursor: not-allowed;
-      }
-
-      .progress-bar-container {
-        width: 300px;
-        height: 20px;
-        background-color: #ccc;
-        border-radius: 10px;
-        overflow: hidden;
-        margin-top: 15px;
-        position: relative;
-      }
-
-      .progress-bar {
-        width: 0;
-        height: 100%;
-        background-color: #4caf50;
-        transition: width 0.2s ease;
-        position: absolute;
-      }
-
-      .progress-label {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: white;
-        font-size: 14px;
-        font-weight: bold;
-      }
-    </style>
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="container">
@@ -159,7 +45,12 @@
         progressBar.style.width = "0";
         progressLabel.textContent = "0%";
         maxProgress = 0;
-        updateClipPath(0, scanner.offsetHeight);
+        moveScanRectangle(0, scanner.offsetHeight);
+      }
+
+      function moveScanRectangle(scannerTop, scannerBottom) {
+        bodySkin.style.clipPath = `polygon(0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%)`;
+        bodyBones.style.clipPath = `inset(${scannerTop}px 0 ${bodySkin.offsetHeight - scannerBottom}px 0)`;
       }
 
       function updateProgress(scannerTop, scannerBottom) {
@@ -193,9 +84,18 @@
         isScanning = false;
       }
 
-      function updateClipPath(scannerTop, scannerBottom) {
-        bodySkin.style.clipPath = `polygon(0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%)`;
-        bodyBones.style.clipPath = `inset(${scannerTop}px 0 ${bodySkin.offsetHeight - scannerBottom}px 0)`;
+      function calculateScannerPosition(e) {
+        const container = document.querySelector(".container");
+        const rect = container.getBoundingClientRect();
+        const containerHeight = rect.height;
+        const scannerHeight = scanner.offsetHeight;
+        let scannerPositionY = e.clientY - rect.top - scannerHeight / 2;
+        scannerPositionY = Math.max(0, Math.min(scannerPositionY, containerHeight - scannerHeight));
+        scanner.style.top = `${scannerPositionY}px`;
+        return {
+          scannerTop: scannerPositionY,
+          scannerBottom: scannerPositionY + scannerHeight,
+        };
       }
 
       scanner.addEventListener("mousedown", () => {
@@ -211,14 +111,8 @@
 
       document.addEventListener("mousemove", (e) => {
         if (!isDragging) return;
-        const container = document.querySelector(".container");
-        const rect = container.getBoundingClientRect();
-        let y = e.clientY - rect.top - scanner.offsetHeight / 2;
-        y = Math.max(0, Math.min(y, rect.height - scanner.offsetHeight));
-        scanner.style.top = `${y}px`;
-        const scannerTop = y;
-        const scannerBottom = y + scanner.offsetHeight;
-        updateClipPath(scannerTop, scannerBottom);
+        const { scannerTop, scannerBottom } = calculateScannerPosition(e);
+        moveScanRectangle(scannerTop, scannerBottom);
         if (isScanning) {
           updateProgress(scannerTop, scannerBottom);
         }

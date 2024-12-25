@@ -147,17 +147,71 @@
 
       let isDragging = false;
       let isScanning = false;
-      let scanProgress = 0;
       let maxProgress = 0;
-      let scanInterval;
 
-      // Function to update the clip-path for body parts
-      function updateClipPath(scannerTop, scannerBottom) {
+      function startScan() {
+        if (isScanning) return;
+        isScanning = true;
+        bodyBones.style.opacity = 1;
+        startButton.textContent = "SCAN RUNNING";
+        startButton.classList.add("disabled");
+        resetButton.disabled = true;
+        progressBar.style.width = "0";
+        progressLabel.textContent = "0%";
+        maxProgress = 0;
+        moveScanRectangle(0, scanner.offsetHeight);
+      }
+
+      function moveScanRectangle(scannerTop, scannerBottom) {
         bodySkin.style.clipPath = `polygon(0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%)`;
         bodyBones.style.clipPath = `inset(${scannerTop}px 0 ${bodySkin.offsetHeight - scannerBottom}px 0)`;
       }
 
-      // Mouse event listeners for scanning
+      function updateProgress(scannerTop, scannerBottom) {
+        const container = document.querySelector(".container");
+        const progress = Math.min(100, (scannerBottom / container.clientHeight) * 100);
+        if (progress > maxProgress) {
+          maxProgress = progress;
+          progressBar.style.width = `${maxProgress}%`;
+          progressLabel.textContent = `${Math.round(maxProgress)}%`;
+        }
+        if (maxProgress >= 100) {
+          handleScanComplete();
+        }
+      }
+
+      function handleScanComplete() {
+        startButton.textContent = "SCAN COMPLETE";
+        startButton.classList.add("disabled");
+        resetButton.disabled = false;
+        isScanning = false;
+      }
+
+      function resetScan() {
+        bodyBones.style.opacity = 0;
+        startButton.textContent = "START SCAN";
+        startButton.classList.remove("disabled");
+        resetButton.disabled = true;
+        progressBar.style.width = "0";
+        progressLabel.textContent = "0%";
+        maxProgress = 0;
+        isScanning = false;
+      }
+
+      function calculateScannerPosition(e) {
+        const container = document.querySelector(".container");
+        const rect = container.getBoundingClientRect();
+        const containerHeight = rect.height;
+        const scannerHeight = scanner.offsetHeight;
+        let scannerPositionY = e.clientY - rect.top - scannerHeight / 2;
+        scannerPositionY = Math.max(0, Math.min(scannerPositionY, containerHeight - scannerHeight));
+        scanner.style.top = `${scannerPositionY}px`;
+        return {
+          scannerTop: scannerPositionY,
+          scannerBottom: scannerPositionY + scannerHeight,
+        };
+      }
+
       scanner.addEventListener("mousedown", () => {
         if (!isScanning && maxProgress < 100) return;
         isDragging = true;
@@ -171,74 +225,15 @@
 
       document.addEventListener("mousemove", (e) => {
         if (!isDragging) return;
-
-        const container = document.querySelector(".container");
-        const rect = container.getBoundingClientRect();
-
-        let y = e.clientY - rect.top - scanner.offsetHeight / 2;
-        y = Math.max(0, Math.min(y, rect.height - scanner.offsetHeight));
-
-        scanner.style.top = `${y}px`;
-
-        const scannerTop = y;
-        const scannerBottom = y + scanner.offsetHeight;
-
-        // Update the body parts' clip-path
-        updateClipPath(scannerTop, scannerBottom);
-
-        // Only calculate progress if the scan is running
+        const { scannerTop, scannerBottom } = calculateScannerPosition(e);
+        moveScanRectangle(scannerTop, scannerBottom);
         if (isScanning) {
-          const progress = Math.min(100, (scannerBottom / container.clientHeight) * 100);
-
-          // Update maxProgress and progress bar
-          if (progress > maxProgress) {
-            maxProgress = progress;
-            progressBar.style.width = `${maxProgress}%`;
-
-            // Update the progress label
-            progressLabel.textContent = `${Math.round(maxProgress)}%`;
-
-            // Complete scan when progress reaches 100%
-            if (maxProgress >= 100) {
-              startButton.textContent = "SCAN COMPLETE"; // Change button text
-              startButton.classList.add("disabled");
-              resetButton.disabled = false;
-              isScanning = false;
-            }
-          }
+          updateProgress(scannerTop, scannerBottom);
         }
       });
 
-      // Start scan button
-      startButton.addEventListener("click", () => {
-        if (isScanning) return;
-
-        isScanning = true;
-        bodyBones.style.opacity = 1;
-        startButton.textContent = "SCAN RUNNING";
-        startButton.classList.add("disabled");
-        resetButton.disabled = true;
-
-        // Reset progress bar and maxProgress
-        progressBar.style.width = "0";
-        progressLabel.textContent = "0%";
-        maxProgress = 0;
-
-        // Reset clip-path
-        updateClipPath(0, scanner.offsetHeight);
-      });
-
-      // Reset button
-      resetButton.addEventListener("click", () => {
-        bodyBones.style.opacity = 0;
-        startButton.textContent = "START SCAN";
-        startButton.classList.remove("disabled");
-        resetButton.disabled = true;
-        progressBar.style.width = "0";
-        progressLabel.textContent = "0%";
-        maxProgress = 0;
-        isScanning = false;
-      });
+      startButton.addEventListener("click", startScan);
+      resetButton.addEventListener("click", resetScan);
     </script>
   </body>
 </html>
