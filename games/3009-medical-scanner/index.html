@@ -149,32 +149,39 @@
       let isScanning = false;
       let maxProgress = 0;
 
-      // Function to update the clip-path for body parts
-      function updateClipPath(scannerTop, scannerBottom) {
-        bodySkin.style.clipPath = `polygon(0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%)`;
-        bodyBones.style.clipPath = `inset(${scannerTop}px 0 ${bodySkin.offsetHeight - scannerBottom}px 0)`;
-      }
-
-      // Function to start the scan
       function startScan() {
         if (isScanning) return;
-
         isScanning = true;
         bodyBones.style.opacity = 1;
         startButton.textContent = "SCAN RUNNING";
         startButton.classList.add("disabled");
         resetButton.disabled = true;
-
-        // Reset progress bar and maxProgress
         progressBar.style.width = "0";
         progressLabel.textContent = "0%";
         maxProgress = 0;
-
-        // Reset clip-path
         updateClipPath(0, scanner.offsetHeight);
       }
 
-      // Function to reset the scan
+      function updateProgress(scannerTop, scannerBottom) {
+        const container = document.querySelector(".container");
+        const progress = Math.min(100, (scannerBottom / container.clientHeight) * 100);
+        if (progress > maxProgress) {
+          maxProgress = progress;
+          progressBar.style.width = `${maxProgress}%`;
+          progressLabel.textContent = `${Math.round(maxProgress)}%`;
+        }
+        if (maxProgress >= 100) {
+          handleScanComplete();
+        }
+      }
+
+      function handleScanComplete() {
+        startButton.textContent = "SCAN COMPLETE";
+        startButton.classList.add("disabled");
+        resetButton.disabled = false;
+        isScanning = false;
+      }
+
       function resetScan() {
         bodyBones.style.opacity = 0;
         startButton.textContent = "START SCAN";
@@ -186,31 +193,11 @@
         isScanning = false;
       }
 
-      // Function to update progress
-      function updateProgress(scannerTop, scannerBottom) {
-        const container = document.querySelector(".container");
-        const progress = Math.min(100, (scannerBottom / container.clientHeight) * 100);
-
-        if (progress > maxProgress) {
-          maxProgress = progress;
-          progressBar.style.width = `${maxProgress}%`;
-          progressLabel.textContent = `${Math.round(maxProgress)}%`;
-        }
-
-        if (maxProgress >= 100) {
-          handleScanComplete();
-        }
+      function updateClipPath(scannerTop, scannerBottom) {
+        bodySkin.style.clipPath = `polygon(0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%)`;
+        bodyBones.style.clipPath = `inset(${scannerTop}px 0 ${bodySkin.offsetHeight - scannerBottom}px 0)`;
       }
 
-      // Function to handle scan completion
-      function handleScanComplete() {
-        startButton.textContent = "SCAN COMPLETE"; // Change button text
-        startButton.classList.add("disabled");
-        resetButton.disabled = false;
-        isScanning = false;
-      }
-
-      // Mouse event listeners for scanning
       scanner.addEventListener("mousedown", () => {
         if (!isScanning && maxProgress < 100) return;
         isDragging = true;
@@ -224,30 +211,20 @@
 
       document.addEventListener("mousemove", (e) => {
         if (!isDragging) return;
-
         const container = document.querySelector(".container");
         const rect = container.getBoundingClientRect();
         let y = e.clientY - rect.top - scanner.offsetHeight / 2;
         y = Math.max(0, Math.min(y, rect.height - scanner.offsetHeight));
-
         scanner.style.top = `${y}px`;
-
         const scannerTop = y;
         const scannerBottom = y + scanner.offsetHeight;
-
-        // Update the body parts' clip-path
         updateClipPath(scannerTop, scannerBottom);
-
-        // Only calculate progress if the scan is running
         if (isScanning) {
           updateProgress(scannerTop, scannerBottom);
         }
       });
 
-      // Start scan button
       startButton.addEventListener("click", startScan);
-
-      // Reset button
       resetButton.addEventListener("click", resetScan);
     </script>
   </body>
