@@ -1,4 +1,4 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -98,6 +98,7 @@
         border-radius: 10px;
         overflow: hidden;
         margin-top: 15px;
+        position: relative;
       }
 
       .progress-bar {
@@ -105,6 +106,17 @@
         height: 100%;
         background-color: #4caf50;
         transition: width 0.2s ease;
+        position: absolute;
+      }
+
+      .progress-label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
       }
     </style>
   </head>
@@ -120,6 +132,7 @@
       <button class="reset-button" aria-label="Reset the game" disabled>RESET</button>
       <div class="progress-bar-container">
         <div class="progress-bar"></div>
+        <div class="progress-label">0%</div>
       </div>
     </div>
 
@@ -130,25 +143,13 @@
       const startButton = document.querySelector(".start-button");
       const resetButton = document.querySelector(".reset-button");
       const progressBar = document.querySelector(".progress-bar");
+      const progressLabel = document.querySelector(".progress-label");
 
       let isDragging = false;
       let isScanning = false;
-      let maxProgress = 0; // Track the maximum progress achieved
-
-      let containerHeight;
-      let scannerHeight;
-
-      document.addEventListener("DOMContentLoaded", () => {
-        const container = document.querySelector(".container");
-        containerHeight = container.offsetHeight;
-        scannerHeight = scanner.offsetHeight;
-
-        // Ensure the scanner starts at the top
-        scanner.style.top = "0px";
-
-        // Initial clip-path setup
-        updateClipPath(0, scannerHeight);
-      });
+      let scanProgress = 0;
+      let maxProgress = 0;
+      let scanInterval;
 
       // Function to update the clip-path for body parts
       function updateClipPath(scannerTop, scannerBottom) {
@@ -158,7 +159,7 @@
 
       // Mouse event listeners for scanning
       scanner.addEventListener("mousedown", () => {
-        if (!isScanning) return;
+        if (!isScanning && maxProgress < 100) return;
         isDragging = true;
         scanner.style.cursor = "grabbing";
       });
@@ -169,7 +170,7 @@
       });
 
       document.addEventListener("mousemove", (e) => {
-        if (!isDragging || !isScanning) return;
+        if (!isDragging) return;
 
         const container = document.querySelector(".container");
         const rect = container.getBoundingClientRect();
@@ -185,21 +186,25 @@
         // Update the body parts' clip-path
         updateClipPath(scannerTop, scannerBottom);
 
-        // Calculate progress
-        const progress = Math.min(100, (scannerBottom / containerHeight) * 100);
+        // Only calculate progress if the scan is running
+        if (isScanning) {
+          const progress = Math.min(100, (scannerBottom / container.clientHeight) * 100);
 
-        // Update maxProgress and progress bar
-        if (progress > maxProgress) {
-          maxProgress = progress;
-          progressBar.style.width = `${maxProgress}%`;
+          // Update maxProgress and progress bar
+          if (progress > maxProgress) {
+            maxProgress = progress;
+            progressBar.style.width = `${maxProgress}%`;
 
-          // Complete scan when progress reaches 100%
-          if (maxProgress >= 100) {
-            alert("Scan Complete!");
-            resetButton.disabled = false;
-            startButton.textContent = "SCAN COMPLETE";
-            startButton.classList.add("disabled");
-            isScanning = false;
+            // Update the progress label
+            progressLabel.textContent = `${Math.round(maxProgress)}%`;
+
+            // Complete scan when progress reaches 100%
+            if (maxProgress >= 100) {
+              startButton.textContent = "SCAN COMPLETE"; // Change button text
+              startButton.classList.add("disabled");
+              resetButton.disabled = false;
+              isScanning = false;
+            }
           }
         }
       });
@@ -216,10 +221,11 @@
 
         // Reset progress bar and maxProgress
         progressBar.style.width = "0";
+        progressLabel.textContent = "0%";
         maxProgress = 0;
 
         // Reset clip-path
-        updateClipPath(0, scannerHeight);
+        updateClipPath(0, scanner.offsetHeight);
       });
 
       // Reset button
@@ -229,11 +235,10 @@
         startButton.classList.remove("disabled");
         resetButton.disabled = true;
         progressBar.style.width = "0";
+        progressLabel.textContent = "0%";
         maxProgress = 0;
         isScanning = false;
-        scanner.style.top = "0px";
-        updateClipPath(0, scannerHeight);
       });
     </script>
   </body>
-</html> -->
+</html>
