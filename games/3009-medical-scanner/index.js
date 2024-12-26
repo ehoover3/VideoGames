@@ -1,16 +1,8 @@
-const scanner = document.querySelector(".scanner");
-const patientClothedView = document.querySelector(".body-clothed-view");
-const patientOrgansView = document.querySelector(".body-organs-view");
+import { patient, patientClothedView, patientOrgansView, scanner, startButton, resetButton, progressBar, progressLabel } from "./domElements.js";
 
-const startButton = document.querySelector(".start-button");
-const resetButton = document.querySelector(".reset-button");
-const progressBar = document.querySelector(".progress-bar");
-const progressLabel = document.querySelector(".progress-label");
-const patient = document.querySelector(".patient");
-
-const PATIENT = patient.getBoundingClientRect();
-const PATIENT_HEIGHT = PATIENT.height;
-const SCANNER_HEIGHT = scanner.offsetHeight;
+const patientRectangle = patient.getBoundingClientRect();
+const patientHeight = patientRectangle.height;
+const scannerHeight = scanner.offsetHeight;
 
 let isScanning = false;
 let isDragging = false;
@@ -26,6 +18,7 @@ function onStart() {
 }
 
 function onReset() {
+  moveMachineScanWindow(0, 0);
   resetPatientImages();
   resetButtons();
   resetProgressBar();
@@ -61,7 +54,6 @@ function startMachineScanUI() {
   patientOrgansView.style.opacity = 1;
   startButton.textContent = "SCAN RUNNING";
   startButton.classList.add("disabled");
-  resetButton.disabled = true;
 }
 
 function moveMachineScanWindow(scannerTop, scannerBottom) {
@@ -70,8 +62,7 @@ function moveMachineScanWindow(scannerTop, scannerBottom) {
 }
 
 function updateProgressBar(scannerTop, scannerBottom) {
-  const container = document.querySelector(".container");
-  const progress = Math.min(100, (scannerBottom / container.clientHeight) * 100);
+  const progress = Math.min(100, (scannerBottom / patient.clientHeight) * 100);
   if (progress > maxProgress) {
     maxProgress = progress;
     progressBar.style.width = `${maxProgress}%`;
@@ -85,28 +76,23 @@ function updateProgressBar(scannerTop, scannerBottom) {
 function handleScanComplete() {
   startButton.textContent = "SCAN COMPLETE";
   startButton.classList.add("disabled");
-  resetButton.disabled = false;
   isScanning = false;
 }
 
 function calculateScannerPosition(e) {
-  let scannerPositionY = e.clientY - PATIENT.top - SCANNER_HEIGHT / 2;
-  console.log("scannerHeight: ", SCANNER_HEIGHT);
-  scannerPositionY = Math.max(0, Math.min(scannerPositionY, PATIENT_HEIGHT - SCANNER_HEIGHT));
+  let scannerPositionY = e.clientY - patientRectangle.top - scannerHeight / 2;
+  scannerPositionY = Math.max(0, Math.min(scannerPositionY, patientHeight - scannerHeight));
   scanner.style.top = `${scannerPositionY}px`;
   return {
     scannerTop: scannerPositionY,
-    scannerBottom: scannerPositionY + SCANNER_HEIGHT,
+    scannerBottom: scannerPositionY + scannerHeight,
   };
 }
 
 function setCursorStyle(element, style) {
-  const validStyles = ["grabbing", "grab"];
-  if (element && validStyles.includes(style)) {
-    element.style.cursor = style;
-  } else {
-    console.warn(`Invalid cursor style: "${style}". Use "grabbing" or "grab" only.`);
-  }
+  const VALID_STYLES = ["grabbing", "grab"];
+  if (element && VALID_STYLES.includes(style)) element.style.cursor = style;
+  else console.warn(`Invalid cursor style: "${style}"`);
 }
 
 function resetPatientImages() {
@@ -116,7 +102,6 @@ function resetPatientImages() {
 function resetButtons() {
   startButton.textContent = "START SCAN";
   startButton.classList.remove("disabled");
-  resetButton.disabled = true;
 }
 
 function resetProgressBar() {
@@ -126,7 +111,7 @@ function resetProgressBar() {
 
 // EVENT LISTENERS
 startButton.addEventListener("click", onStart);
-resetButton.addEventListener("click", onReset);
+resetButton.addEventListener("click", () => onReset());
 scanner.addEventListener("mousedown", () => onMouseDown());
 document.addEventListener("mousemove", (e) => onMouseMove(e));
 document.addEventListener("mouseup", () => onMouseUp());
