@@ -17,12 +17,9 @@ function onStart() {
 }
 
 function onReset() {
-  patientOrgansView.style.opacity = 0;
-  startButton.textContent = "START SCAN";
-  startButton.classList.remove("disabled");
-  resetButton.disabled = true;
-  progressBar.style.width = "0";
-  progressLabel.textContent = "0%";
+  resetPatientImages();
+  resetButtons();
+  resetProgressBar();
   maxProgress = 0;
   isScanning = false;
 }
@@ -30,8 +27,8 @@ function onReset() {
 function onMouseDown() {
   startScan();
   if (!isScanning && maxProgress < 100) return;
-  isDragging = true;
   setCursorStyle(scanner, "grabbing");
+  isDragging = true;
 }
 
 function onMouseMove(e) {
@@ -42,8 +39,8 @@ function onMouseMove(e) {
 }
 
 function onMouseUp() {
-  isDragging = false;
   setCursorStyle(scanner, "grab");
+  isDragging = false;
 }
 
 // HELPER FUNCTIONS
@@ -106,6 +103,21 @@ function setCursorStyle(element, style) {
   } else {
     console.warn(`Invalid cursor style: "${style}". Use "grabbing" or "grab" only.`);
   }
+}
+
+function resetPatientImages() {
+  patientOrgansView.style.opacity = 0;
+}
+
+function resetButtons() {
+  startButton.textContent = "START SCAN";
+  startButton.classList.remove("disabled");
+  resetButton.disabled = true;
+}
+
+function resetProgressBar() {
+  progressBar.style.width = "0";
+  progressLabel.textContent = "0%";
 }
 
 // EVENT LISTENERS
