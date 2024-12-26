@@ -6,6 +6,11 @@ const startButton = document.querySelector(".start-button");
 const resetButton = document.querySelector(".reset-button");
 const progressBar = document.querySelector(".progress-bar");
 const progressLabel = document.querySelector(".progress-label");
+const patient = document.querySelector(".patient");
+
+const PATIENT = patient.getBoundingClientRect();
+const PATIENT_HEIGHT = PATIENT.height;
+const SCANNER_HEIGHT = scanner.offsetHeight;
 
 let isScanning = false;
 let isDragging = false;
@@ -13,7 +18,11 @@ let maxProgress = 0;
 
 // MAIN FUNCTIONS
 function onStart() {
-  startScan();
+  startMachineScanUI();
+  resetProgressBar();
+  moveMachineScanWindow(0, scanner.offsetHeight);
+  isScanning = true;
+  maxProgress = 0;
 }
 
 function onReset() {
@@ -25,7 +34,11 @@ function onReset() {
 }
 
 function onMouseDown() {
-  startScan();
+  startMachineScanUI();
+  resetProgressBar();
+  moveMachineScanWindow(0, scanner.offsetHeight);
+  isScanning = true;
+  maxProgress = 0;
   if (!isScanning && maxProgress < 100) return;
   setCursorStyle(scanner, "grabbing");
   isDragging = true;
@@ -44,17 +57,11 @@ function onMouseUp() {
 }
 
 // HELPER FUNCTIONS
-function startScan() {
-  if (isScanning) return;
-  isScanning = true;
+function startMachineScanUI() {
   patientOrgansView.style.opacity = 1;
   startButton.textContent = "SCAN RUNNING";
   startButton.classList.add("disabled");
   resetButton.disabled = true;
-  progressBar.style.width = "0";
-  progressLabel.textContent = "0%";
-  maxProgress = 0;
-  moveMachineScanWindow(0, scanner.offsetHeight);
 }
 
 function moveMachineScanWindow(scannerTop, scannerBottom) {
@@ -83,16 +90,13 @@ function handleScanComplete() {
 }
 
 function calculateScannerPosition(e) {
-  const container = document.querySelector(".container");
-  const rect = container.getBoundingClientRect();
-  const containerHeight = rect.height;
-  const scannerHeight = scanner.offsetHeight;
-  let scannerPositionY = e.clientY - rect.top - scannerHeight / 2;
-  scannerPositionY = Math.max(0, Math.min(scannerPositionY, containerHeight - scannerHeight));
+  let scannerPositionY = e.clientY - PATIENT.top - SCANNER_HEIGHT / 2;
+  console.log("scannerHeight: ", SCANNER_HEIGHT);
+  scannerPositionY = Math.max(0, Math.min(scannerPositionY, PATIENT_HEIGHT - SCANNER_HEIGHT));
   scanner.style.top = `${scannerPositionY}px`;
   return {
     scannerTop: scannerPositionY,
-    scannerBottom: scannerPositionY + scannerHeight,
+    scannerBottom: scannerPositionY + SCANNER_HEIGHT,
   };
 }
 
