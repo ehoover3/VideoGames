@@ -7,14 +7,44 @@ const resetButton = document.querySelector(".reset-button");
 const progressBar = document.querySelector(".progress-bar");
 const progressLabel = document.querySelector(".progress-label");
 
-{
-  /* <div class="body-organs"></div>
-<div class="body-clothed"></div> */
-}
-
 let isScanning = false;
 let isDragging = false;
 let maxProgress = 0;
+
+// MAIN FUNCTIONS
+function onStart() {
+  startScan();
+}
+
+function onReset() {
+  patientOrgansView.style.opacity = 0;
+  startButton.textContent = "START SCAN";
+  startButton.classList.remove("disabled");
+  resetButton.disabled = true;
+  progressBar.style.width = "0";
+  progressLabel.textContent = "0%";
+  maxProgress = 0;
+  isScanning = false;
+}
+
+function onMouseDown() {
+  startScan();
+  if (!isScanning && maxProgress < 100) return;
+  isDragging = true;
+  setCursorStyle(scanner, "grabbing");
+}
+
+function onMouseMove(e) {
+  if (!isDragging) return;
+  const { scannerTop, scannerBottom } = calculateScannerPosition(e);
+  moveMachineScanWindow(scannerTop, scannerBottom);
+  updateProgressBar(scannerTop, scannerBottom);
+}
+
+function onMouseUp() {
+  isDragging = false;
+  setCursorStyle(scanner, "grab");
+}
 
 // HELPER FUNCTIONS
 function startScan() {
@@ -55,17 +85,6 @@ function handleScanComplete() {
   isScanning = false;
 }
 
-function resetScan() {
-  patientOrgansView.style.opacity = 0;
-  startButton.textContent = "START SCAN";
-  startButton.classList.remove("disabled");
-  resetButton.disabled = true;
-  progressBar.style.width = "0";
-  progressLabel.textContent = "0%";
-  maxProgress = 0;
-  isScanning = false;
-}
-
 function calculateScannerPosition(e) {
   const container = document.querySelector(".container");
   const rect = container.getBoundingClientRect();
@@ -90,24 +109,8 @@ function setCursorStyle(element, style) {
 }
 
 // EVENT LISTENERS
-startButton.addEventListener("click", startScan);
-resetButton.addEventListener("click", resetScan);
-
-scanner.addEventListener("mousedown", () => {
-  startScan();
-  if (!isScanning && maxProgress < 100) return;
-  isDragging = true;
-  setCursorStyle(scanner, "grabbing");
-});
-
-document.addEventListener("mousemove", (e) => {
-  if (!isDragging) return;
-  const { scannerTop, scannerBottom } = calculateScannerPosition(e);
-  moveMachineScanWindow(scannerTop, scannerBottom);
-  updateProgressBar(scannerTop, scannerBottom);
-});
-
-document.addEventListener("mouseup", () => {
-  isDragging = false;
-  setCursorStyle(scanner, "grab");
-});
+startButton.addEventListener("click", onStart);
+resetButton.addEventListener("click", onReset);
+scanner.addEventListener("mousedown", () => onMouseDown());
+document.addEventListener("mousemove", (e) => onMouseMove(e));
+document.addEventListener("mouseup", () => onMouseUp());
