@@ -6,10 +6,16 @@ const scannerHeight = scanner.offsetHeight;
 
 let isScanning = false;
 let isDragging = false;
+let isInitialUpdateDone = false;
 let maxProgress = 0;
 
 // MAIN FUNCTIONS
 function onMouseDown() {
+  if (!isInitialUpdateDone) {
+    showAnatomicalLayer();
+    updatePatientScanUI(0, scannerHeight);
+    isInitialUpdateDone = true;
+  }
   updateStartButtonText();
   isScanning = true;
   isDragging = true;
@@ -41,6 +47,7 @@ function onReset() {
   scanner.style.top = "0";
   maxProgress = 0;
   isScanning = false;
+  isInitialUpdateDone = false;
 }
 
 // HELPER FUNCTIONS
