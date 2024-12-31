@@ -14,10 +14,8 @@ function onMouseDown() {
   showAnatomicalLayer();
   updatePatientScanUI(0, scanner.offsetHeight);
   isScanning = true;
-  maxProgress = 0;
-  if (!isScanning && maxProgress < 100) return;
-  setCursorStyle(scanner, "grabbing");
   isDragging = true;
+  setCursorStyle(scanner, "grabbing");
   document.addEventListener("mousemove", (e) => onMouseMove(e));
   document.addEventListener("mouseup", () => onMouseUp());
 }
