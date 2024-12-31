@@ -11,8 +11,6 @@ let maxProgress = 0;
 // MAIN FUNCTIONS
 function onMouseDown() {
   updateStartButtonText();
-  showAnatomicalLayer();
-  updatePatientScanUI(0, scanner.offsetHeight);
   isScanning = true;
   isDragging = true;
   setCursorStyle(scanner, "grabbing");
@@ -22,6 +20,7 @@ function onMouseDown() {
 
 function onMouseMove(e) {
   if (!isDragging || e.clientY == null) return;
+  showAnatomicalLayer();
   const { scannerTop, scannerBottom } = calculateScannerPosition(e);
   updatePatientScanUI(scannerTop, scannerBottom);
   updateProgressBar(scannerTop, scannerBottom);
