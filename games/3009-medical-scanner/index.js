@@ -9,60 +9,80 @@ let isDragging = false;
 let maxProgress = 0;
 
 // MAIN FUNCTIONS
-function onStart() {
-  startMachineScanUI();
-  resetProgressBar();
-  moveMachineScanWindow(0, scanner.offsetHeight);
-  isScanning = true;
-  maxProgress = 0;
-}
-
-function onReset() {
-  moveMachineScanWindow(0, 0);
-  resetPatientImages();
-  resetButtons();
-  resetProgressBar();
-  maxProgress = 0;
-  isScanning = false;
-}
-
 function onMouseDown() {
-  startMachineScanUI();
-  resetProgressBar();
-  moveMachineScanWindow(0, scanner.offsetHeight);
+  updateStartButtonText();
+  showAnatomicalLayer();
+  updatePatientScanUI(0, scanner.offsetHeight);
   isScanning = true;
   maxProgress = 0;
   if (!isScanning && maxProgress < 100) return;
   setCursorStyle(scanner, "grabbing");
   isDragging = true;
+  document.addEventListener("mousemove", (e) => onMouseMove(e));
+  document.addEventListener("mouseup", () => onMouseUp());
 }
 
 function onMouseMove(e) {
-  if (!isDragging) return;
+  if (!isDragging || e.clientY == null) return;
   const { scannerTop, scannerBottom } = calculateScannerPosition(e);
-  moveMachineScanWindow(scannerTop, scannerBottom);
+  updatePatientScanUI(scannerTop, scannerBottom);
   updateProgressBar(scannerTop, scannerBottom);
 }
 
 function onMouseUp() {
   setCursorStyle(scanner, "grab");
   isDragging = false;
+  document.removeEventListener("mousemove", onMouseMove);
+  document.removeEventListener("mouseup", onMouseUp);
+}
+
+function onReset() {
+  updatePatientScanUI(0, 0);
+  resetPatientImages();
+  resetButtons();
+  resetProgressBar();
+  scanner.style.top = "0";
+  maxProgress = 0;
+  isScanning = false;
 }
 
 // HELPER FUNCTIONS
-function startMachineScanUI() {
+function showAnatomicalLayer() {
   patientOrgansView.style.opacity = 1;
-  startButton.textContent = "SCAN RUNNING";
-  startButton.classList.add("disabled");
 }
 
-function moveMachineScanWindow(scannerTop, scannerBottom) {
-  patientClothedView.style.clipPath = `polygon(0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%)`;
-  patientOrgansView.style.clipPath = `inset(${scannerTop}px 0 ${patientClothedView.offsetHeight - scannerBottom}px 0)`;
+function updateStartButtonText() {
+  startButton.textContent = "SCAN RUNNING";
+}
+
+function updatePatientScanUI(scannerTop, scannerBottom) {
+  const topLeft = "0 0";
+  const topRight = "100% 0";
+  const scannerTopRight = `100% ${scannerTop}px`;
+  const scannerTopLeft = `0 ${scannerTop}px`;
+  const scannerBottomLeft = `0 ${scannerBottom}px`;
+  const scannerBottomRight = `100% ${scannerBottom}px`;
+  const bottomRight = "100% 100%";
+  const bottomLeft = "0 100%";
+
+  patientClothedView.style.clipPath = `polygon(
+    ${topLeft},
+    ${topRight},
+    ${scannerTopRight},
+    ${scannerTopLeft},
+    ${scannerBottomLeft},
+    ${scannerBottomRight},
+    ${bottomRight},
+    ${bottomLeft}
+  )`;
+
+  const rectangleTop = `${scannerTop}px`;
+  const rectangleBottom = `${patientClothedView.offsetHeight - scannerBottom}px`;
+  patientOrgansView.style.clipPath = `inset(${rectangleTop} 0 ${rectangleBottom} 0)`;
 }
 
 function updateProgressBar(scannerTop, scannerBottom) {
-  const progress = Math.min(100, (scannerBottom / patient.clientHeight) * 100);
+  const progress = Math.min(100, (scannerBottom / patientHeight) * 100);
   if (progress > maxProgress) {
     maxProgress = progress;
     progressBar.style.width = `${maxProgress}%`;
@@ -107,11 +127,10 @@ function resetButtons() {
 function resetProgressBar() {
   progressBar.style.width = "0";
   progressLabel.textContent = "0%";
+  maxProgress = 0;
 }
 
 // EVENT LISTENERS
-startButton.addEventListener("click", onStart);
+// startButton.addEventListener("click", onStart);
 resetButton.addEventListener("click", () => onReset());
 scanner.addEventListener("mousedown", () => onMouseDown());
-document.addEventListener("mousemove", (e) => onMouseMove(e));
-document.addEventListener("mouseup", () => onMouseUp());
