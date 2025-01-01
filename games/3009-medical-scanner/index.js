@@ -16,7 +16,10 @@ function onMouseDown() {
     updatePatientScanUI(0, scannerHeight);
     isInitialUpdateDone = true;
   }
-  updateStartButtonText();
+  if (startButton.textContent !== "SCAN COMPLETE") {
+    updateStartButtonText();
+  }
+
   isScanning = true;
   isDragging = true;
   setCursorStyle(scanner, "grabbing");
