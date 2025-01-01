@@ -23,14 +23,7 @@ class ScannerLogic {
     this.dom.resetButton.addEventListener("click", () => this.onReset());
   }
 
-  completeScan = () => {
-    dom.startButton.textContent = "SCAN COMPLETE";
-    dom.startButton.classList.add("disabled");
-    scanner.isScanning = false;
-    quiz.startQuiz();
-  };
-
-  calculateScannerPosition(e) {
+  getScannerPosition(e) {
     let scannerY = e.clientY - this.patientRectangle.top - this.scannerHeight / 2;
     scannerY = Math.max(0, Math.min(scannerY, this.patientHeight - this.scannerHeight));
     this.dom.scanner.style.top = `${scannerY}px`;
@@ -40,7 +33,16 @@ class ScannerLogic {
     };
   }
 
-  updateProgressBar(scannerBottom) {
+  setPatientScanUI(scannerTop, scannerBottom) {
+    const { patientClothedView, patientOrgansView } = this.dom;
+    patientClothedView.style.clipPath = `polygon(
+        0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 
+        0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%
+      )`;
+    patientOrgansView.style.clipPath = `inset(${scannerTop}px 0 ${this.patientHeight - scannerBottom}px 0)`;
+  }
+
+  setProgressBar(scannerBottom) {
     const progress = Math.min(100, (scannerBottom / this.patientHeight) * 100);
     if (progress > this.maxProgress) {
       this.maxProgress = progress;
@@ -50,20 +52,18 @@ class ScannerLogic {
     if (this.maxProgress >= 100) this.handleScanComplete();
   }
 
-  updatePatientScanUI(scannerTop, scannerBottom) {
-    const { patientClothedView, patientOrgansView } = this.dom;
-    patientClothedView.style.clipPath = `polygon(
-        0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 
-        0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%
-      )`;
-    patientOrgansView.style.clipPath = `inset(${scannerTop}px 0 ${this.patientHeight - scannerBottom}px 0)`;
-  }
+  setCompleteScan = () => {
+    dom.startButton.textContent = "SCAN COMPLETE";
+    dom.startButton.classList.add("disabled");
+    scanner.isScanning = false;
+    quiz.startQuiz();
+  };
 
   handleScanComplete() {
     this.dom.startButton.textContent = "SCAN COMPLETE";
     this.dom.startButton.classList.add("disabled");
     this.isScanning = false;
-    this.quiz.showQuiz();
+    this.quiz.setQuizVisible();
   }
 
   onMouseDown(e) {
@@ -74,8 +74,8 @@ class ScannerLogic {
     }
     if (!this.initialScanStart) {
       this.dom.patientOrgansView.style.opacity = 1;
-      const { scannerTop, scannerBottom } = this.calculateScannerPosition(e);
-      this.updatePatientScanUI(scannerTop, scannerBottom);
+      const { scannerTop, scannerBottom } = this.getScannerPosition(e);
+      this.setPatientScanUI(scannerTop, scannerBottom);
       this.initialScanStart = true;
     }
     this.dom.scanner.style.cursor = "grabbing";
@@ -83,9 +83,9 @@ class ScannerLogic {
 
   onMouseMove(e) {
     if (!this.isDragging) return;
-    const { scannerTop, scannerBottom } = this.calculateScannerPosition(e);
-    this.updatePatientScanUI(scannerTop, scannerBottom);
-    this.updateProgressBar(scannerBottom);
+    const { scannerTop, scannerBottom } = this.getScannerPosition(e);
+    this.setPatientScanUI(scannerTop, scannerBottom);
+    this.setProgressBar(scannerBottom);
   }
 
   onMouseUp() {
@@ -94,7 +94,7 @@ class ScannerLogic {
   }
 
   onReset() {
-    this.updatePatientScanUI(0, 0);
+    this.setPatientScanUI(0, 0);
     this.dom.startButton.textContent = "START SCAN";
     this.dom.startButton.classList.remove("disabled");
     this.dom.patientOrgansView.style.opacity = 0;

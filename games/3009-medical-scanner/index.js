@@ -1,7 +1,7 @@
 // index.js
-import DOMElements from "./domElements.js";
-import QuizLogic from "./quizLogic.js";
-import ScannerLogic from "./scannerLogic.js";
+import DOMElements from "./dom.js";
+import QuizLogic from "./quiz.js";
+import ScannerLogic from "./scanner.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const dom = new DOMElements();

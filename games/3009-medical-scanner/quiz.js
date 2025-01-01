@@ -20,15 +20,15 @@ class QuizLogic {
   }
 
   initEventListeners() {
-    this.dom.nextQuestionButton.addEventListener("click", () => this.nextQuestion());
+    this.dom.nextQuestionButton.addEventListener("click", () => this.setNextQuestion());
   }
 
-  showQuiz() {
+  setQuizVisible() {
     this.dom.quizContainer.style.display = "block";
-    this.showQuestion();
+    this.setQuestion();
   }
 
-  showQuestion() {
+  setQuestion() {
     const currentQuestion = this.questions[this.currentQuestionIndex];
     this.dom.quizQuestion.textContent = currentQuestion.question;
     this.dom.quizOptions.innerHTML = "";
@@ -36,20 +36,20 @@ class QuizLogic {
     currentQuestion.options.forEach((option) => {
       const button = document.createElement("button");
       button.textContent = option;
-      button.addEventListener("click", () => this.handleAnswer(option));
+      button.addEventListener("click", () => this.setAnswer(option));
       this.dom.quizOptions.appendChild(button);
     });
   }
 
-  handleAnswer(selectedAnswer) {
+  setAnswer(selectedAnswer) {
     const currentQuestion = this.questions[this.currentQuestionIndex];
     this.userAnswers.push(selectedAnswer === currentQuestion.correctAnswer);
     Array.from(this.dom.quizOptions.children).forEach((button) => (button.disabled = true));
   }
 
-  nextQuestion() {
+  setNextQuestion() {
     this.currentQuestionIndex++;
-    if (this.currentQuestionIndex < this.questions.length) this.showQuestion();
+    if (this.currentQuestionIndex < this.questions.length) this.setQuestion();
     else this.endQuiz();
   }
 
