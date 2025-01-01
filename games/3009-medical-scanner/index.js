@@ -1,93 +1,49 @@
-// index.js
-import { patient, patientClothedView, patientOrgansView, scanner, startButton, resetButton, progressBar, progressLabel, quizContainer, quizQuestion, quizOptions, nextQuestionButton } from "./domElements.js";
+// DOM Elements
+const dom = {
+  patient: document.querySelector(".patient"),
+  patientClothedView: document.querySelector(".body-clothed-view"),
+  patientOrgansView: document.querySelector(".body-organs-view"),
+  scanner: document.querySelector(".scanner"),
+  startButton: document.querySelector(".start-button"),
+  resetButton: document.querySelector(".reset-button"),
+  progressBar: document.querySelector(".progress-bar"),
+  progressLabel: document.querySelector(".progress-label"),
+  quizContainer: document.querySelector(".quiz-container"),
+  quizQuestion: document.getElementById("quiz-question"),
+  quizOptions: document.getElementById("quiz-options"),
+  nextQuestionButton: document.getElementById("next-question-btn"),
+};
 
-const quizData = [
-  {
-    question: "What is the largest organ in the human body?",
-    options: ["Heart", "Lungs", "Skin", "Brain"],
-    correctAnswer: "Skin",
-  },
-  {
-    question: "How many bones are in the adult human body?",
-    options: ["206", "210", "200", "220"],
-    correctAnswer: "206",
-  },
-];
+// Constants
+const VALID_CURSOR_STYLES = ["grabbing", "grab"];
+const TEXT = {
+  START_SCAN: "START SCAN",
+  SCAN_RUNNING: "SCAN RUNNING",
+  SCAN_COMPLETE: "SCAN COMPLETE",
+};
 
+// State Variables
 let currentQuestionIndex = 0;
 let userAnswers = [];
-
-// Function to show the quiz after the scan completes
-function showQuiz() {
-  quizContainer.style.display = "block";
-  showQuestion();
-}
-
-// Function to display the current question and its options
-function showQuestion() {
-  const currentQuestion = quizData[currentQuestionIndex];
-  quizQuestion.textContent = currentQuestion.question;
-  quizOptions.innerHTML = ""; // Clear previous options
-
-  // Create buttons for each answer option
-  currentQuestion.options.forEach((option) => {
-    const optionButton = document.createElement("button");
-    optionButton.textContent = option;
-    optionButton.onclick = () => handleAnswer(option);
-    quizOptions.appendChild(optionButton);
-  });
-}
-
-// Function to handle the user's answer
-function handleAnswer(selectedAnswer) {
-  const currentQuestion = quizData[currentQuestionIndex];
-  userAnswers.push(selectedAnswer === currentQuestion.correctAnswer);
-
-  // Disable options after an answer is selected
-  const optionButtons = quizOptions.querySelectorAll("button");
-  optionButtons.forEach((button) => (button.disabled = true));
-}
-
-// Function to show the next question or end the quiz
-function nextQuestion() {
-  currentQuestionIndex++;
-  if (currentQuestionIndex < quizData.length) {
-    showQuestion();
-  } else {
-    endQuiz();
-  }
-}
-
-// Function to end the quiz and show the result
-function endQuiz() {
-  quizContainer.innerHTML = `<h2>Your score: ${userAnswers.filter((answer) => answer).length} / ${quizData.length}</h2>`;
-  nextQuestionButton.style.display = "none"; // Hide the "Next" button after quiz ends
-}
-
-// Event listener for the "Next Question" button
-nextQuestionButton.addEventListener("click", nextQuestion);
-
-// Modify the `handleScanComplete` function to show the quiz when the scan is complete
-
-//
-
-const patientRectangle = patient.getBoundingClientRect();
-const patientHeight = patientRectangle.height;
-const scannerHeight = scanner.offsetHeight;
-
 let isScanning = false;
 let isDragging = false;
 let maxProgress = 0;
 
+// Utility Functions
+
+// ???
+const patientRectangle = dom.patient.getBoundingClientRect();
+const patientHeight = patientRectangle.height;
+const scannerHeight = dom.scanner.offsetHeight;
+
 // MAIN FUNCTIONS
 function onMouseDown() {
-  updateStartButtonText();
+  updateElementText(dom.startButton, TEXT.SCAN_RUNNING);
   showAnatomicalLayer();
-
-  updatePatientScanUI(0, scanner.offsetHeight);
+  updatePatientScanUI(0, dom.scanner.offsetHeight);
   isScanning = true;
   isDragging = true;
-  setCursorStyle(scanner, "grabbing");
+  setCursorStyle(dom.scanner, "grabbing");
   document.addEventListener("mousemove", (e) => onMouseMove(e));
   document.addEventListener("mouseup", () => onMouseUp());
 }
@@ -100,7 +56,7 @@ function onMouseMove(e) {
 }
 
 function onMouseUp() {
-  setCursorStyle(scanner, "grab");
+  setCursorStyle(dom.scanner, "grab");
   isDragging = false;
   document.removeEventListener("mousemove", onMouseMove);
   document.removeEventListener("mouseup", onMouseUp);
@@ -118,11 +74,11 @@ function onReset() {
 
 // HELPER FUNCTIONS
 function showAnatomicalLayer() {
-  patientOrgansView.style.opacity = 1;
+  dom.patientOrgansView.style.opacity = 1;
 }
 
-function updateStartButtonText() {
-  startButton.textContent = "SCAN RUNNING";
+function updateElementText(element, text) {
+  element.textContent = text;
 }
 
 function updatePatientScanUI(scannerTop, scannerBottom) {
@@ -135,7 +91,7 @@ function updatePatientScanUI(scannerTop, scannerBottom) {
   const bottomRight = "100% 100%";
   const bottomLeft = "0 100%";
 
-  patientClothedView.style.clipPath = `polygon(
+  dom.patientClothedView.style.clipPath = `polygon(
     ${topLeft},
     ${topRight},
     ${scannerTopRight},
@@ -147,16 +103,16 @@ function updatePatientScanUI(scannerTop, scannerBottom) {
   )`;
 
   const rectangleTop = `${scannerTop}px`;
-  const rectangleBottom = `${patientClothedView.offsetHeight - scannerBottom}px`;
-  patientOrgansView.style.clipPath = `inset(${rectangleTop} 0 ${rectangleBottom} 0)`;
+  const rectangleBottom = `${dom.patientClothedView.offsetHeight - scannerBottom}px`;
+  dom.patientOrgansView.style.clipPath = `inset(${rectangleTop} 0 ${rectangleBottom} 0)`;
 }
 
 function updateProgressBar(scannerTop, scannerBottom) {
   const progress = Math.min(100, (scannerBottom / patientHeight) * 100);
   if (progress > maxProgress) {
     maxProgress = progress;
-    progressBar.style.width = `${maxProgress}%`;
-    progressLabel.textContent = `${Math.round(maxProgress)}%`;
+    dom.progressBar.style.width = `${maxProgress}%`;
+    dom.progressLabel.textContent = `${Math.round(maxProgress)}%`;
   }
   if (maxProgress >= 100) {
     handleScanComplete();
@@ -164,8 +120,8 @@ function updateProgressBar(scannerTop, scannerBottom) {
 }
 
 function handleScanComplete() {
-  startButton.textContent = "SCAN COMPLETE";
-  startButton.classList.add("disabled");
+  updateElementText(dom.startButton, TEXT.SCAN_COMPLETE);
+  dom.startButton.classList.add("disabled");
   isScanning = false;
   showQuiz();
 }
@@ -173,7 +129,7 @@ function handleScanComplete() {
 function calculateScannerPosition(e) {
   let scannerPositionY = e.clientY - patientRectangle.top - scannerHeight / 2;
   scannerPositionY = Math.max(0, Math.min(scannerPositionY, patientHeight - scannerHeight));
-  scanner.style.top = `${scannerPositionY}px`;
+  dom.scanner.style.top = `${scannerPositionY}px`;
   return {
     scannerTop: scannerPositionY,
     scannerBottom: scannerPositionY + scannerHeight,
@@ -181,8 +137,7 @@ function calculateScannerPosition(e) {
 }
 
 function setCursorStyle(element, style) {
-  const VALID_STYLES = ["grabbing", "grab"];
-  if (element && VALID_STYLES.includes(style)) element.style.cursor = style;
+  if (element && VALID_CURSOR_STYLES.includes(style)) element.style.cursor = style;
   else console.warn(`Invalid cursor style: "${style}"`);
 }
 
@@ -191,7 +146,7 @@ function resetPatientImages() {
 }
 
 function resetButtons() {
-  startButton.textContent = "START SCAN";
+  updateElementText(startButton, TEXT.START_SCAN_TEXT);
   startButton.classList.remove("disabled");
 }
 
@@ -201,7 +156,60 @@ function resetProgressBar() {
   maxProgress = 0;
 }
 
+// helper quiz functions
+// quiz.js
+const quizQuestions = [
+  {
+    question: "What is the largest organ in the human body?",
+    options: ["Heart", "Lungs", "Skin", "Brain"],
+    correctAnswer: "Skin",
+  },
+  {
+    question: "How many bones are in the adult human body?",
+    options: ["206", "210", "200", "220"],
+    correctAnswer: "206",
+  },
+];
+
+function showQuiz() {
+  dom.quizContainer.style.display = "block";
+  showQuestion();
+}
+
+function showQuestion() {
+  const currentQuestion = quizQuestions[currentQuestionIndex];
+  dom.quizQuestion.textContent = currentQuestion.question;
+  dom.quizOptions.innerHTML = "";
+  currentQuestion.options.forEach((option) => {
+    const optionButton = document.createElement("button");
+    optionButton.textContent = option;
+    optionButton.onclick = () => handleAnswer(option);
+    dom.quizOptions.appendChild(optionButton);
+  });
+}
+
+function handleAnswer(selectedAnswer) {
+  const currentQuestion = quizQuestions[currentQuestionIndex];
+  userAnswers.push(selectedAnswer === currentQuestion.correctAnswer);
+  const optionButtons = dom.quizOptions.querySelectorAll("button");
+  optionButtons.forEach((button) => (button.disabled = true));
+}
+
+function nextQuestion() {
+  currentQuestionIndex++;
+  if (currentQuestionIndex < quizQuestions.length) {
+    showQuestion();
+  } else {
+    endQuiz();
+  }
+}
+
+function endQuiz() {
+  dom.quizContainer.innerHTML = `<h2>Your score: ${userAnswers.filter((answer) => answer).length} / ${quizQuestions.length}</h2>`;
+  dom.nextQuestionButton.style.display = "none";
+}
+
 // EVENT LISTENERS
-// startButton.addEventListener("click", onStart);
-resetButton.addEventListener("click", () => onReset());
-scanner.addEventListener("mousedown", () => onMouseDown());
+dom.resetButton.addEventListener("click", () => onReset());
+dom.scanner.addEventListener("mousedown", () => onMouseDown());
+dom.nextQuestionButton.addEventListener("click", nextQuestion);
