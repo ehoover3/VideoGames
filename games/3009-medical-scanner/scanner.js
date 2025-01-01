@@ -1,4 +1,10 @@
 // scannerLogic.js
+const START_SCAN = "START SCAN";
+const SCAN_RUNNING = "SCAN RUNNING";
+const SCAN_COMPLETE = "SCAN COMPLETE";
+const SCANNER_GRAB = "grab";
+const SCANNER_GRABBING = "grabbing";
+const MAX_PROGRESS = 100;
 
 class ScannerLogic {
   constructor(dom, quiz) {
@@ -49,18 +55,11 @@ class ScannerLogic {
       this.dom.progressBar.style.width = `${this.maxProgress}%`;
       this.dom.progressLabel.textContent = `${Math.round(this.maxProgress)}%`;
     }
-    if (this.maxProgress >= 100) this.handleScanComplete();
+    if (this.maxProgress >= MAX_PROGRESS) this.handleScanComplete();
   }
 
-  setCompleteScan = () => {
-    dom.startButton.textContent = "SCAN COMPLETE";
-    dom.startButton.classList.add("disabled");
-    scanner.isScanning = false;
-    quiz.startQuiz();
-  };
-
   handleScanComplete() {
-    this.dom.startButton.textContent = "SCAN COMPLETE";
+    this.dom.startButton.textContent = SCAN_COMPLETE;
     this.dom.startButton.classList.add("disabled");
     this.isScanning = false;
     this.quiz.setQuizVisible();
@@ -69,8 +68,8 @@ class ScannerLogic {
   onMouseDown(e) {
     this.isDragging = true;
     this.isScanning = true;
-    if (this.dom.startButton.textContent !== "SCAN COMPLETE") {
-      this.dom.startButton.textContent = "SCAN RUNNING";
+    if (this.dom.startButton.textContent !== SCAN_COMPLETE) {
+      this.dom.startButton.textContent = SCAN_RUNNING;
     }
     if (!this.initialScanStart) {
       this.dom.patientOrgansView.style.opacity = 1;
@@ -78,7 +77,7 @@ class ScannerLogic {
       this.setPatientScanUI(scannerTop, scannerBottom);
       this.initialScanStart = true;
     }
-    this.dom.scanner.style.cursor = "grabbing";
+    this.dom.scanner.style.cursor = SCANNER_GRABBING;
   }
 
   onMouseMove(e) {
@@ -90,12 +89,12 @@ class ScannerLogic {
 
   onMouseUp() {
     this.isDragging = false;
-    this.dom.scanner.style.cursor = "grab";
+    this.dom.scanner.style.cursor = SCANNER_GRAB;
   }
 
   onReset() {
     this.setPatientScanUI(0, 0);
-    this.dom.startButton.textContent = "START SCAN";
+    this.dom.startButton.textContent = START_SCAN;
     this.dom.startButton.classList.remove("disabled");
     this.dom.patientOrgansView.style.opacity = 0;
     this.dom.progressBar.style.width = "0";
