@@ -23,10 +23,10 @@ class ScannerLogic {
   }
 
   initEventListeners() {
-    this.dom.scanner.addEventListener("mousedown", (e) => this.onMouseDown(e));
-    document.addEventListener("mousemove", (e) => this.onMouseMove(e));
-    document.addEventListener("mouseup", () => this.onMouseUp());
-    this.dom.resetButton.addEventListener("click", () => this.onReset());
+    this.dom.scanner.addEventListener("mousedown", this.onMouseDown.bind(this));
+    document.addEventListener("mousemove", this.onMouseMove.bind(this));
+    document.addEventListener("mouseup", this.onMouseUp.bind(this));
+    this.dom.resetButton.addEventListener("click", this.onReset.bind(this));
   }
 
   getScannerPosition(e) {
@@ -41,21 +41,29 @@ class ScannerLogic {
 
   setPatientScanUI(scannerTop, scannerBottom) {
     const { patientClothedView, patientOrgansView } = this.dom;
-    patientClothedView.style.clipPath = `polygon(
-        0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 
-        0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%
-      )`;
+    patientClothedView.style.clipPath = this.getClipPath(scannerTop, scannerBottom);
     patientOrgansView.style.clipPath = `inset(${scannerTop}px 0 ${this.patientHeight - scannerBottom}px 0)`;
+  }
+
+  getClipPath(scannerTop, scannerBottom) {
+    return `polygon(
+      0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 
+      0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%
+    )`;
   }
 
   setProgressBar(scannerBottom) {
     const progress = Math.min(100, (scannerBottom / this.patientHeight) * 100);
     if (progress > this.maxProgress) {
       this.maxProgress = progress;
-      this.dom.progressBar.style.width = `${this.maxProgress}%`;
-      this.dom.progressLabel.textContent = `${Math.round(this.maxProgress)}%`;
+      this.updateProgressUI();
     }
     if (this.maxProgress >= MAX_PROGRESS) this.handleScanComplete();
+  }
+
+  updateProgressUI() {
+    this.dom.progressBar.style.width = `${this.maxProgress}%`;
+    this.dom.progressLabel.textContent = `${Math.round(this.maxProgress)}%`;
   }
 
   handleScanComplete() {
@@ -93,7 +101,7 @@ class ScannerLogic {
   }
 
   onReset() {
-    this.setPatientScanUI(0, 0);
+    this.resetScanUI();
     this.dom.startButton.textContent = START_SCAN;
     this.dom.startButton.classList.remove("disabled");
     this.dom.patientOrgansView.style.opacity = 0;
@@ -103,6 +111,10 @@ class ScannerLogic {
     this.isScanning = false;
     this.dom.scanner.style.top = "0";
     this.initialScanStart = false;
+  }
+
+  resetScanUI() {
+    this.setPatientScanUI(0, 0);
   }
 }
 
