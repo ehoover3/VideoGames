@@ -19,81 +19,7 @@ class ScannerLogic {
     this.patientHeight = this.patientRectangle.height;
     this.scannerHeight = this.dom.scanner.offsetHeight;
 
-    this.setBackgroundImages();
-    this.setInitialVisibility();
-    this.initEventListeners();
-  }
-
-  setBackgroundImages() {
-    // Female clothed (Top row, first image)
-    this.dom.patientFemaleClothed.style.background = "url('bodySystems.png') no-repeat 3px 14px";
-    this.dom.patientFemaleClothed.style.backgroundSize = "947px 1283px";
-
-    // Female muscles (Top row, second image)
-    this.dom.patientFemaleMuscles.style.background = "url('bodySystems.png') no-repeat -249px 14px";
-    this.dom.patientFemaleMuscles.style.backgroundSize = "947px 1283px";
-
-    // Female skeleton (Top row, third image)
-    this.dom.patientFemaleSkeleton.style.background = "url('bodySystems.png') no-repeat -500px 14px";
-    this.dom.patientFemaleSkeleton.style.backgroundSize = "947px 1283px";
-
-    // Female cardiovascular (Top row, fourth image)
-    this.dom.patientFemaleCardiovascular.style.background = "url('bodySystems.png') no-repeat -742px 14px";
-    this.dom.patientFemaleCardiovascular.style.backgroundSize = "947px 1283px";
-
-    // Male clothed (Bottom row, first image)
-    this.dom.patientMaleClothed.style.background = "url('bodySystems.png') no-repeat -21px -670px";
-    this.dom.patientMaleClothed.style.backgroundSize = "947px 1283px";
-    this.dom.patientMaleClothed.style.zIndex = 1;
-
-    // Male muscles (Bottom row, second image)
-    this.dom.patientMaleMuscles.style.background = "url('bodySystems.png') no-repeat -263px -670px";
-    this.dom.patientMaleMuscles.style.backgroundSize = "947px 1283px";
-
-    // Male skeleton (Bottom row, third image)
-    this.dom.patientMaleSkeleton.style.background = "url('bodySystems.png') no-repeat -497px -670px";
-    this.dom.patientMaleSkeleton.style.backgroundSize = "947px 1283px";
-
-    // Male cardiovascular (Bottom row, fourth image)
-    this.dom.patientMaleCardiovascular.style.background = "url('bodySystems.png') no-repeat -727px -670px";
-    this.dom.patientMaleCardiovascular.style.backgroundSize = "947px 1283px";
-  }
-
-  setInitialVisibility() {
-    this.dom.patientFemaleClothed.style.display = "block";
-    this.dom.patientFemaleClothed.style.zIndex = 1;
-
-    this.dom.patientFemaleMuscles.style.display = "block";
-    this.dom.patientFemaleSkeleton.style.display = "none";
-    this.dom.patientFemaleCardiovascular.style.display = "none";
-
-    this.dom.patientMaleClothed.style.display = "none";
-    this.dom.patientMaleMuscles.style.display = "none";
-    this.dom.patientMaleSkeleton.style.display = "none";
-    this.dom.patientMaleCardiovascular.style.display = "none";
-  }
-
-  initEventListeners() {
-    this.dom.scanner.addEventListener("mousedown", this.onMouseDown.bind(this));
-    document.addEventListener("mousemove", this.onMouseMove.bind(this));
-    document.addEventListener("mouseup", this.onMouseUp.bind(this));
-    this.dom.resetButton.addEventListener("click", this.onReset.bind(this));
-
-    const genderSelect = document.getElementById("gender-select");
-    const scanTypeSelect = document.getElementById("scan-type-select");
-    genderSelect.addEventListener("change", this.onSelectionChange.bind(this));
-    scanTypeSelect.addEventListener("change", this.onSelectionChange.bind(this));
-  }
-
-  onSelectionChange() {
-    const gender = document.getElementById("gender-select").value;
-    const scanType = document.getElementById("scan-type-select").value;
-
-    this.updatePatientVisibility(gender, scanType);
-  }
-
-  updatePatientVisibility(gender, scanType) {
-    const elements = {
+    this.patientImages = {
       female: {
         clothed: this.dom.patientFemaleClothed,
         muscles: this.dom.patientFemaleMuscles,
@@ -108,13 +34,81 @@ class ScannerLogic {
       },
     };
 
-    Object.values(elements.female).forEach((element) => (element.style.display = "none"));
-    Object.values(elements.male).forEach((element) => (element.style.display = "none"));
+    this.setPatientImages();
+    this.setPatientImagesVisibility();
+    this.initEventListeners();
+  }
 
-    if (elements[gender] && elements[gender][scanType]) {
-      elements[gender].clothed.style.display = "block";
-      elements[gender][scanType].style.display = "block";
-      elements[gender].clothed.style.zIndex = 1;
+  setPatientImages() {
+    const imageUrl = "url('bodySystems.png')";
+    const backgroundSize = "947px 1283px";
+    const imagesConfig = {
+      female: {
+        clothed: { x: 3, y: 14 },
+        muscles: { x: -249, y: 14 },
+        skeleton: { x: -500, y: 14 },
+        cardiovascular: { x: -742, y: 14 },
+      },
+      male: {
+        clothed: { x: -21, y: -670, zIndex: 1 },
+        muscles: { x: -263, y: -670 },
+        skeleton: { x: -497, y: -670 },
+        cardiovascular: { x: -727, y: -670 },
+      },
+    };
+
+    const configureImages = (gender, images) => {
+      Object.entries(images).forEach(([type, { x, y, zIndex }]) => {
+        const style = this.patientImages[gender][type].style;
+        style.background = `${imageUrl} no-repeat ${x}px ${y}px`;
+        style.backgroundSize = backgroundSize;
+        if (zIndex) style.zIndex = zIndex;
+      });
+    };
+
+    Object.entries(imagesConfig).forEach(([gender, images]) => {
+      configureImages(gender, images);
+    });
+  }
+
+  setPatientImagesVisibility() {
+    this.dom.patientFemaleClothed.style.display = "block";
+    this.dom.patientFemaleClothed.style.zIndex = 1;
+    this.dom.patientFemaleMuscles.style.display = "block";
+    this.dom.patientFemaleSkeleton.style.display = "none";
+    this.dom.patientFemaleCardiovascular.style.display = "none";
+    this.dom.patientMaleClothed.style.display = "none";
+    this.dom.patientMaleMuscles.style.display = "none";
+    this.dom.patientMaleSkeleton.style.display = "none";
+    this.dom.patientMaleCardiovascular.style.display = "none";
+  }
+
+  initEventListeners() {
+    this.dom.scanner.addEventListener("mousedown", this.onMouseDown.bind(this));
+    document.addEventListener("mousemove", this.onMouseMove.bind(this));
+    document.addEventListener("mouseup", this.onMouseUp.bind(this));
+    this.dom.resetButton.addEventListener("click", this.onReset.bind(this));
+
+    const genderSelect = document.getElementById("gender-select");
+    const scanTypeSelect = document.getElementById("scan-type-select");
+    genderSelect.addEventListener("change", this.onPatientSelect.bind(this));
+    scanTypeSelect.addEventListener("change", this.onPatientSelect.bind(this));
+  }
+
+  onPatientSelect() {
+    const gender = document.getElementById("gender-select").value;
+    const scanType = document.getElementById("scan-type-select").value;
+    this.updatePatientVisibility(gender, scanType);
+  }
+
+  updatePatientVisibility(gender, scanType) {
+    Object.values(this.patientImages.female).forEach((img) => (img.style.display = "none"));
+    Object.values(this.patientImages.male).forEach((img) => (img.style.display = "none"));
+
+    if (this.patientImages[gender] && this.patientImages[gender][scanType]) {
+      this.patientImages[gender].clothed.style.display = "block";
+      this.patientImages[gender][scanType].style.display = "block";
+      this.patientImages[gender].clothed.style.zIndex = 1;
     }
   }
 
@@ -128,54 +122,24 @@ class ScannerLogic {
     };
   }
 
-  setPatientScanUI(scannerTop, scannerBottom) {
+  setPatientScanner(scannerTop, scannerBottom) {
     const gender = document.getElementById("gender-select").value;
     const scanType = document.getElementById("scan-type-select").value;
-
-    if (gender === "female") {
-      if (scanType === "muscles") {
-        this.dom.patientFemaleClothed.style.clipPath = this.getClipPath(scannerTop, scannerBottom);
-        this.dom.patientFemaleMuscles.style.clipPath = `inset(${scannerTop}px 0 ${this.patientHeight - scannerBottom}px 0)`;
-      } else if (scanType === "skeleton") {
-        this.dom.patientFemaleClothed.style.clipPath = this.getClipPath(scannerTop, scannerBottom);
-        this.dom.patientFemaleSkeleton.style.clipPath = `inset(${scannerTop}px 0 ${this.patientHeight - scannerBottom}px 0)`;
-      } else if (scanType === "cardiovascular") {
-        this.dom.patientFemaleClothed.style.clipPath = this.getClipPath(scannerTop, scannerBottom);
-        this.dom.patientFemaleCardiovascular.style.clipPath = `inset(${scannerTop}px 0 ${this.patientHeight - scannerBottom}px 0)`;
-      }
-    } else if (gender === "male") {
-      if (scanType === "muscles") {
-        this.dom.patientMaleClothed.style.clipPath = this.getClipPath(scannerTop, scannerBottom);
-        this.dom.patientMaleMuscles.style.clipPath = `inset(${scannerTop}px 0 ${this.patientHeight - scannerBottom}px 0)`;
-      } else if (scanType === "skeleton") {
-        this.dom.patientMaleClothed.style.clipPath = this.getClipPath(scannerTop, scannerBottom);
-        this.dom.patientMaleSkeleton.style.clipPath = `inset(${scannerTop}px 0 ${this.patientHeight - scannerBottom}px 0)`;
-      } else if (scanType === "cardiovascular") {
-        this.dom.patientMaleClothed.style.clipPath = this.getClipPath(scannerTop, scannerBottom);
-        this.dom.patientMaleCardiovascular.style.clipPath = `inset(${scannerTop}px 0 ${this.patientHeight - scannerBottom}px 0)`;
-      }
-    }
-  }
-
-  getClipPath(scannerTop, scannerBottom) {
-    return `polygon(
+    this.patientImages[gender].clothed.style.clipPath = `polygon(
       0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 
       0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%
     )`;
+    this.patientImages[gender][scanType].style.clipPath = `inset(${scannerTop}px 0 ${this.patientHeight - scannerBottom}px 0)`;
   }
 
   setProgressBar(scannerBottom) {
     const progress = Math.min(100, (scannerBottom / this.patientHeight) * 100);
     if (progress > this.maxProgress) {
       this.maxProgress = progress;
-      this.updateProgressUI();
+      this.dom.progressBar.style.width = `${this.maxProgress}%`;
+      this.dom.progressLabel.textContent = `${Math.round(this.maxProgress)}%`;
     }
     if (this.maxProgress >= MAX_PROGRESS) this.handleScanComplete();
-  }
-
-  updateProgressUI() {
-    this.dom.progressBar.style.width = `${this.maxProgress}%`;
-    this.dom.progressLabel.textContent = `${Math.round(this.maxProgress)}%`;
   }
 
   handleScanComplete() {
@@ -194,7 +158,7 @@ class ScannerLogic {
     if (!this.initialScanStart) {
       this.dom.patientFemaleMuscles.style.opacity = 1;
       const { scannerTop, scannerBottom } = this.getScannerPosition(e);
-      this.setPatientScanUI(scannerTop, scannerBottom);
+      this.setPatientScanner(scannerTop, scannerBottom);
       this.initialScanStart = true;
     }
     this.dom.scanner.style.cursor = SCANNER_GRABBING;
@@ -203,7 +167,7 @@ class ScannerLogic {
   onMouseMove(e) {
     if (!this.isDragging) return;
     const { scannerTop, scannerBottom } = this.getScannerPosition(e);
-    this.setPatientScanUI(scannerTop, scannerBottom);
+    this.setPatientScanner(scannerTop, scannerBottom);
     this.setProgressBar(scannerBottom);
   }
 
@@ -213,7 +177,7 @@ class ScannerLogic {
   }
 
   onReset() {
-    this.resetScanUI();
+    this.setPatientScanner(0, 0);
     this.dom.startButton.textContent = START_SCAN;
     this.dom.startButton.classList.remove("disabled");
     this.dom.patientFemaleMuscles.style.opacity = 0;
@@ -223,10 +187,6 @@ class ScannerLogic {
     this.isScanning = false;
     this.dom.scanner.style.top = "0";
     this.initialScanStart = false;
-  }
-
-  resetScanUI() {
-    this.setPatientScanUI(0, 0);
   }
 }
 
