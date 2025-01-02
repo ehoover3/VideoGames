@@ -36,12 +36,12 @@ class ScannerLogic {
     // Female skeleton (Top row, third image)
     this.dom.patientFemaleSkeleton.style.background = "url('bodySystems.png') no-repeat -443px 0px";
     this.dom.patientFemaleSkeleton.style.backgroundSize = "947px 1283px";
-    // this.dom.patientFemaleSkeleton.style.display = "none";
+    this.dom.patientFemaleSkeleton.style.display = "none";
 
     // Female cardiovascular (Top row, fourth image)
-    this.dom.patientFemaleCardiovascular.style.background = "url('bodySystems.png') no-repeat -711px 0px";
+    this.dom.patientFemaleCardiovascular.style.background = "url('bodySystems.png') no-repeat -687px 0px";
     this.dom.patientFemaleCardiovascular.style.backgroundSize = "947px 1283px";
-    this.dom.patientFemaleCardiovascular.style.display = "none";
+    // this.dom.patientFemaleCardiovascular.style.display = "none";
 
     // Male clothed (Bottom row, first image)
     this.dom.patientmaleClothed.style.background = "url('bodySystems.png') no-repeat 0px -642px";
