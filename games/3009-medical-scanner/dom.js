@@ -11,6 +11,8 @@ class DOMElements {
     this.patientMaleSkeleton = document.querySelector(".patient-male-skeleton");
     this.patientMaleMuscles = document.querySelector(".patient-male-muscles");
     this.patientMaleCardiovascular = document.querySelector(".patient-male-cardiovascular");
+    this.genderSelect = document.getElementById("gender-select");
+    this.scanTypeSelect = document.getElementById("scan-type-select");
 
     this.scanner = document.querySelector(".scanner");
     this.startButton = document.querySelector(".start-button");

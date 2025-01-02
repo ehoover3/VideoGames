@@ -5,6 +5,22 @@ const SCAN_COMPLETE = "SCAN COMPLETE";
 const SCANNER_GRAB = "grab";
 const SCANNER_GRABBING = "grabbing";
 const MAX_PROGRESS = 100;
+const imageUrl = "url('bodySystems.png')";
+const backgroundSize = "947px 1283px";
+const imagesConfig = {
+  female: {
+    clothed: { x: 3, y: 14 },
+    muscles: { x: -249, y: 14 },
+    skeleton: { x: -500, y: 14 },
+    cardiovascular: { x: -742, y: 14 },
+  },
+  male: {
+    clothed: { x: -21, y: -670, zIndex: 1 },
+    muscles: { x: -263, y: -670 },
+    skeleton: { x: -497, y: -670 },
+    cardiovascular: { x: -727, y: -670 },
+  },
+};
 
 class ScannerLogic {
   constructor(dom, quiz) {
@@ -34,29 +50,12 @@ class ScannerLogic {
       },
     };
 
-    this.setPatientImages();
-    this.setPatientImagesVisibility();
+    this.initPatientImages();
+    this.initPatientImagesVisibility();
     this.initEventListeners();
   }
 
-  setPatientImages() {
-    const imageUrl = "url('bodySystems.png')";
-    const backgroundSize = "947px 1283px";
-    const imagesConfig = {
-      female: {
-        clothed: { x: 3, y: 14 },
-        muscles: { x: -249, y: 14 },
-        skeleton: { x: -500, y: 14 },
-        cardiovascular: { x: -742, y: 14 },
-      },
-      male: {
-        clothed: { x: -21, y: -670, zIndex: 1 },
-        muscles: { x: -263, y: -670 },
-        skeleton: { x: -497, y: -670 },
-        cardiovascular: { x: -727, y: -670 },
-      },
-    };
-
+  initPatientImages() {
     const configureImages = (gender, images) => {
       Object.entries(images).forEach(([type, { x, y, zIndex }]) => {
         const style = this.patientImages[gender][type].style;
@@ -65,13 +64,12 @@ class ScannerLogic {
         if (zIndex) style.zIndex = zIndex;
       });
     };
-
     Object.entries(imagesConfig).forEach(([gender, images]) => {
       configureImages(gender, images);
     });
   }
 
-  setPatientImagesVisibility() {
+  initPatientImagesVisibility() {
     this.dom.patientFemaleClothed.style.display = "block";
     this.dom.patientFemaleClothed.style.zIndex = 1;
     this.dom.patientFemaleMuscles.style.display = "block";
@@ -88,20 +86,14 @@ class ScannerLogic {
     document.addEventListener("mousemove", this.onMouseMove.bind(this));
     document.addEventListener("mouseup", this.onMouseUp.bind(this));
     this.dom.resetButton.addEventListener("click", this.onReset.bind(this));
-
-    const genderSelect = document.getElementById("gender-select");
-    const scanTypeSelect = document.getElementById("scan-type-select");
-    genderSelect.addEventListener("change", this.onPatientSelect.bind(this));
-    scanTypeSelect.addEventListener("change", this.onPatientSelect.bind(this));
+    this.dom.genderSelect.addEventListener("change", this.onPatientSelect.bind(this));
+    this.dom.scanTypeSelect.addEventListener("change", this.onPatientSelect.bind(this));
   }
 
   onPatientSelect() {
-    const gender = document.getElementById("gender-select").value;
-    const scanType = document.getElementById("scan-type-select").value;
-    this.updatePatientVisibility(gender, scanType);
-  }
+    const gender = this.dom.genderSelect.value;
+    const scanType = this.dom.scanTypeSelect.value;
 
-  updatePatientVisibility(gender, scanType) {
     Object.values(this.patientImages.female).forEach((img) => (img.style.display = "none"));
     Object.values(this.patientImages.male).forEach((img) => (img.style.display = "none"));
 
