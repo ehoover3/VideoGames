@@ -60,7 +60,6 @@ class ScannerLogic {
   }
 
   setInitialVisibility() {
-    // Only display the female clothed by default
     this.dom.patientFemaleClothed.style.display = "block";
     this.dom.patientFemaleClothed.style.zIndex = 1;
 
@@ -94,74 +93,28 @@ class ScannerLogic {
   }
 
   updatePatientVisibility(gender, scanType) {
-    console.log(gender);
-    console.log(scanType);
+    const elements = {
+      female: {
+        clothed: this.dom.patientFemaleClothed,
+        muscles: this.dom.patientFemaleMuscles,
+        skeleton: this.dom.patientFemaleSkeleton,
+        cardiovascular: this.dom.patientFemaleCardiovascular,
+      },
+      male: {
+        clothed: this.dom.patientMaleClothed,
+        muscles: this.dom.patientMaleMuscles,
+        skeleton: this.dom.patientMaleSkeleton,
+        cardiovascular: this.dom.patientMaleCardiovascular,
+      },
+    };
 
-    if (gender === "female" && scanType === "muscles") {
-      this.dom.patientFemaleClothed.style.display = "block";
-      this.dom.patientFemaleMuscles.style.display = "block";
-      this.dom.patientFemaleSkeleton.style.display = "none";
-      this.dom.patientFemaleCardiovascular.style.display = "none";
-      this.dom.patientMaleClothed.style.display = "none";
-      this.dom.patientMaleMuscles.style.display = "none";
-      this.dom.patientMaleSkeleton.style.display = "none";
-      this.dom.patientMaleCardiovascular.style.display = "none";
-      this.dom.patientFemaleClothed.style.zIndex = 1;
-    }
-    if (gender === "female" && scanType === "skeleton") {
-      this.dom.patientFemaleClothed.style.display = "block";
-      this.dom.patientFemaleMuscles.style.display = "none";
-      this.dom.patientFemaleSkeleton.style.display = "block";
-      this.dom.patientFemaleCardiovascular.style.display = "none";
-      this.dom.patientMaleClothed.style.display = "none";
-      this.dom.patientMaleMuscles.style.display = "none";
-      this.dom.patientMaleSkeleton.style.display = "none";
-      this.dom.patientMaleCardiovascular.style.display = "none";
-      this.dom.patientFemaleClothed.style.zIndex = 1;
-    }
-    if (gender === "female" && scanType === "cardiovascular") {
-      this.dom.patientFemaleClothed.style.display = "block";
-      this.dom.patientFemaleMuscles.style.display = "none";
-      this.dom.patientFemaleSkeleton.style.display = "none";
-      this.dom.patientFemaleCardiovascular.style.display = "block";
-      this.dom.patientMaleClothed.style.display = "none";
-      this.dom.patientMaleMuscles.style.display = "none";
-      this.dom.patientMaleSkeleton.style.display = "none";
-      this.dom.patientMaleCardiovascular.style.display = "none";
-      this.dom.patientFemaleClothed.style.zIndex = 1;
-    }
-    if (gender === "male" && scanType === "muscles") {
-      this.dom.patientFemaleClothed.style.display = "none";
-      this.dom.patientFemaleMuscles.style.display = "none";
-      this.dom.patientFemaleSkeleton.style.display = "none";
-      this.dom.patientFemaleCardiovascular.style.display = "none";
-      this.dom.patientMaleClothed.style.display = "block";
-      this.dom.patientMaleMuscles.style.display = "block";
-      this.dom.patientMaleSkeleton.style.display = "none";
-      this.dom.patientMaleCardiovascular.style.display = "none";
-      this.dom.patientMaleClothed.style.zIndex = 1;
-    }
-    if (gender === "male" && scanType === "skeleton") {
-      this.dom.patientFemaleClothed.style.display = "none";
-      this.dom.patientFemaleMuscles.style.display = "none";
-      this.dom.patientFemaleSkeleton.style.display = "none";
-      this.dom.patientFemaleCardiovascular.style.display = "none";
-      this.dom.patientMaleClothed.style.display = "block";
-      this.dom.patientMaleMuscles.style.display = "none";
-      this.dom.patientMaleSkeleton.style.display = "block";
-      this.dom.patientMaleCardiovascular.style.display = "none";
-      this.dom.patientMaleClothed.style.zIndex = 1;
-    }
-    if (gender === "male" && scanType === "cardiovascular") {
-      this.dom.patientFemaleClothed.style.display = "none";
-      this.dom.patientFemaleMuscles.style.display = "none";
-      this.dom.patientFemaleSkeleton.style.display = "none";
-      this.dom.patientFemaleCardiovascular.style.display = "none";
-      this.dom.patientMaleClothed.style.display = "block";
-      this.dom.patientMaleMuscles.style.display = "none";
-      this.dom.patientMaleSkeleton.style.display = "none";
-      this.dom.patientMaleCardiovascular.style.display = "block";
-      this.dom.patientMaleClothed.style.zIndex = 1;
+    Object.values(elements.female).forEach((element) => (element.style.display = "none"));
+    Object.values(elements.male).forEach((element) => (element.style.display = "none"));
+
+    if (elements[gender] && elements[gender][scanType]) {
+      elements[gender].clothed.style.display = "block";
+      elements[gender][scanType].style.display = "block";
+      elements[gender].clothed.style.zIndex = 1;
     }
   }
 
