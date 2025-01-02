@@ -25,12 +25,12 @@ class ScannerLogic {
 
   setBackgroundImages() {
     // Female clothed (Top row, first image)
-    this.dom.patientFemaleClothed.style.background = "url('bodySystems.png') no-repeat 0px 0px";
+    this.dom.patientFemaleClothed.style.background = "url('bodySystems.png') no-repeat 60px 0px";
     this.dom.patientFemaleClothed.style.backgroundSize = "947px 1283px";
     this.dom.patientFemaleClothed.style.zIndex = 1;
 
     // Female muscles (Top row, second image)
-    this.dom.patientFemaleMuscles.style.background = "url('bodySystems.png') no-repeat -237px 0px";
+    this.dom.patientFemaleMuscles.style.background = "url('bodySystems.png') no-repeat -193px 0px";
     this.dom.patientFemaleMuscles.style.backgroundSize = "947px 1283px";
 
     // Female skeleton (Top row, third image)
