@@ -6,53 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Medical Scanning Game</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="scanner.css" />
     <script type="module" src="index.js" defer></script>
   </head>
   <body>
-    <section>
-      <div class="patient">
-        <div class="patient-female-clothed"></div>
-        <div class="patient-female-muscles"></div>
-        <div class="patient-female-skeleton"></div>
-        <div class="patient-female-cardiovascular"></div>
-        <div class="patient-male-clothed"></div>
-        <div class="patient-male-muscles"></div>
-        <div class="patient-male-skeleton"></div>
-        <div class="patient-male-cardiovascular"></div>
-        <div class="scanner"></div>
-      </div>
-
-      <div class="controls">
-        <label for="gender-select">Select Gender:</label>
-        <select id="gender-select">
-          <option value="female">Female</option>
-          <option value="male">Male</option>
-        </select>
-
-        <label for="scan-type-select">Select Scan Type:</label>
-        <select id="scan-type-select">
-          <option value="muscles">Muscles</option>
-          <option value="skeleton">Skeleton</option>
-          <option value="cardiovascular">Cardiovascular</option>
-        </select>
-
-        <button class="start-button" aria-label="Start the scan">START SCAN</button>
-        <button class="reset-button" aria-label="Reset the game">RESET</button>
-        <div class="progress-bar-container">
-          <div class="progress-bar"></div>
-          <div class="progress-label">0%</div>
-        </div>
-      </div>
-    </section>
-
-    <div class="quiz">
-      <div class="quiz-container" style="display: none">
-        <div class="question">
-          <p id="quiz-question"></p>
-          <div id="quiz-options"></div>
-        </div>
-        <button id="next-question-btn">Next Question</button>
-      </div>
-    </div>
+    <div id="root"></div>
   </body>
 </html>

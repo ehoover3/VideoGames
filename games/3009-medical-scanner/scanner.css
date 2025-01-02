@@ -1,0 +1,14 @@
+.patient-female-clothed,
+.patient-female-muscles,
+.patient-female-skeleton,
+.patient-female-cardiovascular,
+.patient-male-clothed,
+.patient-male-muscles,
+.patient-male-skeleton,
+.patient-male-cardiovascular {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}

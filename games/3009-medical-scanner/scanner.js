@@ -23,9 +23,8 @@ const imagesConfig = {
 };
 
 class ScannerLogic {
-  constructor(dom, quiz) {
+  constructor(dom) {
     this.dom = dom;
-    this.quiz = quiz;
     this.isDragging = false;
     this.isScanning = false;
     this.maxProgress = 0;
@@ -55,18 +54,22 @@ class ScannerLogic {
     this.initEventListeners();
   }
 
+  // Initialization methods
   initPatientImages() {
-    const configureImages = (gender, images) => {
-      Object.entries(images).forEach(([type, { x, y, zIndex }]) => {
-        const style = this.patientImages[gender][type].style;
-        style.background = `${imageUrl} no-repeat ${x}px ${y}px`;
-        style.backgroundSize = backgroundSize;
-        if (zIndex) style.zIndex = zIndex;
-      });
+    const configureImage = (gender, type, { x, y, zIndex }) => {
+      const style = this.patientImages[gender][type].style;
+      style.background = `${imageUrl} no-repeat ${x}px ${y}px`;
+      style.backgroundSize = backgroundSize;
+      if (zIndex) style.zIndex = zIndex;
     };
-    Object.entries(imagesConfig).forEach(([gender, images]) => {
-      configureImages(gender, images);
-    });
+    configureImage("female", "clothed", imagesConfig.female.clothed);
+    configureImage("female", "muscles", imagesConfig.female.muscles);
+    configureImage("female", "skeleton", imagesConfig.female.skeleton);
+    configureImage("female", "cardiovascular", imagesConfig.female.cardiovascular);
+    configureImage("male", "clothed", imagesConfig.male.clothed);
+    configureImage("male", "muscles", imagesConfig.male.muscles);
+    configureImage("male", "skeleton", imagesConfig.male.skeleton);
+    configureImage("male", "cardiovascular", imagesConfig.male.cardiovascular);
   }
 
   initPatientImagesVisibility() {
@@ -82,14 +85,15 @@ class ScannerLogic {
   }
 
   initEventListeners() {
-    this.dom.scanner.addEventListener("mousedown", this.onMouseDown.bind(this));
-    document.addEventListener("mousemove", this.onMouseMove.bind(this));
-    document.addEventListener("mouseup", this.onMouseUp.bind(this));
+    this.dom.scanner.addEventListener("mousedown", this.onScannerMouseDown.bind(this));
+    document.addEventListener("mousemove", this.onScannerMouseMove.bind(this));
+    document.addEventListener("mouseup", this.onScannerMouseUp.bind(this));
     this.dom.resetButton.addEventListener("click", this.onReset.bind(this));
     this.dom.genderSelect.addEventListener("change", this.onPatientSelect.bind(this));
     this.dom.scanTypeSelect.addEventListener("change", this.onPatientSelect.bind(this));
   }
 
+  // Event handlers
   onPatientSelect() {
     const gender = this.dom.genderSelect.value;
     const scanType = this.dom.scanTypeSelect.value;
@@ -104,44 +108,7 @@ class ScannerLogic {
     }
   }
 
-  getScannerPosition(e) {
-    let scannerY = e.clientY - this.patientRectangle.top - this.scannerHeight / 2;
-    scannerY = Math.max(0, Math.min(scannerY, this.patientHeight - this.scannerHeight));
-    this.dom.scanner.style.top = `${scannerY}px`;
-    return {
-      scannerTop: scannerY,
-      scannerBottom: scannerY + this.scannerHeight,
-    };
-  }
-
-  setPatientScanner(scannerTop, scannerBottom) {
-    const gender = document.getElementById("gender-select").value;
-    const scanType = document.getElementById("scan-type-select").value;
-    this.patientImages[gender].clothed.style.clipPath = `polygon(
-      0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 
-      0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%
-    )`;
-    this.patientImages[gender][scanType].style.clipPath = `inset(${scannerTop}px 0 ${this.patientHeight - scannerBottom}px 0)`;
-  }
-
-  setProgressBar(scannerBottom) {
-    const progress = Math.min(100, (scannerBottom / this.patientHeight) * 100);
-    if (progress > this.maxProgress) {
-      this.maxProgress = progress;
-      this.dom.progressBar.style.width = `${this.maxProgress}%`;
-      this.dom.progressLabel.textContent = `${Math.round(this.maxProgress)}%`;
-    }
-    if (this.maxProgress >= MAX_PROGRESS) this.handleScanComplete();
-  }
-
-  handleScanComplete() {
-    this.dom.startButton.textContent = SCAN_COMPLETE;
-    this.dom.startButton.classList.add("disabled");
-    this.isScanning = false;
-    this.quiz.setQuizVisible();
-  }
-
-  onMouseDown(e) {
+  onScannerMouseDown(e) {
     this.isDragging = true;
     this.isScanning = true;
     if (this.dom.startButton.textContent !== SCAN_COMPLETE) {
@@ -156,14 +123,14 @@ class ScannerLogic {
     this.dom.scanner.style.cursor = SCANNER_GRABBING;
   }
 
-  onMouseMove(e) {
+  onScannerMouseMove(e) {
     if (!this.isDragging) return;
     const { scannerTop, scannerBottom } = this.getScannerPosition(e);
     this.setPatientScanner(scannerTop, scannerBottom);
     this.setProgressBar(scannerBottom);
   }
 
-  onMouseUp() {
+  onScannerMouseUp() {
     this.isDragging = false;
     this.dom.scanner.style.cursor = SCANNER_GRAB;
   }
@@ -179,6 +146,43 @@ class ScannerLogic {
     this.isScanning = false;
     this.dom.scanner.style.top = "0";
     this.initialScanStart = false;
+  }
+
+  // State/Utility methods
+  getScannerPosition(e) {
+    let scannerY = e.clientY - this.patientRectangle.top - this.scannerHeight / 2;
+    scannerY = Math.max(0, Math.min(scannerY, this.patientHeight - this.scannerHeight));
+    this.dom.scanner.style.top = `${scannerY}px`;
+    return {
+      scannerTop: scannerY,
+      scannerBottom: scannerY + this.scannerHeight,
+    };
+  }
+
+  setPatientScanner(scannerTop, scannerBottom) {
+    const gender = this.dom.genderSelect.value;
+    const scanType = this.dom.scanTypeSelect.value;
+    this.patientImages[gender].clothed.style.clipPath = `polygon(
+      0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 
+      0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%)`;
+    this.patientImages[gender][scanType].style.clipPath = `inset(${scannerTop}px 0 ${this.patientHeight - scannerBottom}px 0)`;
+  }
+
+  setProgressBar(scannerBottom) {
+    const progress = Math.min(100, (scannerBottom / this.patientHeight) * 100);
+    if (progress > this.maxProgress) {
+      this.maxProgress = progress;
+      this.dom.progressBar.style.width = `${this.maxProgress}%`;
+      this.dom.progressLabel.textContent = `${Math.round(this.maxProgress)}%`;
+    }
+    if (this.maxProgress >= MAX_PROGRESS) this.handleScanComplete();
+  }
+
+  // Completion method(s)
+  handleScanComplete() {
+    this.dom.startButton.textContent = SCAN_COMPLETE;
+    this.dom.startButton.classList.add("disabled");
+    this.isScanning = false;
   }
 }
 
