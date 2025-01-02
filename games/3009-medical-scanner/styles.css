@@ -13,8 +13,8 @@ body {
 
 .patient {
     position: relative;
-    width: 300px;
-    height: 600px;
+    width: 200px;
+    height: 611px;
     overflow: hidden;
     background: #ddd;
     border: 2px solid #ccc;

@@ -25,41 +25,43 @@ class ScannerLogic {
 
   setBackgroundImages() {
     // Female clothed (Top row, first image)
-    this.dom.patientFemaleClothed.style.background = "url('bodySystems.png') no-repeat 60px 0px";
+    this.dom.patientFemaleClothed.style.background = "url('bodySystems.png') no-repeat 3px 14px";
     this.dom.patientFemaleClothed.style.backgroundSize = "947px 1283px";
     this.dom.patientFemaleClothed.style.zIndex = 1;
+    // this.dom.patientFemaleClothed.style.display = "none";
 
     // Female muscles (Top row, second image)
-    this.dom.patientFemaleMuscles.style.background = "url('bodySystems.png') no-repeat -193px 0px";
+    this.dom.patientFemaleMuscles.style.background = "url('bodySystems.png') no-repeat -249px 14px";
     this.dom.patientFemaleMuscles.style.backgroundSize = "947px 1283px";
+    // this.dom.patientFemaleMuscles.style.display = "none";
 
     // Female skeleton (Top row, third image)
-    this.dom.patientFemaleSkeleton.style.background = "url('bodySystems.png') no-repeat -443px 0px";
+    this.dom.patientFemaleSkeleton.style.background = "url('bodySystems.png') no-repeat -500px 14px";
     this.dom.patientFemaleSkeleton.style.backgroundSize = "947px 1283px";
     this.dom.patientFemaleSkeleton.style.display = "none";
 
     // Female cardiovascular (Top row, fourth image)
-    this.dom.patientFemaleCardiovascular.style.background = "url('bodySystems.png') no-repeat -687px 0px";
+    this.dom.patientFemaleCardiovascular.style.background = "url('bodySystems.png') no-repeat -742px 14px";
     this.dom.patientFemaleCardiovascular.style.backgroundSize = "947px 1283px";
-    // this.dom.patientFemaleCardiovascular.style.display = "none";
+    this.dom.patientFemaleCardiovascular.style.display = "none";
 
     // Male clothed (Bottom row, first image)
-    this.dom.patientmaleClothed.style.background = "url('bodySystems.png') no-repeat 0px -642px";
+    this.dom.patientmaleClothed.style.background = "url('bodySystems.png') no-repeat -21px -670px";
     this.dom.patientmaleClothed.style.backgroundSize = "947px 1283px";
     this.dom.patientmaleClothed.style.display = "none";
 
     // Male muscles (Bottom row, second image)
-    this.dom.patientmaleMuscles.style.background = "url('bodySystems.png') no-repeat -237px -642px";
+    this.dom.patientmaleMuscles.style.background = "url('bodySystems.png') no-repeat -263px -670px";
     this.dom.patientmaleMuscles.style.backgroundSize = "947px 1283px";
     this.dom.patientmaleMuscles.style.display = "none";
 
     // Male skeleton (Bottom row, third image)
-    this.dom.patientmaleSkeleton.style.background = "url('bodySystems.png') no-repeat -474px -642px";
+    this.dom.patientmaleSkeleton.style.background = "url('bodySystems.png') no-repeat -497px -670px";
     this.dom.patientmaleSkeleton.style.backgroundSize = "947px 1283px";
     this.dom.patientmaleSkeleton.style.display = "none";
 
     // Male cardiovascular (Bottom row, fourth image)
-    this.dom.patientmaleCardiovascular.style.background = "url('bodySystems.png') no-repeat -711px -642px";
+    this.dom.patientmaleCardiovascular.style.background = "url('bodySystems.png') no-repeat -727px -670px";
     this.dom.patientmaleCardiovascular.style.backgroundSize = "947px 1283px";
     this.dom.patientmaleCardiovascular.style.display = "none";
   }
