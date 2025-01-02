@@ -7,10 +7,10 @@ class DOMElements {
     this.patientFemaleMuscles = document.querySelector(".patient-female-muscles");
     this.patientFemaleSkeleton = document.querySelector(".patient-female-skeleton");
     this.patientFemaleCardiovascular = document.querySelector(".patient-female-cardiovascular");
-    this.patientmaleClothed = document.querySelector(".patient-male-clothed");
-    this.patientmaleMuscles = document.querySelector(".patient-male-muscles");
-    this.patientmaleSkeleton = document.querySelector(".patient-male-skeleton");
-    this.patientmaleCardiovascular = document.querySelector(".patient-male-cardiovascular");
+    this.patientMaleClothed = document.querySelector(".patient-male-clothed");
+    this.patientMaleMuscles = document.querySelector(".patient-male-muscles");
+    this.patientMaleSkeleton = document.querySelector(".patient-male-skeleton");
+    this.patientMaleCardiovascular = document.querySelector(".patient-male-cardiovascular");
 
     this.scanner = document.querySelector(".scanner");
     this.startButton = document.querySelector(".start-button");
