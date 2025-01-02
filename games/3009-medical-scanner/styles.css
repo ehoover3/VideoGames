@@ -31,12 +31,10 @@ body {
 }
 
 .body-clothed-view {
-    background: url("person.png") no-repeat center/cover;
     z-index: 1;
 }
 
 .body-organs-view {
-    background: url("organs.png") no-repeat center/cover;
     z-index: 0;
     opacity: 0;
     clip-path: inset(0 0 0 0);
@@ -140,4 +138,19 @@ button {
 
 button:hover {
     background-color: #45a049;
+}
+
+.patient-female-clothed,
+.patient-female-muscles,
+.patient-female-skeleton,
+.patient-female-cardiovascular,
+.patient-male-clothed,
+.patient-male-muscles,
+.patient-male-skeleton,
+.patient-male-cardiovascular {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
