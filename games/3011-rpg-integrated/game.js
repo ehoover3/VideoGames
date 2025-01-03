@@ -1,15 +1,42 @@
+// Get the canvas and context
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 let currentState = "mainMenu"; // "mainMenu", "overworld", or "scanningGame"
 let isGameStarted = false; // Tracks if the game has been started or is in progress
 
+// Load the sprite sheet
+const spriteSheet = new Image();
+spriteSheet.src = "./images/character.png";
+
+// Flag to track whether the sprite sheet is loaded
+let isSpriteSheetLoaded = false;
+
+spriteSheet.onload = () => {
+  isSpriteSheetLoaded = true;
+};
+
+spriteSheet.onerror = () => {
+  console.error("Failed to load the sprite sheet. Please check the file path.");
+};
+
+// Animation frame configuration
+const FRAME_WIDTH = 64; // Width of each frame
+const FRAME_HEIGHT = 64; // Height of each frame
+const WALK_FRAMES = 4; // Number of frames for walking
+const ATTACK_FRAMES = 4; // Number of frames for attacking
+
+let currentFrame = 0;
+let animationTimer = 0;
+let animationSpeed = 10; // Lower value = faster animation
+let currentAction = "idle"; // "idle", "walking", "attacking"
+
 // Menu options and navigation
 let mainMenuOptions = ["Start New Game", "Load Game", "Settings", "Exit"];
 let selectedOption = 0;
 
 // Overworld variables
-const player = { x: 100, y: 100, width: 30, height: 30, speed: 5 };
+const player = { x: 100, y: 100, width: FRAME_WIDTH, height: FRAME_HEIGHT, speed: 5 };
 const machine = { x: 300, y: 200, width: 50, height: 50 };
 
 // Save player position to return after menu or mini-game
@@ -59,7 +86,6 @@ function drawMainMenu() {
 function drawOverworld() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw player
   ctx.fillStyle = "blue";
   ctx.fillRect(player.x, player.y, player.width, player.height);
 
@@ -92,21 +118,59 @@ function drawScanningGame() {
 }
 
 function updateOverworld() {
-  if (keys["ArrowUp"]) player.y -= player.speed;
-  if (keys["ArrowDown"]) player.y += player.speed;
-  if (keys["ArrowLeft"]) player.x -= player.speed;
-  if (keys["ArrowRight"]) player.x += player.speed;
+  let isMoving = false;
+
+  if (keys["ArrowUp"]) {
+    player.y -= player.speed;
+    isMoving = true;
+  }
+  if (keys["ArrowDown"]) {
+    player.y += player.speed;
+    isMoving = true;
+  }
+  if (keys["ArrowLeft"]) {
+    player.x -= player.speed;
+    isMoving = true;
+  }
+  if (keys["ArrowRight"]) {
+    player.x += player.speed;
+    isMoving = true;
+  }
+
+  if (keys["z"] || keys["Z"]) {
+    currentAction = "attacking";
+  } else if (isMoving) {
+    currentAction = "walking";
+  } else {
+    currentAction = "idle";
+  }
+
+  if (isMoving || currentAction === "attacking") {
+    animationTimer++;
+    if (animationTimer >= animationSpeed) {
+      animationTimer = 0;
+      currentFrame++;
+      if (currentAction === "walking" && currentFrame >= WALK_FRAMES) {
+        currentFrame = 0;
+      }
+      if (currentAction === "attacking" && currentFrame >= ATTACK_FRAMES) {
+        currentFrame = 0;
+      }
+    }
+  } else {
+    // Reset to the first frame of the "idle" animation if not moving
+    currentFrame = 0;
+  }
 
   // Collision detection with the machine
   if (player.x < machine.x + machine.width && player.x + player.width > machine.x && player.y < machine.y + machine.height && player.y + player.height > machine.y && keys[" "]) {
-    // Save current player position before entering scanning game
     savedPlayerPosition = { x: player.x, y: player.y };
     currentState = "scanningGame";
   }
 
   // Exit to main menu
   if (keys["Escape"]) {
-    savedPlayerPosition = { x: player.x, y: player.y }; // Save position
+    savedPlayerPosition = { x: player.x, y: player.y };
     currentState = "mainMenu";
   }
 }
@@ -188,5 +252,8 @@ const keys = {};
 window.addEventListener("keydown", (e) => (keys[e.key] = true));
 window.addEventListener("keyup", (e) => (keys[e.key] = false));
 
-// Start game loop
-gameLoop();
+// Start the game loop after the sprite sheet is loaded
+spriteSheet.onload = () => {
+  isSpriteSheetLoaded = true;
+  gameLoop();
+};
