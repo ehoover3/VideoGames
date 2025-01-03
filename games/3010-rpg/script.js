@@ -17,7 +17,6 @@ let textTimer = 0;
 
 // Event listeners for player movement
 window.addEventListener("keydown", (e) => {
-  console.log("inBuilding: ", inBuilding);
   if (e.key === "ArrowUp") keys.up = true;
   if (e.key === "ArrowDown") keys.down = true;
   if (e.key === "ArrowLeft") keys.left = true;
@@ -75,10 +74,13 @@ class NPC extends GameObject {
   }
   interact(player) {
     if (player.x + player.width > this.x && player.x < this.x + this.width && player.y + player.height > this.y && player.y < this.y + this.height && keys.space) {
-      console.log("Interaction triggered!");
       interactionText = this.message;
       textTimer = 120;
     }
+  }
+
+  draw() {
+    super.draw();
   }
 }
 
@@ -108,8 +110,8 @@ class Interior {
 const player = new Player(100, 100, 32, 32, "green", 5);
 const building = new Building(400, 200, 100, 100, "brown");
 const interior = new Interior(canvas.width, canvas.height, "lightgray");
-const npcOutside = new NPC(300, 300, 32, 32, "blue", "Welcome to the world.");
-const npcInside = new NPC(100, 100, 32, 32, "red", "Welcome to Anatomy Scans.");
+const npcOutside = new NPC(100, 200, 32, 32, "blue", "Welcome to the world.");
+const npcInside = new NPC(200, 300, 32, 32, "red", "Welcome to Anatomy Scans.");
 const machine = new Machine(400, 300, 50, 50, "gray");
 
 function checkInteractions() {
@@ -155,6 +157,8 @@ function update() {
       player.x = canvas.width / 2 - player.width / 2; // Reset player position inside
       player.y = canvas.height - 50;
     }
+
+    checkInteractions();
   } else {
     // Inside building logic
     player.move();
