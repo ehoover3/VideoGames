@@ -27,6 +27,13 @@ const DIRECTION = {
   RIGHT: "right",
 };
 
+const MENU_OPTIONS = {
+  START_NEW_GAME: "Start New Game",
+  LOAD_GAME: "Load Game",
+  SETTINGS: "Settings",
+  EXIT: "Exit",
+};
+
 let currentState = STATES.MAIN_MENU;
 let previousState = STATES.MAIN_MENU;
 let isGameStarted = false;
@@ -183,11 +190,11 @@ function updateMainMenu() {
 function handleMenuSelection() {
   const selected = mainMenuOptions[selectedMenuOption];
   switch (selected) {
-    case !isGameStarted && "Start New Game":
+    case !isGameStarted && MENU_OPTIONS.START_NEW_GAME:
       currentState = STATES.OVERWORLD;
       isGameStarted = true;
       break;
-    case isGameStarted && "Start New Game": // "Return to Game"
+    case isGameStarted && MENU_OPTIONS.START_NEW_GAME:
       if (previousState === STATES.MEDICAL_SCANS_GAME) {
         currentState = STATES.MEDICAL_SCANS_GAME;
       } else {
@@ -195,13 +202,13 @@ function handleMenuSelection() {
       }
       isGameStarted = true;
       break;
-    case "Load Game":
+    case MENU_OPTIONS.LOAD_GAME:
       alert("Load Game functionality is not implemented yet.");
       break;
-    case "Settings":
+    case MENU_OPTIONS.SETTINGS:
       alert("Settings functionality is not implemented yet.");
       break;
-    case "Exit":
+    case MENU_OPTIONS.EXIT:
       alert("Exiting the game...");
       break;
   }
