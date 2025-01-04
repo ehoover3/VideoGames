@@ -1,3 +1,5 @@
+import { drawScanningGame } from "./drawScanningGame.js";
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -70,18 +72,6 @@ function drawMainMenu() {
   });
 }
 
-// function drawOverworld() {
-//   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-//   ctx.fillStyle = player.color;
-//   ctx.fillRect(player.x, player.y, player.width, player.height);
-
-//   ctx.fillStyle = machine.color;
-//   ctx.fillRect(machine.x, machine.y, machine.width, machine.height);
-
-//   drawHUD();
-// }
-
 function drawOverworld() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -116,138 +106,97 @@ function drawOverworld() {
   drawHUD();
 }
 
-function drawScanningGame() {
-  const mriImg = new Image();
-  mriImg.src = "MRI.png";
+// export function drawScanningGame() {
+//   const mriImg = new Image();
+//   mriImg.src = "MRI.png";
 
-  mriImg.onload = function () {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+//   mriImg.onload = function () {
+//     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const mriImgConfig = {
-      image: mriImg,
-      sourceImgX: 0,
-      sourceImgY: 0,
-      sourceImgWidth: 458,
-      sourceImgHeight: 248,
-      destinationX: (canvas.width - 458) / 2,
-      destinationY: 10,
-      destinationWidth: 458,
-      destinationHeight: 248,
-    };
+//     const mriImgConfig = {
+//       image: mriImg,
+//       sourceImgX: 0,
+//       sourceImgY: 0,
+//       sourceImgWidth: 458,
+//       sourceImgHeight: 248,
+//       destinationX: (canvas.width - 458) / 2,
+//       destinationY: 10,
+//       destinationWidth: 458,
+//       destinationHeight: 248,
+//     };
 
-    ctx.drawImage(
-      mriImgConfig.image, //
-      mriImgConfig.sourceImgX,
-      mriImgConfig.sourceImgY,
-      mriImgConfig.sourceImgWidth,
-      mriImgConfig.sourceImgHeight,
-      mriImgConfig.destinationX,
-      mriImgConfig.destinationY,
-      mriImgConfig.destinationWidth,
-      mriImgConfig.destinationHeight
-    );
+//     ctx.drawImage(
+//       mriImgConfig.image, //
+//       mriImgConfig.sourceImgX,
+//       mriImgConfig.sourceImgY,
+//       mriImgConfig.sourceImgWidth,
+//       mriImgConfig.sourceImgHeight,
+//       mriImgConfig.destinationX,
+//       mriImgConfig.destinationY,
+//       mriImgConfig.destinationWidth,
+//       mriImgConfig.destinationHeight
+//     );
 
-    // Draw progress bar
-    ctx.fillStyle = "lightgray";
-    ctx.fillRect((canvas.width - 400) / 2, 270, 400, 24);
+//     // Draw progress bar
+//     ctx.fillStyle = "lightgray";
+//     ctx.fillRect((canvas.width - 400) / 2, 270, 400, 24);
 
-    const turquoiseBlue = "#13beec";
-    ctx.fillStyle = turquoiseBlue;
-    ctx.fillRect((canvas.width - 400) / 2, 270, (scanProgress / maxScanProgress) * 400, 24);
+//     const turquoiseBlue = "#13beec";
+//     ctx.fillStyle = turquoiseBlue;
+//     ctx.fillRect((canvas.width - 400) / 2, 270, (scanProgress / maxScanProgress) * 400, 24);
 
-    if (scanProgress >= maxScanProgress) {
-      drawText("Scanning Complete! Press SPACE to return.", 250, 350, "20px Arial");
-    }
-    drawHUD();
-  };
-
-  // Handle case when image fails to load
-  mriImg.onerror = function () {
-    console.error("Failed to load image: MRI.png");
-  };
-}
-
-// function updateOverworld() {
-//   let isMoving = false;
-
-//   if (keys["ArrowUp"]) {
-//     player.y -= player.speed;
-//     isMoving = true;
-//   }
-//   if (keys["ArrowDown"]) {
-//     player.y += player.speed;
-//     isMoving = true;
-//   }
-//   if (keys["ArrowLeft"]) {
-//     player.x -= player.speed;
-//     isMoving = true;
-//   }
-//   if (keys["ArrowRight"]) {
-//     player.x += player.speed;
-//     isMoving = true;
-//   }
-
-//   // Handle actions
-//   if (keys["z"] || keys["Z"]) {
-//     currentAction = "attacking";
-//   } else if (isMoving) {
-//     currentAction = "walking";
-//   } else {
-//     currentAction = "idle";
-//   }
-
-//   // Animation frame logic
-//   if (isMoving || currentAction === "attacking") {
-//     animationTimer++;
-//     if (animationTimer >= animationSpeed) {
-//       animationTimer = 0;
-//       currentFrame++;
-//       if ((currentAction === "walking" && currentFrame >= WALK_FRAMES) || (currentAction === "attacking" && currentFrame >= ATTACK_FRAMES)) {
-//         currentFrame = 0;
-//       }
+//     if (scanProgress >= maxScanProgress) {
+//       drawText("Scanning Complete! Press SPACE to return.", 250, 350, "20px Arial");
 //     }
-//   } else {
-//     currentFrame = 0;
-//   }
+//     drawHUD();
+//   };
 
-//   // Handle collision with machine and state transition
-//   if (isCollidingWithMachine() && keys[" "]) {
-//     savedPlayerPosition = { x: player.x, y: player.y };
-//     previousState = currentState;
-//     currentState = STATES.SCANNING_GAME;
-//   }
-
-//   // Exit to main menu
-//   if (keys["Escape"]) {
-//     previousState = currentState;
-//     savedPlayerPosition = { x: player.x, y: player.y };
-//     currentState = STATES.MAIN_MENU;
-//   }
+//   // Handle case when image fails to load
+//   mriImg.onerror = function () {
+//     console.error("Failed to load image: MRI.png");
+//   };
 // }
 
 function updateOverworld() {
   let isMoving = false;
 
+  let moveX = 0,
+    moveY = 0;
+
   if (keys["ArrowUp"]) {
-    player.y -= player.speed;
+    moveY -= 1;
     player.direction = "up";
     isMoving = true;
   }
   if (keys["ArrowDown"]) {
-    player.y += player.speed;
+    moveY += 1;
     player.direction = "down";
     isMoving = true;
   }
   if (keys["ArrowLeft"]) {
-    player.x -= player.speed;
+    moveX -= 1;
     player.direction = "left";
     isMoving = true;
   }
   if (keys["ArrowRight"]) {
-    player.x += player.speed;
+    moveX += 1;
     player.direction = "right";
     isMoving = true;
   }
+
+  // Normalize diagonal movement
+  if (moveX !== 0 && moveY !== 0) {
+    const diagonalSpeed = 0.75 * player.speed;
+    moveX *= diagonalSpeed;
+    moveY *= diagonalSpeed;
+  } else {
+    moveX *= player.speed;
+    moveY *= player.speed;
+  }
+
+  // Apply movement
+  player.x += moveX;
+  player.y += moveY;
 
   // Handle actions
   if (keys["z"] || keys["Z"]) {
@@ -371,7 +320,7 @@ function gameLoop() {
       break;
     case STATES.SCANNING_GAME:
       updateScanningGame();
-      drawScanningGame();
+      drawScanningGame(ctx, canvas, scanProgress, maxScanProgress, drawHUD);
       break;
   }
 
