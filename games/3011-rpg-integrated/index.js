@@ -1,3 +1,5 @@
+// index.js
+import { drawMainMenu, mainMenuOptions } from "./mainMenu.js";
 import { drawScanningGame } from "./drawScanningGame.js";
 
 const canvas = document.getElementById("gameCanvas");
@@ -7,7 +9,7 @@ const ctx = canvas.getContext("2d");
 const STATES = {
   MAIN_MENU: "mainMenu",
   OVERWORLD: "overworld",
-  SCANNING_GAME: "scanningGame",
+  MRI_SCANNING_GAME: "scanningGame",
 };
 
 let currentState = STATES.MAIN_MENU;
@@ -28,13 +30,13 @@ let currentFrame = 0,
 let currentAction = "idle"; // "idle", "walking", "attacking"
 
 // Menu options
-const mainMenuOptions = ["Start New Game", "Load Game", "Settings", "Exit"];
 let selectedOption = 0;
 
 // Overworld variables
 const player = { x: 100, y: 100, width: 32, height: 32, color: "blue", speed: 4 };
 player.direction = "down";
-const machine = { x: 130, y: 130, width: 32, height: 32, color: "grey" };
+const mriMachine = { x: 130, y: 130, width: 32, height: 32, color: "grey" };
+const xrayMachine = { x: 70, y: 130, width: 32, height: 32, color: "green" };
 
 // Scanning game variables
 let scanProgress = 0,
@@ -61,16 +63,16 @@ function drawHUD() {
   drawText(hudText, canvas.width / 2, canvas.height - 20);
 }
 
-function drawMainMenu() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawText("Welcome to the Game", canvas.width / 2, canvas.height / 4, "30px Arial");
-  let options = [...mainMenuOptions];
-  if (isGameStarted) options[0] = "Return to Game";
+// function drawMainMenu() {
+//   ctx.clearRect(0, 0, canvas.width, canvas.height);
+//   drawText("Welcome to the Game", canvas.width / 2, canvas.height / 4, "30px Arial");
+//   let options = [...mainMenuOptions];
+//   if (isGameStarted) options[0] = "Return to Game";
 
-  options.forEach((option, index) => {
-    drawText(option, canvas.width / 2, canvas.height / 2 + index * 30, "20px Arial", index === selectedOption ? "blue" : "black");
-  });
-}
+//   options.forEach((option, index) => {
+//     drawText(option, canvas.width / 2, canvas.height / 2 + index * 30, "20px Arial", index === selectedOption ? "blue" : "black");
+//   });
+// }
 
 function drawOverworld() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -100,8 +102,11 @@ function drawOverworld() {
   );
 
   // Draw the machine as a rectangle
-  ctx.fillStyle = machine.color;
-  ctx.fillRect(machine.x, machine.y, machine.width, machine.height);
+  ctx.fillStyle = mriMachine.color;
+  ctx.fillRect(mriMachine.x, mriMachine.y, mriMachine.width, mriMachine.height);
+
+  ctx.fillStyle = xrayMachine.color;
+  ctx.fillRect(xrayMachine.x, xrayMachine.y, xrayMachine.width, xrayMachine.height);
 
   drawHUD();
 }
@@ -136,7 +141,6 @@ function updateOverworld() {
   // Normalize diagonal movement
   if (moveX !== 0 && moveY !== 0) {
     const SQUARE_ROOT_OF_TWO = 1.4142;
-
     const diagonalSpeed = (SQUARE_ROOT_OF_TWO / 2) * player.speed;
     moveX *= diagonalSpeed;
     moveY *= diagonalSpeed;
@@ -173,10 +177,10 @@ function updateOverworld() {
   }
 
   // Handle collision with machine and state transition
-  if (isCollidingWithMachine() && keys[" "]) {
+  if (isCollidingWithMRIMachine() && keys[" "]) {
     savedPlayerPosition = { x: player.x, y: player.y };
     previousState = currentState;
-    currentState = STATES.SCANNING_GAME;
+    currentState = STATES.MRI_SCANNING_GAME;
   }
 
   // Exit to main menu
@@ -187,11 +191,11 @@ function updateOverworld() {
   }
 }
 
-function isCollidingWithMachine() {
-  return player.x < machine.x + machine.width && player.x + player.width > machine.x && player.y < machine.y + machine.height && player.y + player.height > machine.y;
+function isCollidingWithMRIMachine() {
+  return player.x < mriMachine.x + mriMachine.width && player.x + player.width > mriMachine.x && player.y < mriMachine.y + mriMachine.height && player.y + player.height > mriMachine.y;
 }
 
-function updateScanningGame() {
+function updateMriScanningGame() {
   if (keys[" "]) {
     scanning = true;
     if (scanProgress < maxScanProgress) {
@@ -240,8 +244,8 @@ function handleMenuSelection() {
       isGameStarted = true;
       break;
     case isGameStarted && "Start New Game": // "Return to Game"
-      if (previousState === STATES.SCANNING_GAME) {
-        currentState = STATES.SCANNING_GAME;
+      if (previousState === STATES.MRI_SCANNING_GAME) {
+        currentState = STATES.MRI_SCANNING_GAME;
       } else {
         currentState = previousState;
       }
@@ -263,14 +267,14 @@ function gameLoop() {
   switch (currentState) {
     case STATES.MAIN_MENU:
       updateMainMenu();
-      drawMainMenu();
+      drawMainMenu(ctx, canvas, drawText, isGameStarted, selectedOption);
       break;
     case STATES.OVERWORLD:
       updateOverworld();
       drawOverworld();
       break;
-    case STATES.SCANNING_GAME:
-      updateScanningGame();
+    case STATES.MRI_SCANNING_GAME:
+      updateMriScanningGame();
       drawScanningGame(ctx, canvas, scanProgress, maxScanProgress, drawHUD);
       break;
   }
