@@ -1,27 +1,29 @@
 // index.js
 import { drawMainMenu, mainMenuOptions } from "./drawMainMenu.js";
-import { drawOverworld } from "./drawOverworld.js";
+import { drawOverworld } from "./overworld/drawOverworld.js";
 import { drawHUD } from "./drawHud.js";
 import { drawMedicalScansGame } from "./minigames/medicalScans/drawMedicalScansGame.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// Game states
+// Constants
 const STATES = {
   MAIN_MENU: "mainMenu",
   OVERWORLD: "overworld",
   MEDICAL_SCANS_GAME: "medicalScansGame",
 };
 
+const ACTIONS = {
+  IDLE: "idle",
+  WALKING: "walking",
+  ATTACKING: "attacking",
+};
+
 let currentState = STATES.MAIN_MENU;
 let previousState = STATES.MAIN_MENU;
 let isGameStarted = false;
 
-const spriteSheet = new Image();
-spriteSheet.src = "images/characters/PC.png";
-
-// Animation configuration
 const FRAME_WIDTH = 133.5,
   FRAME_HEIGHT = 200,
   WALK_FRAMES = 4,
@@ -29,24 +31,20 @@ const FRAME_WIDTH = 133.5,
 let currentFrame = 0,
   animationTimer = 0,
   animationSpeed = 10;
-let currentAction = "idle"; // "idle", "walking", "attacking"
+let currentAction = ACTIONS.IDLE;
 
-// Menu options
-let selectedOption = 0;
+let selectedMenuOption = 0;
 
-// Overworld variables
 const player = { x: 100, y: 100, width: 32, height: 32, color: "blue", speed: 4 };
 player.direction = "down";
 const mriMachine = { x: 130, y: 130, width: 32, height: 32, color: "grey" };
 const xrayMachine = { x: 70, y: 130, width: 32, height: 32, color: "green" };
 
-// Scanning game variables
 let scanProgress = 0,
   maxScanProgress = 100,
   scanning = false;
 let savedPlayerPosition = { x: player.x, y: player.y };
 
-// Input handling
 const keys = {};
 window.addEventListener("keydown", (e) => (keys[e.key] = true));
 window.addEventListener("keyup", (e) => (keys[e.key] = false));
@@ -58,7 +56,7 @@ function drawText(text, x, y, font = "16px Arial", color = "black", align = "cen
   ctx.fillText(text, x, y);
 }
 
-function updateOverworld() {
+function updatePlayerInOverworld() {
   let isMoving = false;
 
   let moveX = 0,
@@ -85,7 +83,6 @@ function updateOverworld() {
     isMoving = true;
   }
 
-  // Normalize diagonal movement
   if (moveX !== 0 && moveY !== 0) {
     const SQUARE_ROOT_OF_TWO = 1.4142;
     const diagonalSpeed = (SQUARE_ROOT_OF_TWO / 2) * player.speed;
@@ -96,26 +93,23 @@ function updateOverworld() {
     moveY *= player.speed;
   }
 
-  // Apply movement
   player.x += moveX;
   player.y += moveY;
 
-  // Handle actions
   if (keys["z"] || keys["Z"]) {
-    currentAction = "attacking";
+    currentAction = ACTIONS.ATTACKING;
   } else if (isMoving) {
-    currentAction = "walking";
+    currentAction = ACTIONS.WALKING;
   } else {
-    currentAction = "idle";
+    currentAction = ACTIONS.IDLE;
   }
 
-  // Animation frame logic
-  if (isMoving || currentAction === "attacking") {
+  if (isMoving || currentAction === ACTIONS.ATTACKING) {
     animationTimer++;
     if (animationTimer >= animationSpeed) {
       animationTimer = 0;
       currentFrame++;
-      if ((currentAction === "walking" && currentFrame >= WALK_FRAMES) || (currentAction === "attacking" && currentFrame >= ATTACK_FRAMES)) {
+      if ((currentAction === ACTIONS.WALKING && currentFrame >= WALK_FRAMES) || (currentAction === ACTIONS.ATTACKING && currentFrame >= ATTACK_FRAMES)) {
         currentFrame = 0;
       }
     }
@@ -123,14 +117,12 @@ function updateOverworld() {
     currentFrame = 0;
   }
 
-  // Handle collision with machine and state transition
-  if (isCollidingWithMRIMachine() && keys[" "]) {
+  if (isCollidingWithMedicalScanGame() && keys[" "]) {
     savedPlayerPosition = { x: player.x, y: player.y };
     previousState = currentState;
     currentState = STATES.MEDICAL_SCANS_GAME;
   }
 
-  // Exit to main menu
   if (keys["Escape"]) {
     previousState = currentState;
     savedPlayerPosition = { x: player.x, y: player.y };
@@ -138,11 +130,11 @@ function updateOverworld() {
   }
 }
 
-function isCollidingWithMRIMachine() {
+function isCollidingWithMedicalScanGame() {
   return player.x < mriMachine.x + mriMachine.width && player.x + player.width > mriMachine.x && player.y < mriMachine.y + mriMachine.height && player.y + player.height > mriMachine.y;
 }
 
-function updateMriScanningGame() {
+function updateMedicalScanGame() {
   if (keys[" "]) {
     scanning = true;
     if (scanProgress < maxScanProgress) {
@@ -152,7 +144,6 @@ function updateMriScanningGame() {
     scanning = false;
   }
 
-  // Handle returning to overworld or exiting
   if (keys["x"] || keys["X"] || (scanProgress >= maxScanProgress && keys[" "])) {
     currentState = STATES.OVERWORLD;
     player.x = savedPlayerPosition.x;
@@ -160,7 +151,6 @@ function updateMriScanningGame() {
     scanProgress = 0;
   }
 
-  // Exit to main menu
   if (keys["Escape"]) {
     previousState = currentState;
     currentState = STATES.MAIN_MENU;
@@ -169,11 +159,11 @@ function updateMriScanningGame() {
 
 function updateMainMenu() {
   if (keys["ArrowUp"]) {
-    selectedOption = (selectedOption - 1 + mainMenuOptions.length) % mainMenuOptions.length;
+    selectedMenuOption = (selectedMenuOption - 1 + mainMenuOptions.length) % mainMenuOptions.length;
     keys["ArrowUp"] = false;
   }
   if (keys["ArrowDown"]) {
-    selectedOption = (selectedOption + 1) % mainMenuOptions.length;
+    selectedMenuOption = (selectedMenuOption + 1) % mainMenuOptions.length;
     keys["ArrowDown"] = false;
   }
 
@@ -184,7 +174,7 @@ function updateMainMenu() {
 }
 
 function handleMenuSelection() {
-  const selected = mainMenuOptions[selectedOption];
+  const selected = mainMenuOptions[selectedMenuOption];
   switch (selected) {
     case !isGameStarted && "Start New Game":
       currentState = STATES.OVERWORLD;
@@ -214,16 +204,16 @@ function gameLoop() {
   switch (currentState) {
     case STATES.MAIN_MENU:
       updateMainMenu();
-      drawMainMenu(ctx, canvas, drawText, isGameStarted, selectedOption);
+      drawMainMenu(ctx, canvas, drawText, isGameStarted, selectedMenuOption);
       break;
     case STATES.OVERWORLD:
-      updateOverworld();
-      drawOverworld(ctx, canvas, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT, spriteSheet, mriMachine, xrayMachine);
+      updatePlayerInOverworld();
+      drawOverworld(ctx, canvas, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT, mriMachine, xrayMachine);
       drawHUD(ctx, canvas, currentState, STATES, drawText);
 
       break;
     case STATES.MEDICAL_SCANS_GAME:
-      updateMriScanningGame();
+      updateMedicalScanGame();
       drawMedicalScansGame(ctx, canvas, scanProgress, maxScanProgress);
       drawHUD(ctx, canvas, currentState, STATES, drawText);
       break;

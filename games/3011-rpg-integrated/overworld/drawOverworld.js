@@ -1,4 +1,7 @@
-export function drawOverworld(ctx, canvas, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT, spriteSheet, mriMachine, xrayMachine) {
+const playerSpriteSheet = new Image();
+playerSpriteSheet.src = "overworld/images/player.png";
+
+export function drawOverworld(ctx, canvas, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT, mriMachine, xrayMachine) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Draw the player sprite from the sprite sheet
@@ -12,7 +15,7 @@ export function drawOverworld(ctx, canvas, player, currentFrame, FRAME_WIDTH, FR
   const sourceY = spriteRow * FRAME_HEIGHT;
 
   ctx.drawImage(
-    spriteSheet, // Image
+    playerSpriteSheet, // Image
     sourceX, // Source X (frame column)
     sourceY, // Source Y (row for direction)
     FRAME_WIDTH, // Source width
