@@ -21,10 +21,6 @@ let currentAction = ACTIONS.IDLE;
 
 let selectedMenuOption = 0;
 
-// function createPlayer(x, y, width, height, color, speed) {
-//   return { x, y, width, height, color, speed, direction: DIRECTION.DOWN };
-// }
-
 function createGameObject(x, y, width, height, color) {
   return { x, y, width, height, color };
 }
@@ -33,9 +29,9 @@ const player = createPlayer(100, 100, 32, 32, "blue", 4, DIRECTION.DOWN);
 const mriMachine = createGameObject(130, 130, 32, 32, "grey");
 const xrayMachine = createGameObject(70, 130, 32, 32, "green");
 
-let scanProgress = 0,
-  maxScanProgress = 100,
-  scanning = false;
+let scanProgress = 0;
+let maxScanProgress = 100;
+let scanning = false;
 let savedPlayerPosition = { x: player.x, y: player.y };
 
 const keys = {};
