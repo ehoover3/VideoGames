@@ -1,7 +1,7 @@
 // index.js
 import { drawMainMenu, mainMenuOptions } from "./mainMenu.js";
-import { drawScanningGame } from "./drawScanningGame.js";
 import { drawHUD } from "./drawHud.js";
+import { drawScanningGame } from "./drawScanningGame.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -67,8 +67,6 @@ function drawOverworld() {
     left: 2,
     right: 3,
   }[player.direction];
-  const SOURCE_FRAME_WIDTH = 133.5;
-  const SOURCE_FRAME_HEIGHT = 133.5;
   const sourceX = currentFrame * FRAME_WIDTH;
   const sourceY = spriteRow * FRAME_HEIGHT;
 
