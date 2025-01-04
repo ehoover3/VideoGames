@@ -112,7 +112,7 @@ function updatePlayerInOverworld() {
     currentFrame = 0;
   }
 
-  if (isCollidingWithMedicalScanGame() && keys[" "]) {
+  if (checkCollisionWithGameObject(mriMachine) && keys[" "]) {
     savedPlayerPosition = { x: player.x, y: player.y };
     previousState = currentState;
     currentState = STATES.MEDICAL_SCANS_GAME;
@@ -125,8 +125,8 @@ function updatePlayerInOverworld() {
   }
 }
 
-function isCollidingWithMedicalScanGame() {
-  return player.x < mriMachine.x + mriMachine.width && player.x + player.width > mriMachine.x && player.y < mriMachine.y + mriMachine.height && player.y + player.height > mriMachine.y;
+function checkCollisionWithGameObject(gameObject) {
+  return player.x < gameObject.x + gameObject.width && player.x + player.width > gameObject.x && player.y < gameObject.y + gameObject.height && player.y + player.height > gameObject.y;
 }
 
 function updateMedicalScanGame() {
