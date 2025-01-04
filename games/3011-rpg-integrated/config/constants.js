@@ -1,3 +1,5 @@
+// constants.py  # Constant values used throughout the game
+
 export const STATES = {
   MAIN_MENU: "mainMenu",
   OVERWORLD: "overworld",

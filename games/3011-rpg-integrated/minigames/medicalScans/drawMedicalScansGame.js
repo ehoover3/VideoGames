@@ -1,6 +1,6 @@
 export function drawMedicalScansGame(ctx, canvas, scanProgress, maxScanProgress) {
   const mriImg = new Image();
-  mriImg.src = "minigames/medicalScans/images/mri.png";
+  mriImg.src = "assets/images/mri.png";
 
   mriImg.onload = function () {
     ctx.clearRect(0, 0, canvas.width, canvas.height);

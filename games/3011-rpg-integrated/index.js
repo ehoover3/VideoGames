@@ -1,7 +1,7 @@
 // index.js
-import { STATES, ACTIONS, DIRECTION } from "./constants.js";
-import { checkCollisionWithGameObject } from "./gameLogic/checkCollisionwithGameObject.js";
-import { handleMainMenu, handleMenuSelection, drawMainMenu } from "./mainMenu.js"; // Import new functions
+import { STATES, ACTIONS, DIRECTION } from "./config/constants.js";
+import { checkCollisionWithGameObject } from "./game/checkCollisionwithGameObject.js";
+import { handleMainMenu, handleMenuSelection, drawMainMenu } from "./game/menu.js"; // Import new functions
 import { drawOverworld } from "./overworld/drawOverworld.js";
 import { drawHUD } from "./drawHud.js";
 import { drawMedicalScansGame } from "./minigames/medicalScans/drawMedicalScansGame.js";

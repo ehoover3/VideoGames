@@ -1,5 +1,5 @@
 // menuHandler.js
-import { MENU_OPTIONS, STATES } from "./constants.js";
+import { MENU_OPTIONS, STATES } from "../config/constants.js";
 
 const mainMenuOptions = [MENU_OPTIONS.START_NEW_GAME, MENU_OPTIONS.LOAD_GAME, MENU_OPTIONS.SETTINGS, MENU_OPTIONS.EXIT];
 
