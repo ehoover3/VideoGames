@@ -1,5 +1,5 @@
 const playerSpriteSheet = new Image();
-playerSpriteSheet.src = "overworld/images/player.png";
+playerSpriteSheet.src = "assets/images/player.png";
 
 export function drawOverworld(ctx, canvas, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT, mriMachine, xrayMachine) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);

@@ -1,10 +1,10 @@
 // index.js
-import { STATES, ACTIONS, DIRECTION } from "./config/constants.js";
+import { STATES, ACTIONS, DIRECTION, FRAME_WIDTH, FRAME_HEIGHT, WALK_FRAMES, ATTACK_FRAMES } from "./config/constants.js";
 import { checkCollisionWithGameObject } from "./game/game.js";
 import { handleMainMenu, handleMenuSelection, drawMainMenu } from "./game/menu.js"; // Import new functions
-import { drawOverworld } from "./overworld/drawOverworld.js";
-import { drawHUD } from "./drawHud.js";
-import { drawMedicalScansGame } from "./minigames/medicalScans/drawMedicalScansGame.js";
+import { drawOverworld } from "./game/world.js";
+import { drawHUD } from "./game/hud.js";
+import { drawMedicalScansGame } from "./game/minigames/medScan.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -13,10 +13,6 @@ let currentState = STATES.MAIN_MENU;
 let previousState = STATES.MAIN_MENU;
 let isGameStarted = false;
 
-const FRAME_WIDTH = 133.5;
-const FRAME_HEIGHT = 200;
-const WALK_FRAMES = 4;
-const ATTACK_FRAMES = 4;
 let currentFrame = 0;
 let animationTimer = 0;
 let animationSpeed = 10;
@@ -52,7 +48,7 @@ function drawText(text, x, y, font = "16px Arial", color = "black", align = "cen
   ctx.fillText(text, x, y);
 }
 
-function updatePlayerInOverworld() {
+function updatePlayer() {
   let isMoving = false;
 
   let moveX = 0,
@@ -175,7 +171,7 @@ function gameLoop() {
       drawMainMenu(ctx, canvas, drawText, isGameStarted, selectedMenuOption);
       break;
     case STATES.OVERWORLD:
-      updatePlayerInOverworld();
+      updatePlayer();
       drawOverworld(ctx, canvas, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT, mriMachine, xrayMachine);
       drawHUD(ctx, canvas, currentState, STATES, drawText);
       break;

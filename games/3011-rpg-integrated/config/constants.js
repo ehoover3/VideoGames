@@ -1,4 +1,4 @@
-// constants.py  # Constant values used throughout the game
+// constants.js  # Constant values used throughout the game
 
 export const STATES = {
   MAIN_MENU: "mainMenu",
@@ -25,3 +25,8 @@ export const MENU_OPTIONS = {
   SETTINGS: "Settings",
   EXIT: "Exit",
 };
+
+export const FRAME_WIDTH = 133.5;
+export const FRAME_HEIGHT = 200;
+export const WALK_FRAMES = 4;
+export const ATTACK_FRAMES = 4;
