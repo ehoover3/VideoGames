@@ -1,8 +1,4 @@
-// drawOverworld.js
-const spriteSheet = new Image();
-spriteSheet.src = "images/characters/PC.png";
-
-export function drawOverworld(ctx, canvas, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT, mriMachine) {
+export function drawOverworld(ctx, canvas, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT, spriteSheet, mriMachine, xrayMachine) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Draw the player sprite from the sprite sheet
@@ -12,8 +8,6 @@ export function drawOverworld(ctx, canvas, player, currentFrame, FRAME_WIDTH, FR
     left: 2,
     right: 3,
   }[player.direction];
-  const SOURCE_FRAME_WIDTH = 133.5;
-  const SOURCE_FRAME_HEIGHT = 133.5;
   const sourceX = currentFrame * FRAME_WIDTH;
   const sourceY = spriteRow * FRAME_HEIGHT;
 
@@ -32,4 +26,7 @@ export function drawOverworld(ctx, canvas, player, currentFrame, FRAME_WIDTH, FR
   // Draw the machine as a rectangle
   ctx.fillStyle = mriMachine.color;
   ctx.fillRect(mriMachine.x, mriMachine.y, mriMachine.width, mriMachine.height);
+
+  ctx.fillStyle = xrayMachine.color;
+  ctx.fillRect(xrayMachine.x, xrayMachine.y, xrayMachine.width, xrayMachine.height);
 }
