@@ -1,6 +1,6 @@
 export function drawScanningGame(ctx, canvas, scanProgress, maxScanProgress, drawHUD) {
   const mriImg = new Image();
-  mriImg.src = "MRI.png";
+  mriImg.src = "images/scanningMachines/mri.png";
 
   mriImg.onload = function () {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
