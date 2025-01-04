@@ -20,6 +20,13 @@ const ACTIONS = {
   ATTACKING: "attacking",
 };
 
+const DIRECTION = {
+  UP: "up",
+  DOWN: "down",
+  LEFT: "left",
+  RIGHT: "right",
+};
+
 let currentState = STATES.MAIN_MENU;
 let previousState = STATES.MAIN_MENU;
 let isGameStarted = false;
@@ -64,22 +71,22 @@ function updatePlayerInOverworld() {
 
   if (keys["ArrowUp"]) {
     moveY -= 1;
-    player.direction = "up";
+    player.direction = DIRECTION.UP;
     isMoving = true;
   }
   if (keys["ArrowDown"]) {
     moveY += 1;
-    player.direction = "down";
+    player.direction = DIRECTION.DOWN;
     isMoving = true;
   }
   if (keys["ArrowLeft"]) {
     moveX -= 1;
-    player.direction = "left";
+    player.direction = DIRECTION.LEFT;
     isMoving = true;
   }
   if (keys["ArrowRight"]) {
     moveX += 1;
-    player.direction = "right";
+    player.direction = DIRECTION.RIGHT;
     isMoving = true;
   }
 
