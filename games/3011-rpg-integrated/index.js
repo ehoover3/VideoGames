@@ -2,7 +2,7 @@
 import { drawMainMenu, mainMenuOptions } from "./drawMainMenu.js";
 import { drawOverworld } from "./drawOverworld.js";
 import { drawHUD } from "./drawHud.js";
-import { drawScanningGame } from "./drawScanningGame.js";
+import { drawMedicalScansGame } from "./minigames/medicalScans/drawMedicalScansGame.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -11,7 +11,7 @@ const ctx = canvas.getContext("2d");
 const STATES = {
   MAIN_MENU: "mainMenu",
   OVERWORLD: "overworld",
-  MRI_SCANNING_GAME: "scanningGame",
+  MEDICAL_SCANS_GAME: "medicalScansGame",
 };
 
 let currentState = STATES.MAIN_MENU;
@@ -57,39 +57,6 @@ function drawText(text, x, y, font = "16px Arial", color = "black", align = "cen
   ctx.textAlign = align;
   ctx.fillText(text, x, y);
 }
-
-// function drawOverworld() {
-//   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-//   // Draw the player sprite from the sprite sheet
-//   const spriteRow = {
-//     down: 0,
-//     up: 1,
-//     left: 2,
-//     right: 3,
-//   }[player.direction];
-//   const sourceX = currentFrame * FRAME_WIDTH;
-//   const sourceY = spriteRow * FRAME_HEIGHT;
-
-//   ctx.drawImage(
-//     spriteSheet, // Image
-//     sourceX, // Source X (frame column)
-//     sourceY, // Source Y (row for direction)
-//     FRAME_WIDTH, // Source width
-//     FRAME_HEIGHT, // Source height
-//     player.x, // Destination X
-//     player.y, // Destination Y
-//     player.width, // Destination width
-//     player.height // Destination height
-//   );
-
-//   // Draw the machine as a rectangle
-//   ctx.fillStyle = mriMachine.color;
-//   ctx.fillRect(mriMachine.x, mriMachine.y, mriMachine.width, mriMachine.height);
-
-//   ctx.fillStyle = xrayMachine.color;
-//   ctx.fillRect(xrayMachine.x, xrayMachine.y, xrayMachine.width, xrayMachine.height);
-// }
 
 function updateOverworld() {
   let isMoving = false;
@@ -160,7 +127,7 @@ function updateOverworld() {
   if (isCollidingWithMRIMachine() && keys[" "]) {
     savedPlayerPosition = { x: player.x, y: player.y };
     previousState = currentState;
-    currentState = STATES.MRI_SCANNING_GAME;
+    currentState = STATES.MEDICAL_SCANS_GAME;
   }
 
   // Exit to main menu
@@ -224,8 +191,8 @@ function handleMenuSelection() {
       isGameStarted = true;
       break;
     case isGameStarted && "Start New Game": // "Return to Game"
-      if (previousState === STATES.MRI_SCANNING_GAME) {
-        currentState = STATES.MRI_SCANNING_GAME;
+      if (previousState === STATES.MEDICAL_SCANS_GAME) {
+        currentState = STATES.MEDICAL_SCANS_GAME;
       } else {
         currentState = previousState;
       }
@@ -255,9 +222,9 @@ function gameLoop() {
       drawHUD(ctx, canvas, currentState, STATES, drawText);
 
       break;
-    case STATES.MRI_SCANNING_GAME:
+    case STATES.MEDICAL_SCANS_GAME:
       updateMriScanningGame();
-      drawScanningGame(ctx, canvas, scanProgress, maxScanProgress);
+      drawMedicalScansGame(ctx, canvas, scanProgress, maxScanProgress);
       drawHUD(ctx, canvas, currentState, STATES, drawText);
       break;
   }

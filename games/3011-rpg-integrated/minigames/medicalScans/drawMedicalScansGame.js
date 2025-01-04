@@ -1,6 +1,6 @@
-export function drawScanningGame(ctx, canvas, scanProgress, maxScanProgress) {
+export function drawMedicalScansGame(ctx, canvas, scanProgress, maxScanProgress) {
   const mriImg = new Image();
-  mriImg.src = "images/scanningMachines/mri.png";
+  mriImg.src = "minigames/medicalScans/images/mri.png";
 
   mriImg.onload = function () {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -44,6 +44,6 @@ export function drawScanningGame(ctx, canvas, scanProgress, maxScanProgress) {
 
   // Handle case when image fails to load
   mriImg.onerror = function () {
-    console.error("Failed to load image: MRI.png");
+    console.error("Failed to load image: mri.png");
   };
 }
