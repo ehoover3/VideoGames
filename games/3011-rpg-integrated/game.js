@@ -1,4 +1,3 @@
-// Get the canvas and context
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -28,7 +27,7 @@ let selectedOption = 0;
 
 // Overworld variables
 const player = { x: 100, y: 100, width: FRAME_WIDTH, height: FRAME_HEIGHT, speed: 5 };
-const machine = { x: 300, y: 200, width: 32, height: 32 };
+const machine = { x: 130, y: 130, width: 32, height: 32 };
 
 // Scanning game variables
 let scanProgress = 0,
@@ -86,22 +85,56 @@ function drawOverworld() {
   drawHUD();
 }
 
-// Draw Scanning Game
 function drawScanningGame() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const mriImg = new Image();
+  mriImg.src = "MRI.png";
 
-  // Draw progress bar
-  ctx.fillStyle = "lightgray";
-  ctx.fillRect((canvas.width - 400) / 2, 250, 400, 50);
+  mriImg.onload = function () {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "green";
-  ctx.fillRect((canvas.width - 400) / 2, 250, (scanProgress / maxScanProgress) * 400, 50);
+    const mriImgConfig = {
+      image: mriImg,
+      sourceImgX: 0,
+      sourceImgY: 0,
+      sourceImgWidth: 458,
+      sourceImgHeight: 248,
+      destinationX: (canvas.width - 458) / 2,
+      destinationY: 10,
+      destinationWidth: 458,
+      destinationHeight: 248,
+    };
 
-  if (scanProgress >= maxScanProgress) {
-    drawText("Scanning Complete! Press SPACE to return.", 250, 350, "20px Arial");
-  }
+    ctx.drawImage(
+      mriImgConfig.image, //
+      mriImgConfig.sourceImgX,
+      mriImgConfig.sourceImgY,
+      mriImgConfig.sourceImgWidth,
+      mriImgConfig.sourceImgHeight,
+      mriImgConfig.destinationX,
+      mriImgConfig.destinationY,
+      mriImgConfig.destinationWidth,
+      mriImgConfig.destinationHeight
+    );
 
-  drawHUD();
+    // Draw progress bar
+    ctx.fillStyle = "lightgray";
+    ctx.fillRect((canvas.width - 400) / 2, 270, 400, 24);
+
+    const turquoiseBlue = "#13beec";
+    ctx.fillStyle = turquoiseBlue;
+    ctx.fillRect((canvas.width - 400) / 2, 270, (scanProgress / maxScanProgress) * 400, 24);
+
+    if (scanProgress >= maxScanProgress) {
+      drawText("Scanning Complete! Press SPACE to return.", 250, 350, "20px Arial");
+    }
+
+    drawHUD();
+  };
+
+  // Handle case when image fails to load
+  mriImg.onerror = function () {
+    console.error("Failed to load image: MRI.png");
+  };
 }
 
 // Update Overworld state
