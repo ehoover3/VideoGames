@@ -23,10 +23,17 @@ let currentAction = ACTIONS.IDLE;
 
 let selectedMenuOption = 0;
 
-const player = { x: 100, y: 100, width: 32, height: 32, color: "blue", speed: 4 };
-player.direction = "down";
-const mriMachine = { x: 130, y: 130, width: 32, height: 32, color: "grey" };
-const xrayMachine = { x: 70, y: 130, width: 32, height: 32, color: "green" };
+function createPlayer(x, y, width, height, color, speed) {
+  return { x, y, width, height, color, speed, direction: DIRECTION.DOWN };
+}
+
+function createGameObject(x, y, width, height, color) {
+  return { x, y, width, height, color };
+}
+
+const player = createPlayer(100, 100, 32, 32, "blue", 4);
+const mriMachine = createGameObject(130, 130, 32, 32, "grey");
+const xrayMachine = createGameObject(70, 130, 32, 32, "green");
 
 let scanProgress = 0,
   maxScanProgress = 100,
