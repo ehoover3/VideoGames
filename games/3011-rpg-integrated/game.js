@@ -12,9 +12,12 @@ let currentState = STATES.MAIN_MENU;
 let previousState = STATES.MAIN_MENU;
 let isGameStarted = false;
 
+const spriteSheet = new Image();
+spriteSheet.src = "images/PC.png";
+
 // Animation configuration
-const FRAME_WIDTH = 32,
-  FRAME_HEIGHT = 32,
+const FRAME_WIDTH = 133.5,
+  FRAME_HEIGHT = 200,
   WALK_FRAMES = 4,
   ATTACK_FRAMES = 4;
 let currentFrame = 0,
@@ -27,7 +30,8 @@ const mainMenuOptions = ["Start New Game", "Load Game", "Settings", "Exit"];
 let selectedOption = 0;
 
 // Overworld variables
-const player = { x: 100, y: 100, width: FRAME_WIDTH, height: FRAME_HEIGHT, color: "blue", speed: 5 };
+const player = { x: 100, y: 100, width: 32, height: 32, color: "blue", speed: 4 };
+player.direction = "down";
 const machine = { x: 130, y: 130, width: 32, height: 32, color: "grey" };
 
 // Scanning game variables
@@ -66,12 +70,46 @@ function drawMainMenu() {
   });
 }
 
+// function drawOverworld() {
+//   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+//   ctx.fillStyle = player.color;
+//   ctx.fillRect(player.x, player.y, player.width, player.height);
+
+//   ctx.fillStyle = machine.color;
+//   ctx.fillRect(machine.x, machine.y, machine.width, machine.height);
+
+//   drawHUD();
+// }
+
 function drawOverworld() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = player.color;
-  ctx.fillRect(player.x, player.y, player.width, player.height);
+  // Draw the player sprite from the sprite sheet
+  const spriteRow = {
+    down: 0,
+    up: 1,
+    left: 2,
+    right: 3,
+  }[player.direction];
+  const SOURCE_FRAME_WIDTH = 133.5;
+  const SOURCE_FRAME_HEIGHT = 133.5;
+  const sourceX = currentFrame * FRAME_WIDTH;
+  const sourceY = spriteRow * FRAME_HEIGHT;
 
+  ctx.drawImage(
+    spriteSheet, // Image
+    sourceX, // Source X (frame column)
+    sourceY, // Source Y (row for direction)
+    FRAME_WIDTH, // Source width
+    FRAME_HEIGHT, // Source height
+    player.x, // Destination X
+    player.y, // Destination Y
+    player.width, // Destination width
+    player.height // Destination height
+  );
+
+  // Draw the machine as a rectangle
   ctx.fillStyle = machine.color;
   ctx.fillRect(machine.x, machine.y, machine.width, machine.height);
 
@@ -129,23 +167,85 @@ function drawScanningGame() {
   };
 }
 
+// function updateOverworld() {
+//   let isMoving = false;
+
+//   if (keys["ArrowUp"]) {
+//     player.y -= player.speed;
+//     isMoving = true;
+//   }
+//   if (keys["ArrowDown"]) {
+//     player.y += player.speed;
+//     isMoving = true;
+//   }
+//   if (keys["ArrowLeft"]) {
+//     player.x -= player.speed;
+//     isMoving = true;
+//   }
+//   if (keys["ArrowRight"]) {
+//     player.x += player.speed;
+//     isMoving = true;
+//   }
+
+//   // Handle actions
+//   if (keys["z"] || keys["Z"]) {
+//     currentAction = "attacking";
+//   } else if (isMoving) {
+//     currentAction = "walking";
+//   } else {
+//     currentAction = "idle";
+//   }
+
+//   // Animation frame logic
+//   if (isMoving || currentAction === "attacking") {
+//     animationTimer++;
+//     if (animationTimer >= animationSpeed) {
+//       animationTimer = 0;
+//       currentFrame++;
+//       if ((currentAction === "walking" && currentFrame >= WALK_FRAMES) || (currentAction === "attacking" && currentFrame >= ATTACK_FRAMES)) {
+//         currentFrame = 0;
+//       }
+//     }
+//   } else {
+//     currentFrame = 0;
+//   }
+
+//   // Handle collision with machine and state transition
+//   if (isCollidingWithMachine() && keys[" "]) {
+//     savedPlayerPosition = { x: player.x, y: player.y };
+//     previousState = currentState;
+//     currentState = STATES.SCANNING_GAME;
+//   }
+
+//   // Exit to main menu
+//   if (keys["Escape"]) {
+//     previousState = currentState;
+//     savedPlayerPosition = { x: player.x, y: player.y };
+//     currentState = STATES.MAIN_MENU;
+//   }
+// }
+
 function updateOverworld() {
   let isMoving = false;
 
   if (keys["ArrowUp"]) {
     player.y -= player.speed;
+    player.direction = "up";
     isMoving = true;
   }
   if (keys["ArrowDown"]) {
     player.y += player.speed;
+    player.direction = "down";
     isMoving = true;
   }
   if (keys["ArrowLeft"]) {
     player.x -= player.speed;
+    player.direction = "left";
     isMoving = true;
   }
   if (keys["ArrowRight"]) {
     player.x += player.speed;
+    player.direction = "right";
     isMoving = true;
   }
 
