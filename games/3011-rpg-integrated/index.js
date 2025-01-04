@@ -1,6 +1,7 @@
 // index.js
 import { drawMainMenu, mainMenuOptions } from "./mainMenu.js";
 import { drawScanningGame } from "./drawScanningGame.js";
+import { drawHUD } from "./drawHud.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -56,24 +57,6 @@ function drawText(text, x, y, font = "16px Arial", color = "black", align = "cen
   ctx.fillText(text, x, y);
 }
 
-function drawHUD() {
-  ctx.fillStyle = "lightgray";
-  ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
-  const hudText = currentState === STATES.OVERWORLD ? "Arrow Keys to Move | Space to Interact | ESC for Main Menu" : "Hold SPACE to Scan | X to Exit to Overworld | ESC for Main Menu";
-  drawText(hudText, canvas.width / 2, canvas.height - 20);
-}
-
-// function drawMainMenu() {
-//   ctx.clearRect(0, 0, canvas.width, canvas.height);
-//   drawText("Welcome to the Game", canvas.width / 2, canvas.height / 4, "30px Arial");
-//   let options = [...mainMenuOptions];
-//   if (isGameStarted) options[0] = "Return to Game";
-
-//   options.forEach((option, index) => {
-//     drawText(option, canvas.width / 2, canvas.height / 2 + index * 30, "20px Arial", index === selectedOption ? "blue" : "black");
-//   });
-// }
-
 function drawOverworld() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -107,8 +90,6 @@ function drawOverworld() {
 
   ctx.fillStyle = xrayMachine.color;
   ctx.fillRect(xrayMachine.x, xrayMachine.y, xrayMachine.width, xrayMachine.height);
-
-  drawHUD();
 }
 
 function updateOverworld() {
@@ -272,10 +253,13 @@ function gameLoop() {
     case STATES.OVERWORLD:
       updateOverworld();
       drawOverworld();
+      drawHUD(ctx, canvas, currentState, STATES, drawText);
+
       break;
     case STATES.MRI_SCANNING_GAME:
       updateMriScanningGame();
-      drawScanningGame(ctx, canvas, scanProgress, maxScanProgress, drawHUD);
+      drawScanningGame(ctx, canvas, scanProgress, maxScanProgress);
+      drawHUD(ctx, canvas, currentState, STATES, drawText);
       break;
   }
 

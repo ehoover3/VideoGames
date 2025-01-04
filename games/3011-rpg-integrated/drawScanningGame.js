@@ -1,4 +1,4 @@
-export function drawScanningGame(ctx, canvas, scanProgress, maxScanProgress, drawHUD) {
+export function drawScanningGame(ctx, canvas, scanProgress, maxScanProgress) {
   const mriImg = new Image();
   mriImg.src = "images/scanningMachines/mri.png";
 
@@ -40,7 +40,6 @@ export function drawScanningGame(ctx, canvas, scanProgress, maxScanProgress, dra
     if (scanProgress >= maxScanProgress) {
       drawText("Scanning Complete! Press SPACE to return.", 250, 350, "20px Arial");
     }
-    drawHUD();
   };
 
   // Handle case when image fails to load
