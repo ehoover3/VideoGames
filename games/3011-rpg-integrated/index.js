@@ -1,4 +1,5 @@
 // index.js
+import { STATES, ACTIONS, DIRECTION, MENU_OPTIONS } from "./constants.js";
 import { drawMainMenu, mainMenuOptions } from "./drawMainMenu.js";
 import { drawOverworld } from "./overworld/drawOverworld.js";
 import { drawHUD } from "./drawHud.js";
@@ -6,33 +7,6 @@ import { drawMedicalScansGame } from "./minigames/medicalScans/drawMedicalScansG
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-
-// Constants
-const STATES = {
-  MAIN_MENU: "mainMenu",
-  OVERWORLD: "overworld",
-  MEDICAL_SCANS_GAME: "medicalScansGame",
-};
-
-const ACTIONS = {
-  IDLE: "idle",
-  WALKING: "walking",
-  ATTACKING: "attacking",
-};
-
-const DIRECTION = {
-  UP: "up",
-  DOWN: "down",
-  LEFT: "left",
-  RIGHT: "right",
-};
-
-const MENU_OPTIONS = {
-  START_NEW_GAME: "Start New Game",
-  LOAD_GAME: "Load Game",
-  SETTINGS: "Settings",
-  EXIT: "Exit",
-};
 
 let currentState = STATES.MAIN_MENU;
 let previousState = STATES.MAIN_MENU;
