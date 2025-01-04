@@ -1,6 +1,6 @@
 // index.js
 import { STATES, ACTIONS, DIRECTION } from "./config/constants.js";
-import { checkCollisionWithGameObject } from "./game/checkCollisionwithGameObject.js";
+import { checkCollisionWithGameObject } from "./game/game.js";
 import { handleMainMenu, handleMenuSelection, drawMainMenu } from "./game/menu.js"; // Import new functions
 import { drawOverworld } from "./overworld/drawOverworld.js";
 import { drawHUD } from "./drawHud.js";
@@ -13,13 +13,13 @@ let currentState = STATES.MAIN_MENU;
 let previousState = STATES.MAIN_MENU;
 let isGameStarted = false;
 
-const FRAME_WIDTH = 133.5,
-  FRAME_HEIGHT = 200,
-  WALK_FRAMES = 4,
-  ATTACK_FRAMES = 4;
-let currentFrame = 0,
-  animationTimer = 0,
-  animationSpeed = 10;
+const FRAME_WIDTH = 133.5;
+const FRAME_HEIGHT = 200;
+const WALK_FRAMES = 4;
+const ATTACK_FRAMES = 4;
+let currentFrame = 0;
+let animationTimer = 0;
+let animationSpeed = 10;
 let currentAction = ACTIONS.IDLE;
 
 let selectedMenuOption = 0;
