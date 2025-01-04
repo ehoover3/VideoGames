@@ -1,6 +1,7 @@
 // index.js
-import { STATES, ACTIONS, DIRECTION, MENU_OPTIONS } from "./constants.js";
-import { drawMainMenu, mainMenuOptions } from "./drawMainMenu.js";
+import { STATES, ACTIONS, DIRECTION } from "./constants.js";
+import { checkCollisionWithGameObject } from "./gameLogic/checkCollisionwithGameObject.js";
+import { handleMainMenu, handleMenuSelection, drawMainMenu } from "./mainMenu.js"; // Import new functions
 import { drawOverworld } from "./overworld/drawOverworld.js";
 import { drawHUD } from "./drawHud.js";
 import { drawMedicalScansGame } from "./minigames/medicalScans/drawMedicalScansGame.js";
@@ -112,7 +113,7 @@ function updatePlayerInOverworld() {
     currentFrame = 0;
   }
 
-  if (checkCollisionWithGameObject(mriMachine) && keys[" "]) {
+  if (checkCollisionWithGameObject(player, mriMachine) && keys[" "]) {
     savedPlayerPosition = { x: player.x, y: player.y };
     previousState = currentState;
     currentState = STATES.MEDICAL_SCANS_GAME;
@@ -123,10 +124,6 @@ function updatePlayerInOverworld() {
     savedPlayerPosition = { x: player.x, y: player.y };
     currentState = STATES.MAIN_MENU;
   }
-}
-
-function checkCollisionWithGameObject(gameObject) {
-  return player.x < gameObject.x + gameObject.width && player.x + player.width > gameObject.x && player.y < gameObject.y + gameObject.height && player.y + player.height > gameObject.y;
 }
 
 function updateMedicalScanGame() {
@@ -152,60 +149,35 @@ function updateMedicalScanGame() {
   }
 }
 
-function updateMainMenu() {
-  if (keys["ArrowUp"]) {
-    selectedMenuOption = (selectedMenuOption - 1 + mainMenuOptions.length) % mainMenuOptions.length;
-    keys["ArrowUp"] = false;
-  }
-  if (keys["ArrowDown"]) {
-    selectedMenuOption = (selectedMenuOption + 1) % mainMenuOptions.length;
-    keys["ArrowDown"] = false;
-  }
-
-  if (keys["Enter"]) {
-    handleMenuSelection();
-    keys["Enter"] = false; // Prevent multiple triggers
-  }
-}
-
-function handleMenuSelection() {
-  const selected = mainMenuOptions[selectedMenuOption];
-  switch (selected) {
-    case !isGameStarted && MENU_OPTIONS.START_NEW_GAME:
-      currentState = STATES.OVERWORLD;
-      isGameStarted = true;
-      break;
-    case isGameStarted && MENU_OPTIONS.START_NEW_GAME:
-      if (previousState === STATES.MEDICAL_SCANS_GAME) {
-        currentState = STATES.MEDICAL_SCANS_GAME;
-      } else {
-        currentState = previousState;
-      }
-      isGameStarted = true;
-      break;
-    case MENU_OPTIONS.LOAD_GAME:
-      alert("Load Game functionality is not implemented yet.");
-      break;
-    case MENU_OPTIONS.SETTINGS:
-      alert("Settings functionality is not implemented yet.");
-      break;
-    case MENU_OPTIONS.EXIT:
-      alert("Exiting the game...");
-      break;
-  }
-}
-
 function gameLoop() {
   switch (currentState) {
     case STATES.MAIN_MENU:
-      updateMainMenu();
+      handleMainMenu(
+        keys,
+        selectedMenuOption,
+        (newSelected) => {
+          selectedMenuOption = newSelected;
+        },
+        () =>
+          handleMenuSelection(
+            selectedMenuOption,
+            previousState,
+            currentState,
+            isGameStarted,
+            (newState) => {
+              currentState = newState;
+            },
+            (newGameStarted) => {
+              isGameStarted = newGameStarted;
+            }
+          )
+      );
       drawMainMenu(ctx, canvas, drawText, isGameStarted, selectedMenuOption);
       break;
     case STATES.OVERWORLD:
       updatePlayerInOverworld();
       drawOverworld(ctx, canvas, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT, mriMachine, xrayMachine);
       drawHUD(ctx, canvas, currentState, STATES, drawText);
-
       break;
     case STATES.MEDICAL_SCANS_GAME:
       updateMedicalScanGame();
@@ -213,7 +185,6 @@ function gameLoop() {
       drawHUD(ctx, canvas, currentState, STATES, drawText);
       break;
   }
-
   requestAnimationFrame(gameLoop);
 }
 
