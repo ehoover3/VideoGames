@@ -1,3 +1,26 @@
+export function updateMedicalScanGame(keys, scanning, scanProgress, maxScanProgress, currentState, player, previousState, STATES, savedPlayerPosition) {
+  if (keys[" "]) {
+    scanning = true;
+    if (scanProgress < maxScanProgress) {
+      scanProgress++;
+    }
+  } else {
+    scanning = false;
+  }
+
+  if (keys["x"] || keys["X"] || (scanProgress >= maxScanProgress && keys[" "])) {
+    currentState = STATES.OVERWORLD;
+    player.x = savedPlayerPosition.x;
+    player.y = savedPlayerPosition.y;
+    scanProgress = 0;
+  }
+
+  if (keys["Escape"]) {
+    previousState = currentState;
+    currentState = STATES.MAIN_MENU;
+  }
+}
+
 export function drawMedicalScansGame(ctx, canvas, scanProgress, maxScanProgress) {
   const mriImg = new Image();
   mriImg.src = "assets/images/mri.png";

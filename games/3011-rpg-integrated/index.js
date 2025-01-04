@@ -1,10 +1,11 @@
 // index.js
 import { STATES, ACTIONS, DIRECTION, FRAME_WIDTH, FRAME_HEIGHT, WALK_FRAMES, ATTACK_FRAMES } from "./config/constants.js";
 import { checkCollisionWithGameObject } from "./game/game.js";
-import { handleMainMenu, handleMenuSelection, drawMainMenu } from "./game/menu.js"; // Import new functions
+import { handleMainMenu, handleMenuSelection, drawMainMenu } from "./game/menu.js";
 import { drawOverworld } from "./game/world.js";
 import { drawHUD } from "./game/hud.js";
 import { drawMedicalScansGame } from "./game/minigames/medScan.js";
+import { createPlayer } from "./game/player.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -20,15 +21,15 @@ let currentAction = ACTIONS.IDLE;
 
 let selectedMenuOption = 0;
 
-function createPlayer(x, y, width, height, color, speed) {
-  return { x, y, width, height, color, speed, direction: DIRECTION.DOWN };
-}
+// function createPlayer(x, y, width, height, color, speed) {
+//   return { x, y, width, height, color, speed, direction: DIRECTION.DOWN };
+// }
 
 function createGameObject(x, y, width, height, color) {
   return { x, y, width, height, color };
 }
 
-const player = createPlayer(100, 100, 32, 32, "blue", 4);
+const player = createPlayer(100, 100, 32, 32, "blue", 4, DIRECTION.DOWN);
 const mriMachine = createGameObject(130, 130, 32, 32, "grey");
 const xrayMachine = createGameObject(70, 130, 32, 32, "green");
 
@@ -122,7 +123,7 @@ function updatePlayer() {
   }
 }
 
-function updateMedicalScanGame() {
+export function updateMedicalScanLogic() {
   if (keys[" "]) {
     scanning = true;
     if (scanProgress < maxScanProgress) {
@@ -176,7 +177,7 @@ function gameLoop() {
       drawHUD(ctx, canvas, currentState, STATES, drawText);
       break;
     case STATES.MEDICAL_SCANS_GAME:
-      updateMedicalScanGame();
+      updateMedicalScanLogic();
       drawMedicalScansGame(ctx, canvas, scanProgress, maxScanProgress);
       drawHUD(ctx, canvas, currentState, STATES, drawText);
       break;
