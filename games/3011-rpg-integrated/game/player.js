@@ -1,8 +1,8 @@
 // player.js
 
-export function createPlayer(x, y, width, height, color, speed, direction) {
-  return { x, y, width, height, color, speed, direction };
-}
+// export function createPlayer(x, y, width, height, color, speed, direction) {
+//   return { x, y, width, height, color, speed, direction };
+// }
 
 import { ACTIONS, DIRECTION } from "../config/constants.js";
 import { checkCollisionWithGameObject } from "../game/game.js";
