@@ -1,67 +1,66 @@
-import { updatePlayer } from "./player.js";
-import { STATES, ACTIONS, FRAME_WIDTH, FRAME_HEIGHT, WALK_FRAMES, ATTACK_FRAMES } from "../config/constants.js";
-import { handleMainMenu, handleMenuSelection, drawMainMenu } from "./menu/index.js";
-import { drawOverworld } from "./world.js";
-import { drawHUD } from "./hud.js";
-import { drawMedicalScansGame, updateMedScanLogic } from "./minigames/medScan.js";
+export function startGameLoop({ ctx, canvas, keys, gameState, player, mriMachine, xrayMachine, drawText, handleMainMenu, handleMenuSelection, drawMainMenu, updatePlayer, drawOverworld, drawHUD, drawMedicalScansGame, updateMedScanLogic, STATES, WALK_FRAMES, ATTACK_FRAMES, FRAME_WIDTH, FRAME_HEIGHT }) {
+  function handleMenu() {
+    handleMainMenu(
+      keys,
+      gameState.selectedMenuOption,
+      (newSelected) => (gameState.selectedMenuOption = newSelected),
+      () => {
+        handleMenuSelection(
+          gameState.selectedMenuOption,
+          gameState.previousState,
+          gameState.currentState,
+          gameState.isGameStarted,
+          (newState) => (gameState.currentState = newState),
+          (newGameStarted) => (gameState.isGameStarted = newGameStarted)
+        );
+      }
+    );
 
-export function gameLoop({ ctx, canvas, keys, player, mriMachine, xrayMachine, drawText, animationSettings, gameState }) {
-  const { currentState, previousState, savedPlayerPosition, isGameStarted, selectedMenuOption, currentFrame, animationTimer, animationSpeed, currentAction, scanProgress, maxScanProgress, scanning } = gameState;
-
-  switch (currentState) {
-    case STATES.MAIN_MENU:
-      handleMainMenu(
-        keys,
-        selectedMenuOption,
-        (newSelected) => {
-          gameState.selectedMenuOption = newSelected;
-        },
-        () =>
-          handleMenuSelection(
-            selectedMenuOption,
-            previousState,
-            currentState,
-            isGameStarted,
-            (newState) => {
-              gameState.currentState = newState;
-            },
-            (newGameStarted) => {
-              gameState.isGameStarted = newGameStarted;
-            }
-          )
-      );
-      drawMainMenu(ctx, canvas, drawText, isGameStarted, selectedMenuOption);
-      break;
-    case STATES.OVERWORLD:
-      let updatedState = updatePlayer(player, keys, currentAction, animationTimer, animationSpeed, WALK_FRAMES, ATTACK_FRAMES, currentFrame, mriMachine, STATES, currentState, previousState, savedPlayerPosition);
-      gameState.currentState = updatedState.currentState;
-      gameState.previousState = updatedState.previousState;
-      gameState.savedPlayerPosition = updatedState.savedPlayerPosition;
-      drawOverworld(ctx, canvas, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT, mriMachine, xrayMachine);
-      drawHUD(ctx, canvas, currentState, STATES, drawText);
-      break;
-    case STATES.SCAN_GAME:
-      const updatedValues = updateMedScanLogic(keys, scanning, scanProgress, maxScanProgress, currentState, player, previousState, STATES, savedPlayerPosition);
-      gameState.scanProgress = updatedValues.scanProgress;
-      gameState.scanning = updatedValues.scanning;
-      gameState.currentState = updatedValues.currentState;
-      gameState.previousState = updatedValues.previousState;
-      drawMedicalScansGame(ctx, canvas, scanProgress, maxScanProgress);
-      drawHUD(ctx, canvas, currentState, STATES, drawText);
-      break;
+    drawMainMenu(ctx, canvas, drawText, gameState.isGameStarted, gameState.selectedMenuOption);
   }
 
-  requestAnimationFrame(() =>
-    gameLoop({
-      ctx,
-      canvas,
-      keys,
-      player,
-      mriMachine,
-      xrayMachine,
-      drawText,
-      animationSettings,
-      gameState,
-    })
-  );
+  function handleOverworld() {
+    const updatedState = updatePlayer(player, keys, gameState.currentAction, gameState.animationTimer, gameState.animationSpeed, WALK_FRAMES, ATTACK_FRAMES, gameState.currentFrame, mriMachine, STATES, gameState.currentState, gameState.previousState, gameState.savedPlayerPosition);
+
+    Object.assign(gameState, {
+      currentState: updatedState.currentState,
+      previousState: updatedState.previousState,
+      savedPlayerPosition: updatedState.savedPlayerPosition,
+    });
+
+    drawOverworld(ctx, canvas, player, gameState.currentFrame, FRAME_WIDTH, FRAME_HEIGHT, mriMachine, xrayMachine);
+    drawHUD(ctx, canvas, gameState.currentState, STATES, drawText);
+  }
+
+  function handleScanGame() {
+    const updatedValues = updateMedScanLogic(keys, gameState.scanning, gameState.scanProgress, gameState.maxScanProgress, gameState.currentState, player, gameState.previousState, STATES, gameState.savedPlayerPosition);
+
+    Object.assign(gameState, {
+      scanProgress: updatedValues.scanProgress,
+      scanning: updatedValues.scanning,
+      currentState: updatedValues.currentState,
+      previousState: updatedValues.previousState,
+    });
+
+    drawMedicalScansGame(ctx, canvas, gameState.scanProgress, gameState.maxScanProgress);
+    drawHUD(ctx, canvas, gameState.currentState, STATES, drawText);
+  }
+
+  function gameLoop() {
+    switch (gameState.currentState) {
+      case STATES.MAIN_MENU:
+        handleMenu();
+        break;
+      case STATES.OVERWORLD:
+        handleOverworld();
+        break;
+      case STATES.SCAN_GAME:
+        handleScanGame();
+        break;
+    }
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  gameLoop();
 }
