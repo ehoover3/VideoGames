@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medical Scanning Game</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+      }
+
+      .patient {
+        position: relative;
+        width: 140px;
+        height: 300px;
+        overflow: hidden;
+        background: #ddd;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+      }
+
+      .scanner {
+        position: absolute;
+        width: 200px;
+        height: 60px;
+        border: 3px dashed purple;
+        background-color: rgba(255, 255, 255, 0.3);
+        z-index: 2;
+        cursor: grab;
+        transition: height 0.3s ease;
+      }
+
+      .controls {
+        margin-top: 10px;
+        text-align: center;
+      }
+
+      .start-button,
+      .reset-button {
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: bold;
+        color: white;
+        background-color: #4caf50;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        box-shadow: 0 4px #2e7d32;
+        transition: all 0.2s ease;
+        margin: 5px;
+      }
+
+      .start-button:active,
+      .reset-button:active {
+        box-shadow: 0 2px #2e7d32;
+        transform: translateY(2px);
+      }
+
+      .start-button.disabled {
+        background-color: #a5d6a7;
+        cursor: not-allowed;
+      }
+
+      .progress-bar-container {
+        width: 200px;
+        height: 16px;
+        background-color: #ccc;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 10px;
+        position: relative;
+      }
+
+      .progress-bar {
+        width: 0;
+        height: 100%;
+        background-color: #4caf50;
+        transition: width 0.2s ease;
+        position: absolute;
+      }
+
+      .progress-label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .patient-female-clothed,
+      .patient-female-muscles,
+      .patient-female-skeleton,
+      .patient-female-cardiovascular,
+      .patient-male-clothed,
+      .patient-male-muscles,
+      .patient-male-skeleton,
+      .patient-male-cardiovascular {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="root">
+      <section class="patient">
+        <div class="patient-female-clothed"></div>
+        <div class="patient-female-muscles"></div>
+        <div class="patient-female-skeleton"></div>
+        <div class="patient-female-cardiovascular"></div>
+        <div class="patient-male-clothed"></div>
+        <div class="patient-male-muscles"></div>
+        <div class="patient-male-skeleton"></div>
+        <div class="patient-male-cardiovascular"></div>
+        <div class="scanner"></div>
+      </section>
+
+      <div class="controls">
+        <label for="gender-select">Select Gender:</label>
+        <select id="gender-select">
+          <option value="female">Female</option>
+          <option value="male">Male</option>
+        </select>
+
+        <label for="scan-type-select">Select Scan Type:</label>
+        <select id="scan-type-select">
+          <option value="muscles">Muscles</option>
+          <option value="skeleton">Skeleton</option>
+          <option value="cardiovascular">Cardiovascular</option>
+        </select>
+
+        <button class="start-button" aria-label="Start the scan">START SCAN</button>
+        <button class="reset-button" aria-label="Reset the game">RESET</button>
+
+        <div class="progress-bar-container">
+          <div class="progress-bar"></div>
+          <div class="progress-label">0%</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const START_SCAN = "START SCAN";
+      const SCAN_RUNNING = "SCAN RUNNING";
+      const SCAN_COMPLETE = "SCAN COMPLETE";
+      const SCANNER_GRAB = "grab";
+      const SCANNER_GRABBING = "grabbing";
+      const MAX_PROGRESS = 100;
+      const imageUrl = "url('bodySystems.png')";
+      const backgroundSize = "472px 641px";
+      const imagesConfig = {
+        female: {
+          clothed: { x: 3, y: 14 },
+          muscles: { x: -124, y: 14 },
+          skeleton: { x: -250, y: 14 },
+          cardiovascular: { x: -371, y: 14 },
+        },
+        male: {
+          clothed: { x: -11, y: -335, zIndex: 1 },
+          muscles: { x: -131, y: -335 },
+          skeleton: { x: -248, y: -335 },
+          cardiovascular: { x: -363, y: -335 },
+        },
+      };
+
+      class DOMElements {
+        constructor() {
+          this.root = document.getElementById("root");
+          this.patient = document.querySelector(".patient");
+          this.patientFemaleClothed = document.querySelector(".patient-female-clothed");
+          this.patientFemaleMuscles = document.querySelector(".patient-female-muscles");
+          this.patientFemaleSkeleton = document.querySelector(".patient-female-skeleton");
+          this.patientFemaleCardiovascular = document.querySelector(".patient-female-cardiovascular");
+          this.patientMaleClothed = document.querySelector(".patient-male-clothed");
+          this.patientMaleMuscles = document.querySelector(".patient-male-muscles");
+          this.patientMaleSkeleton = document.querySelector(".patient-male-skeleton");
+          this.patientMaleCardiovascular = document.querySelector(".patient-male-cardiovascular");
+          this.scanner = document.querySelector(".scanner");
+          this.startButton = document.querySelector(".start-button");
+          this.resetButton = document.querySelector(".reset-button");
+          this.genderSelect = document.getElementById("gender-select");
+          this.scanTypeSelect = document.getElementById("scan-type-select");
+          this.progressBar = document.querySelector(".progress-bar");
+          this.progressLabel = document.querySelector(".progress-label");
+        }
+      }
+
+      class ScannerLogic {
+        constructor(dom) {
+          this.dom = dom;
+          this.isDragging = false;
+          this.isScanning = false;
+          this.maxProgress = 0;
+          this.initialScanStart = false;
+
+          this.patientRectangle = this.dom.patient.getBoundingClientRect();
+          this.patientHeight = this.patientRectangle.height;
+          this.scannerHeight = this.dom.scanner.offsetHeight;
+
+          this.patientImages = {
+            female: {
+              clothed: this.dom.patientFemaleClothed,
+              muscles: this.dom.patientFemaleMuscles,
+              skeleton: this.dom.patientFemaleSkeleton,
+              cardiovascular: this.dom.patientFemaleCardiovascular,
+            },
+            male: {
+              clothed: this.dom.patientMaleClothed,
+              muscles: this.dom.patientMaleMuscles,
+              skeleton: this.dom.patientMaleSkeleton,
+              cardiovascular: this.dom.patientMaleCardiovascular,
+            },
+          };
+
+          this.initPatientImages();
+          this.initPatientImagesVisibility();
+          this.initEventListeners();
+        }
+
+        initPatientImages() {
+          const configureImage = (gender, type, { x, y, zIndex }) => {
+            const style = this.patientImages[gender][type].style;
+            style.background = `${imageUrl} no-repeat ${x}px ${y}px`;
+            style.backgroundSize = backgroundSize;
+            if (zIndex) style.zIndex = zIndex;
+          };
+
+          ["female", "male"].forEach((gender) => {
+            Object.keys(imagesConfig[gender]).forEach((bodySystem) => {
+              configureImage(gender, bodySystem, imagesConfig[gender][bodySystem]);
+            });
+          });
+        }
+
+        initPatientImagesVisibility() {
+          this.dom.patientFemaleClothed.style.display = "block";
+          this.dom.patientFemaleClothed.style.zIndex = 1;
+          this.dom.patientFemaleMuscles.style.display = "block";
+          this.dom.patientFemaleSkeleton.style.display = "none";
+          this.dom.patientFemaleCardiovascular.style.display = "none";
+          this.dom.patientMaleClothed.style.display = "none";
+          this.dom.patientMaleMuscles.style.display = "none";
+          this.dom.patientMaleSkeleton.style.display = "none";
+          this.dom.patientMaleCardiovascular.style.display = "none";
+        }
+
+        initEventListeners() {
+          this.dom.scanner.addEventListener("mousedown", this.onScannerMouseDown.bind(this));
+          document.addEventListener("mousemove", this.onScannerMouseMove.bind(this));
+          document.addEventListener("mouseup", this.onScannerMouseUp.bind(this));
+          this.dom.resetButton.addEventListener("click", this.onReset.bind(this));
+          this.dom.genderSelect.addEventListener("change", this.onPatientSelect.bind(this));
+          this.dom.scanTypeSelect.addEventListener("change", this.onPatientSelect.bind(this));
+        }
+
+        onPatientSelect() {
+          const gender = this.dom.genderSelect.value;
+          const scanType = this.dom.scanTypeSelect.value;
+
+          Object.values(this.patientImages.female).forEach((img) => (img.style.display = "none"));
+          Object.values(this.patientImages.male).forEach((img) => (img.style.display = "none"));
+
+          if (this.patientImages[gender] && this.patientImages[gender][scanType]) {
+            this.patientImages[gender].clothed.style.display = "block";
+            this.patientImages[gender][scanType].style.display = "block";
+            this.patientImages[gender].clothed.style.zIndex = 1;
+          }
+        }
+
+        onScannerMouseDown(e) {
+          this.isDragging = true;
+          this.isScanning = true;
+          if (this.dom.startButton.textContent !== SCAN_COMPLETE) {
+            this.dom.startButton.textContent = SCAN_RUNNING;
+          }
+          if (!this.initialScanStart) {
+            this.dom.patientFemaleMuscles.style.opacity = 1;
+            const { scannerTop, scannerBottom } = this.getScannerPosition(e);
+            this.setPatientScanner(scannerTop, scannerBottom);
+            this.initialScanStart = true;
+          }
+          this.dom.scanner.style.cursor = SCANNER_GRABBING;
+        }
+
+        onScannerMouseMove(e) {
+          if (!this.isDragging) return;
+          const { scannerTop, scannerBottom } = this.getScannerPosition(e);
+          this.setPatientScanner(scannerTop, scannerBottom);
+          this.setProgressBar(scannerBottom);
+        }
+
+        onScannerMouseUp() {
+          this.isDragging = false;
+          this.dom.scanner.style.cursor = SCANNER_GRAB;
+        }
+
+        onReset() {
+          this.setPatientScanner(0, 0);
+          this.dom.startButton.textContent = START_SCAN;
+          this.dom.startButton.classList.remove("disabled");
+          this.dom.patientFemaleMuscles.style.opacity = 0;
+          this.dom.progressBar.style.width = "0";
+          this.dom.progressLabel.textContent = "0%";
+          this.maxProgress = 0;
+          this.isScanning = false;
+          this.dom.scanner.style.top = "0";
+          this.initialScanStart = false;
+        }
+
+        getScannerPosition(e) {
+          let scannerY = e.clientY - this.patientRectangle.top - this.scannerHeight / 2;
+          scannerY = Math.max(0, Math.min(scannerY, this.patientHeight - this.scannerHeight));
+          this.dom.scanner.style.top = `${scannerY}px`;
+          return {
+            scannerTop: scannerY,
+            scannerBottom: scannerY + this.scannerHeight,
+          };
+        }
+
+        setPatientScanner(scannerTop, scannerBottom) {
+          const gender = this.dom.genderSelect.value;
+          const scanType = this.dom.scanTypeSelect.value;
+          this.patientImages[gender].clothed.style.clipPath = `polygon(
+            0 0, 100% 0, 100% ${scannerTop}px, 0 ${scannerTop}px, 
+            0 ${scannerBottom}px, 100% ${scannerBottom}px, 100% 100%, 0 100%)`;
+          this.patientImages[gender][scanType].style.clipPath = `inset(${scannerTop}px 0 ${this.patientHeight - scannerBottom}px 0)`;
+        }
+
+        setProgressBar(scannerBottom) {
+          const progress = Math.min(100, (scannerBottom / this.patientHeight) * 100);
+          if (progress > this.maxProgress) {
+            this.maxProgress = progress;
+            this.dom.progressBar.style.width = `${this.maxProgress}%`;
+            this.dom.progressLabel.textContent = `${Math.round(this.maxProgress)}%`;
+          }
+          if (this.maxProgress >= MAX_PROGRESS) this.handleScanComplete();
+        }
+
+        handleScanComplete() {
+          this.dom.startButton.textContent = SCAN_COMPLETE;
+          this.dom.startButton.classList.add("disabled");
+          this.isScanning = false;
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const dom = new DOMElements();
+        const scanner = new ScannerLogic(dom);
+      });
+    </script>
+  </body>
+</html>
