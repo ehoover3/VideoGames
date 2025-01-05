@@ -107,16 +107,6 @@ export function handleCollision(player, keys, mriMachine, STATES, currentState, 
   }
 }
 
-// export function handleEscapeKeyLogic(keys, player, STATES, currentState, previousState, savedPlayerPosition) {
-//   const updatedValues = handleEscapeKey(keys, currentState, previousState, player, savedPlayerPosition, STATES);
-
-//   return {
-//     savedPlayerPosition: { ...updatedValues.savedPlayerPosition },
-//     previousState: updatedValues.previousState,
-//     currentState: updatedValues.currentState,
-//   };
-// }
-
 export function handleEscapeKeyLogic(keys, player, STATES, currentState, previousState, savedPlayerPosition) {
   if (keys["Escape"]) {
     return {
