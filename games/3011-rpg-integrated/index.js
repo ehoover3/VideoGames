@@ -9,34 +9,37 @@ import { drawMedicalScansGame, updateMedScanLogic } from "./game/minigames/medSc
 import { createPlayer } from "./game/player.js";
 import globalState from "./game/state.js";
 
+// Canvas Setup
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+// Game State and Configuration
 let isGameStarted = false;
-
+let selectedMenuOption = 0;
 let currentFrame = 0;
 let animationTimer = 0;
 let animationSpeed = 10;
 let currentAction = ACTIONS.IDLE;
-
-let selectedMenuOption = 0;
-
-function createGameObject(x, y, width, height, color) {
-  return { x, y, width, height, color };
-}
-
-const player = createPlayer(100, 100, 32, 32, "blue", 4, DIRECTION.DOWN);
-const mriMachine = createGameObject(130, 130, 32, 32, "grey");
-const xrayMachine = createGameObject(70, 130, 32, 32, "green");
-
 let scanProgress = 0;
 let maxScanProgress = 100;
 let scanning = false;
 
+// Player and Objects Setup
+const player = createPlayer(100, 100, 32, 32, "blue", 4, DIRECTION.DOWN);
+const mriMachine = createGameObject(130, 130, 32, 32, "grey");
+const xrayMachine = createGameObject(70, 130, 32, 32, "green");
+
+// OnKey Handling
 const keys = {};
 window.addEventListener("keydown", (e) => (keys[e.key] = true));
 window.addEventListener("keyup", (e) => (keys[e.key] = false));
 
+// Game Object Factory
+function createGameObject(x, y, width, height, color) {
+  return { x, y, width, height, color };
+}
+
+// Utility Function
 function drawText(text, x, y, font = "16px Arial", color = "black", align = "center") {
   ctx.fillStyle = color;
   ctx.font = font;
@@ -44,6 +47,7 @@ function drawText(text, x, y, font = "16px Arial", color = "black", align = "cen
   ctx.fillText(text, x, y);
 }
 
+// Game Loop
 function gameLoop() {
   switch (globalState.getCurrentState()) {
     case STATES.MAIN_MENU:
