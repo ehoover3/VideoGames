@@ -102,7 +102,7 @@ export function handleCollision(player, keys, mriMachine, STATES, currentState, 
     return {
       savedPlayerPosition: { x: player.x, y: player.y },
       previousState: currentState,
-      currentState: STATES.MEDICAL_SCANS_GAME,
+      currentState: STATES.SCAN_GAME,
     };
   }
 }

@@ -3,7 +3,7 @@
 export const STATES = {
   MAIN_MENU: "mainMenu",
   OVERWORLD: "overworld",
-  MEDICAL_SCANS_GAME: "medicalScansGame",
+  SCAN_GAME: "medicalScansGame",
 };
 
 export const ACTIONS = {
