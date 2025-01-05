@@ -2,7 +2,7 @@
 
 import { updatePlayer } from "./game/player.js";
 import { STATES, ACTIONS, DIRECTION, FRAME_WIDTH, FRAME_HEIGHT, WALK_FRAMES, ATTACK_FRAMES } from "./config/constants.js";
-import { handleMainMenu, handleMenuSelection, drawMainMenu } from "./game/menu.js";
+import { handleMainMenu, handleMenuSelection, drawMainMenu } from "./game/menu/index.js";
 import { drawOverworld } from "./game/world.js";
 import { drawHUD } from "./game/hud.js";
 import { drawMedicalScansGame, updateMedScanLogic } from "./game/minigames/medScan.js";
