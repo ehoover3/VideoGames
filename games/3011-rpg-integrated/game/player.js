@@ -1,20 +1,35 @@
+// player.js
+
 export function createPlayer(x, y, width, height, color, speed, direction) {
   return { x, y, width, height, color, speed, direction };
 }
 
-// player.js
-
 import { ACTIONS, DIRECTION } from "../config/constants.js";
 import { checkCollisionWithGameObject } from "../game/game.js";
-import globalState from "../game/state.js";
-import { handleEscapeKey } from "../events/eventsManager.js";
 
-export function updatePlayer(player, keys, currentAction, animationTimer, animationSpeed, WALK_FRAMES, ATTACK_FRAMES, currentFrame, mriMachine, STATES) {
+export function updatePlayer(player, keys, currentAction, animationTimer, animationSpeed, WALK_FRAMES, ATTACK_FRAMES, currentFrame, mriMachine, STATES, currentState, previousState, savedPlayerPosition) {
   handleMovement(player, keys);
   handleAction(keys, currentAction);
   handleAnimation(currentAction, animationTimer, animationSpeed, WALK_FRAMES, ATTACK_FRAMES, currentFrame);
-  handleCollision(player, keys, mriMachine, STATES);
-  handleEscapeKeyLogic(keys, player, STATES);
+  const collisionResult = handleCollision(player, keys, mriMachine, STATES, currentState, previousState, savedPlayerPosition);
+  if (collisionResult) {
+    savedPlayerPosition = collisionResult.savedPlayerPosition;
+    previousState = collisionResult.previousState;
+    currentState = collisionResult.currentState;
+  }
+  const escapeKeyResult = handleEscapeKeyLogic(keys, player, STATES, currentState, previousState, savedPlayerPosition);
+
+  if (escapeKeyResult) {
+    savedPlayerPosition = escapeKeyResult.savedPlayerPosition;
+    previousState = escapeKeyResult.previousState;
+    currentState = escapeKeyResult.currentState;
+  }
+
+  return {
+    currentState: currentState,
+    previousState: previousState,
+    savedPlayerPosition: savedPlayerPosition,
+  };
 }
 
 export function handleMovement(player, keys) {
@@ -82,17 +97,39 @@ export function handleAnimation(currentAction, animationTimer, animationSpeed, W
   }
 }
 
-export function handleCollision(player, keys, mriMachine, STATES) {
+export function handleCollision(player, keys, mriMachine, STATES, currentState, previousState, savedPlayerPosition) {
   if (checkCollisionWithGameObject(player, mriMachine) && keys[" "]) {
-    globalState.setSavedPlayerPosition({ x: player.x, y: player.y });
-    globalState.setPreviousState(globalState.getCurrentState());
-    globalState.setCurrentState(STATES.MEDICAL_SCANS_GAME);
+    return {
+      savedPlayerPosition: { x: player.x, y: player.y },
+      previousState: currentState,
+      currentState: STATES.MEDICAL_SCANS_GAME,
+    };
   }
 }
 
-export function handleEscapeKeyLogic(keys, player, STATES) {
-  const updatedValues = handleEscapeKey(keys, globalState.getCurrentState(), globalState.getPreviousState(), player, globalState.getSavedPlayerPosition(), STATES);
-  globalState.setCurrentState(updatedValues.currentState);
-  globalState.setPreviousState(updatedValues.previousState);
-  globalState.setSavedPlayerPosition(updatedValues.savedPlayerPosition);
+// export function handleEscapeKeyLogic(keys, player, STATES, currentState, previousState, savedPlayerPosition) {
+//   const updatedValues = handleEscapeKey(keys, currentState, previousState, player, savedPlayerPosition, STATES);
+
+//   return {
+//     savedPlayerPosition: { ...updatedValues.savedPlayerPosition },
+//     previousState: updatedValues.previousState,
+//     currentState: updatedValues.currentState,
+//   };
+// }
+
+export function handleEscapeKeyLogic(keys, player, STATES, currentState, previousState, savedPlayerPosition) {
+  if (keys["Escape"]) {
+    return {
+      savedPlayerPosition: { x: player.x, y: player.y }, // Save the current player position
+      previousState: currentState,
+      currentState: STATES.MAIN_MENU, // Switch to the MAIN_MENU state
+    };
+  }
+
+  // If Escape is not pressed, return the current states unchanged
+  return {
+    savedPlayerPosition: savedPlayerPosition,
+    previousState: previousState,
+    currentState: currentState,
+  };
 }

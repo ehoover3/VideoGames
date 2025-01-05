@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zelda-Like 2D Game</title>
+    <style>
+      body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #2e2e2e;
+        color: white;
+        font-family: Arial, sans-serif;
+      }
+      #container {
+        /* New container div for positioning */
+        position: relative; /* Needed for absolute positioning of children */
+      }
+      canvas {
+        border: 2px solid white;
+        position: absolute; /* Position canvas over the image */
+        top: 0;
+        left: 0;
+        z-index: 1; /* Ensure canvas is on top */
+        pointer-events: none; /* Prevent canvas from blocking clicks on the image */
+      }
+      #heart-image {
+        max-width: 80%;
+        height: auto;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <canvas id="myCanvas" left="0" top="0" width="800" height="400"></canvas>
+      <img id="heart-image" left="0" top="0" width="800" height="400" src="heart.jpg" alt="Anatomically Correct Heart" />
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>

@@ -7,13 +7,15 @@ import { drawOverworld } from "./game/world.js";
 import { drawHUD } from "./game/hud.js";
 import { drawMedicalScansGame, updateMedScanLogic } from "./game/minigames/medScan.js";
 import { createPlayer } from "./game/player.js";
-import globalState from "./game/state.js";
 
 // Canvas Setup
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 // Game State and Configuration
+let currentState = STATES.MAIN_MENU;
+let previousState = STATES.MAIN_MENU;
+let savedPlayerPosition = { x: 0, y: 0 };
 let isGameStarted = false;
 let selectedMenuOption = 0;
 let currentFrame = 0;
@@ -49,7 +51,7 @@ function drawText(text, x, y, font = "16px Arial", color = "black", align = "cen
 
 // Game Loop
 function gameLoop() {
-  switch (globalState.getCurrentState()) {
+  switch (currentState) {
     case STATES.MAIN_MENU:
       handleMainMenu(
         keys,
@@ -60,11 +62,11 @@ function gameLoop() {
         () =>
           handleMenuSelection(
             selectedMenuOption,
-            globalState.getPreviousState(),
-            globalState.getCurrentState(),
+            previousState,
+            currentState,
             isGameStarted,
             (newState) => {
-              globalState.setCurrentState(newState);
+              currentState = newState;
             },
             (newGameStarted) => {
               isGameStarted = newGameStarted;
@@ -74,18 +76,21 @@ function gameLoop() {
       drawMainMenu(ctx, canvas, drawText, isGameStarted, selectedMenuOption);
       break;
     case STATES.OVERWORLD:
-      updatePlayer(player, keys, currentAction, animationTimer, animationSpeed, WALK_FRAMES, ATTACK_FRAMES, currentFrame, mriMachine, STATES);
+      let updatedState = updatePlayer(player, keys, currentAction, animationTimer, animationSpeed, WALK_FRAMES, ATTACK_FRAMES, currentFrame, mriMachine, STATES, currentState, previousState, savedPlayerPosition);
+      currentState = updatedState.currentState;
+      previousState = updatedState.previousState;
+      savedPlayerPosition = updatedState.savedPlayerPosition;
       drawOverworld(ctx, canvas, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT, mriMachine, xrayMachine);
-      drawHUD(ctx, canvas, globalState.getCurrentState(), STATES, drawText);
+      drawHUD(ctx, canvas, currentState, STATES, drawText);
       break;
     case STATES.MEDICAL_SCANS_GAME:
-      const updatedValues = updateMedScanLogic(keys, scanning, scanProgress, maxScanProgress, globalState.getCurrentState(), player, globalState.getPreviousState(), STATES, globalState.getSavedPlayerPosition());
+      const updatedValues = updateMedScanLogic(keys, scanning, scanProgress, maxScanProgress, currentState, player, previousState, STATES, savedPlayerPosition);
       scanProgress = updatedValues.scanProgress;
       scanning = updatedValues.scanning;
-      globalState.setCurrentState(updatedValues.currentState);
-      globalState.setPreviousState(updatedValues.previousState);
+      currentState = updatedValues.currentState;
+      previousState = updatedValues.previousState;
       drawMedicalScansGame(ctx, canvas, scanProgress, maxScanProgress);
-      drawHUD(ctx, canvas, globalState.getCurrentState(), STATES, drawText);
+      drawHUD(ctx, canvas, currentState, STATES, drawText);
       break;
   }
   requestAnimationFrame(gameLoop);
