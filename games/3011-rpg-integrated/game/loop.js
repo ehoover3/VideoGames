@@ -1,4 +1,25 @@
-export function startGameLoop({ ctx, canvas, keys, gameState, player, mriMachine, xrayMachine, drawText, handleMainMenu, handleMenuSelection, drawMainMenu, updatePlayer, drawOverworld, drawHUD, drawMedicalScansGame, updateMedScanLogic, STATES, WALK_FRAMES, ATTACK_FRAMES, FRAME_WIDTH, FRAME_HEIGHT }) {
+// games/loop.js
+import { handleMainMenu, handleMenuSelection, drawMainMenu } from "./menu/index.js";
+import { STATES, WALK_FRAMES, ATTACK_FRAMES, FRAME_WIDTH, FRAME_HEIGHT } from "../config/constants.js";
+
+export function startGameLoop({
+  ctx,
+  canvas,
+  keys,
+  gameState, //
+  gameObjects,
+  drawText,
+  updatePlayer,
+  drawOverworld,
+  drawHUD,
+  drawMedicalScansGame,
+  updateMedScanLogic,
+  // STATES,
+  // WALK_FRAMES,
+  // ATTACK_FRAMES,
+  // FRAME_WIDTH,
+  // FRAME_HEIGHT,
+}) {
   function handleMenu() {
     handleMainMenu(
       keys,
@@ -20,6 +41,7 @@ export function startGameLoop({ ctx, canvas, keys, gameState, player, mriMachine
   }
 
   function handleOverworld() {
+    const { player, mriMachine, xrayMachine } = gameObjects;
     const updatedState = updatePlayer(player, keys, gameState.currentAction, gameState.animationTimer, gameState.animationSpeed, WALK_FRAMES, ATTACK_FRAMES, gameState.currentFrame, mriMachine, STATES, gameState.currentState, gameState.previousState, gameState.savedPlayerPosition);
 
     Object.assign(gameState, {
@@ -33,6 +55,7 @@ export function startGameLoop({ ctx, canvas, keys, gameState, player, mriMachine
   }
 
   function handleScanGame() {
+    const { player } = gameObjects;
     const updatedValues = updateMedScanLogic(keys, gameState.scanning, gameState.scanProgress, gameState.maxScanProgress, gameState.currentState, player, gameState.previousState, STATES, gameState.savedPlayerPosition);
 
     Object.assign(gameState, {
