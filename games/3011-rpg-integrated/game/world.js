@@ -1,35 +1,30 @@
+// world.js
 const playerSpriteSheet = new Image();
 playerSpriteSheet.src = "assets/images/player.png";
 
+const DIRECTIONS = {
+  down: 0,
+  up: 1,
+  left: 2,
+  right: 3,
+};
+
 export function drawOverworld(ctx, canvas, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT, mriMachine, xrayMachine) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawPlayerSprite(ctx, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT);
+  drawMachine(ctx, mriMachine);
+  drawMachine(ctx, xrayMachine);
+}
 
-  // Draw the player sprite from the sprite sheet
-  const spriteRow = {
-    down: 0,
-    up: 1,
-    left: 2,
-    right: 3,
-  }[player.direction];
+function drawPlayerSprite(ctx, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT) {
+  const spriteRow = DIRECTIONS[player.direction];
   const sourceX = currentFrame * FRAME_WIDTH;
   const sourceY = spriteRow * FRAME_HEIGHT;
 
-  ctx.drawImage(
-    playerSpriteSheet, // Image
-    sourceX, // Source X (frame column)
-    sourceY, // Source Y (row for direction)
-    FRAME_WIDTH, // Source width
-    FRAME_HEIGHT, // Source height
-    player.x, // Destination X
-    player.y, // Destination Y
-    player.width, // Destination width
-    player.height // Destination height
-  );
+  ctx.drawImage(playerSpriteSheet, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, player.x, player.y, player.width, player.height);
+}
 
-  // Draw the machine as a rectangle
-  ctx.fillStyle = mriMachine.color;
-  ctx.fillRect(mriMachine.x, mriMachine.y, mriMachine.width, mriMachine.height);
-
-  ctx.fillStyle = xrayMachine.color;
-  ctx.fillRect(xrayMachine.x, xrayMachine.y, xrayMachine.width, xrayMachine.height);
+function drawMachine(ctx, machine) {
+  ctx.fillStyle = machine.color;
+  ctx.fillRect(machine.x, machine.y, machine.width, machine.height);
 }
