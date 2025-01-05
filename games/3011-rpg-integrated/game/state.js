@@ -1,4 +1,5 @@
 // globalState.js
+
 const STATES = {
   MAIN_MENU: "mainMenu",
   OVERWORLD: "overworld",

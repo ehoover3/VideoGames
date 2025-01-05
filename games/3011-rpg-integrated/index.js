@@ -46,8 +46,15 @@ function drawText(text, x, y, font = "16px Arial", color = "black", align = "cen
 }
 
 function updatePlayer() {
-  let isMoving = false;
+  handleMovement();
+  handleAction();
+  handleAnimation();
+  handleCollision();
+  handleEscapeKeyLogic();
+}
 
+function handleMovement() {
+  let isMoving = false;
   let moveX = 0,
     moveY = 0;
 
@@ -84,16 +91,20 @@ function updatePlayer() {
 
   player.x += moveX;
   player.y += moveY;
+}
 
+function handleAction() {
   if (keys["z"] || keys["Z"]) {
     currentAction = ACTIONS.ATTACKING;
-  } else if (isMoving) {
+  } else if (keys["ArrowUp"] || keys["ArrowDown"] || keys["ArrowLeft"] || keys["ArrowRight"]) {
     currentAction = ACTIONS.WALKING;
   } else {
     currentAction = ACTIONS.IDLE;
   }
+}
 
-  if (isMoving || currentAction === ACTIONS.ATTACKING) {
+function handleAnimation() {
+  if (currentAction === ACTIONS.WALKING || currentAction === ACTIONS.ATTACKING) {
     animationTimer++;
     if (animationTimer >= animationSpeed) {
       animationTimer = 0;
@@ -105,15 +116,18 @@ function updatePlayer() {
   } else {
     currentFrame = 0;
   }
+}
 
+function handleCollision() {
   if (checkCollisionWithGameObject(player, mriMachine) && keys[" "]) {
     globalState.setSavedPlayerPosition({ x: player.x, y: player.y });
     globalState.setPreviousState(globalState.getCurrentState());
     globalState.setCurrentState(STATES.MEDICAL_SCANS_GAME);
   }
+}
 
+function handleEscapeKeyLogic() {
   const updatedValues = handleEscapeKey(keys, globalState.getCurrentState(), globalState.getPreviousState(), player, globalState.getSavedPlayerPosition(), STATES);
-
   globalState.setCurrentState(updatedValues.currentState);
   globalState.setPreviousState(updatedValues.previousState);
   globalState.setSavedPlayerPosition(updatedValues.savedPlayerPosition);
