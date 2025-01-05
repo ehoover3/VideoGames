@@ -6,6 +6,7 @@ import { drawOverworld } from "./game/world.js";
 import { drawHUD } from "./game/hud.js";
 import { drawMedicalScansGame } from "./game/minigames/medScan.js";
 import { createPlayer } from "./game/player.js";
+import { handleEscapeKey } from "./events/eventsManager.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -112,14 +113,14 @@ function updatePlayer() {
     currentState = STATES.MEDICAL_SCANS_GAME;
   }
 
-  if (keys["Escape"]) {
-    previousState = currentState;
-    savedPlayerPosition = { x: player.x, y: player.y };
-    currentState = STATES.MAIN_MENU;
-  }
+  // handleEscapeKey(keys);
+  const updatedValues = handleEscapeKey(keys, currentState, previousState, player, savedPlayerPosition, STATES);
+  currentState = updatedValues.currentState;
+  previousState = updatedValues.previousState;
+  savedPlayerPosition = updatedValues.savedPlayerPosition;
 }
 
-export function updateMedicalScanLogic() {
+export function updateMedScanLogic() {
   if (keys[" "]) {
     scanning = true;
     if (scanProgress < maxScanProgress) {
@@ -136,10 +137,10 @@ export function updateMedicalScanLogic() {
     scanProgress = 0;
   }
 
-  if (keys["Escape"]) {
-    previousState = currentState;
-    currentState = STATES.MAIN_MENU;
-  }
+  const updatedValues = handleEscapeKey(keys, currentState, previousState, player, savedPlayerPosition, STATES);
+  currentState = updatedValues.currentState;
+  previousState = updatedValues.previousState;
+  savedPlayerPosition = updatedValues.savedPlayerPosition;
 }
 
 function gameLoop() {
@@ -173,7 +174,7 @@ function gameLoop() {
       drawHUD(ctx, canvas, currentState, STATES, drawText);
       break;
     case STATES.MEDICAL_SCANS_GAME:
-      updateMedicalScanLogic();
+      updateMedScanLogic();
       drawMedicalScansGame(ctx, canvas, scanProgress, maxScanProgress);
       drawHUD(ctx, canvas, currentState, STATES, drawText);
       break;
