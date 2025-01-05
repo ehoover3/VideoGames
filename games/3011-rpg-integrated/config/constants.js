@@ -1,4 +1,4 @@
-// constants.js  # Constant values used throughout the game
+// constants.js
 
 export const STATES = {
   MAIN_MENU: "mainMenu",
@@ -17,13 +17,6 @@ export const DIRECTION = {
   DOWN: "down",
   LEFT: "left",
   RIGHT: "right",
-};
-
-export const MENU_OPTIONS = {
-  START_NEW_GAME: "Start New Game",
-  LOAD_GAME: "Load Game",
-  SETTINGS: "Settings",
-  EXIT: "Exit",
 };
 
 export const FRAME_WIDTH = 133.5;
