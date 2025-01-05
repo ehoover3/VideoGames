@@ -32,6 +32,7 @@ Main Monitor Sizes
 │ ├── game.js
 │ ├── hud.js
 │ ├── item.js
+│ ├── loop.js
 │ ├── player.js
 │ ├── world.js
 ├── utils/

@@ -9,10 +9,9 @@ import { drawMedicalScansGame, updateMedScanLogic } from "./game/minigames/medSc
 import { createPlayer } from "./game/player.js";
 import { createGameObject } from "./utils/helpers.js";
 import { startGameLoop } from "./game/loop.js";
+import { setupCanvas } from "./utils/canvasSetup.js";
 
-// Canvas Setup
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+const { canvas, ctx } = setupCanvas("gameCanvas");
 
 // Game State and Configuration
 const gameState = {
