@@ -47,7 +47,7 @@ export function handleMenuSelection(selectedMenuOption, previousState, currentSt
   }
 }
 
-export function drawMainMenu(ctx, canvas, drawText, isGameStarted, selectedOption) {
+export function drawMenu(ctx, canvas, drawText, isGameStarted, selectedOption) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawText("Welcome to the Game", canvas.width / 2, canvas.height / 4, "30px Arial");
   const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
