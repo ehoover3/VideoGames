@@ -2,8 +2,7 @@
 import { handleMainMenu, handleMenuSelection, drawMenu } from "../menu/index.js";
 import { STATES, WALK_FRAMES, ATTACK_FRAMES, FRAME_WIDTH, FRAME_HEIGHT } from "../../config/constants.js";
 import { updatePlayer } from "../player.js";
-import { drawOverworld } from "../world.js";
-import { drawHUD } from "../hud.js";
+import { drawHUD, drawOverworld } from "../draw.js";
 import { drawMedicalScansGame, updateMedScanLogic } from "../minigames/medScan.js";
 
 export function startGame({ ctx, canvas, keys, gameState, gameObjects }) {
