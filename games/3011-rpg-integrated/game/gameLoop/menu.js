@@ -13,7 +13,7 @@ export const MENU_OPTIONS = {
 
 export const BASE_MENU = [MENU_OPTIONS.START_NEW_GAME, MENU_OPTIONS.LOAD_GAME, MENU_OPTIONS.SETTINGS, MENU_OPTIONS.EXIT];
 
-export function loadMenu({ keys, gameState, canvas, ctx }) {
+export function loadMenu({ canvas, ctx, keys, gameState }) {
   let menuState = { keys, gameState };
   let drawMenuState = { canvas: canvas, ctx: ctx, isGameStarted: gameState.isGameStarted, selectedOption: gameState.selectedMenuOption };
 
