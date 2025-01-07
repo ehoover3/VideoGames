@@ -47,7 +47,8 @@ export function drawHUD(ctx, canvas, currentState, STATES) {
   drawText(ctx, hudText, canvas.width / 2, canvas.height - 20);
 }
 
-export function drawMenu(ctx, canvas, isGameStarted, selectedOption) {
+export function drawMenu(drawMenuState) {
+  let { ctx, canvas, isGameStarted, selectedOption } = drawMenuState;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawText(ctx, "Welcome to the Game", canvas.width / 2, canvas.height / 4, "30px Arial");
   const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;

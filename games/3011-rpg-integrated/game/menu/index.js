@@ -1,4 +1,4 @@
-// menu/index.js
+// game/menu/index.js
 
 import { STATES } from "../../config/constants.js";
 import { handleStartNewGame } from "./handleStartNewGame.js";
@@ -17,36 +17,49 @@ const MENU_OPTIONS = {
 
 const BASE_MENU = [MENU_OPTIONS.START_NEW_GAME, MENU_OPTIONS.LOAD_GAME, MENU_OPTIONS.SETTINGS, MENU_OPTIONS.EXIT];
 
-export function handleMenu(menuState, setSelectedMenuOption, handleMenuSelection) {
+export function updateMenu(menuState) {
   let { keys, gameState } = menuState;
   let selectedMenuOption = gameState.selectedMenuOption;
+
+  function setCurrentState(newState) {
+    gameState.currentState = newState;
+  }
+
+  function setIsGameStarted(newGameStarted) {
+    gameState.isGameStarted = newGameStarted;
+  }
+
+  function setSelectedMenuOption(newSelected) {
+    gameState.selectedMenuOption = newSelected;
+  }
+
+  function handleMenuSelection() {
+    const menu = gameState.isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
+    const selected = menu[selectedMenuOption];
+
+    switch (selected) {
+      case MENU_OPTIONS.START_NEW_GAME:
+        handleStartNewGame(setCurrentState, setIsGameStarted, STATES);
+        break;
+      case MENU_OPTIONS.RETURN_TO_GAME:
+        handleReturnToGame(gameState.previousState, setCurrentState, STATES);
+        break;
+      case MENU_OPTIONS.LOAD_GAME:
+        handleLoadGame();
+        break;
+      case MENU_OPTIONS.SETTINGS:
+        handleSettings();
+        break;
+      case MENU_OPTIONS.EXIT:
+        handleExit();
+        break;
+      default:
+        console.warn("Invalid menu option selected");
+    }
+  }
+
   updateSelectedOption(keys, selectedMenuOption, setSelectedMenuOption, BASE_MENU.length);
   handleEnterKey(keys, handleMenuSelection);
-}
-
-export function handleMenuSelection(selectedMenuOption, previousState, isGameStarted, setCurrentState, setIsGameStarted) {
-  const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
-  const selected = menu[selectedMenuOption];
-
-  switch (selected) {
-    case MENU_OPTIONS.START_NEW_GAME:
-      handleStartNewGame(setCurrentState, setIsGameStarted, STATES);
-      break;
-    case MENU_OPTIONS.RETURN_TO_GAME:
-      handleReturnToGame(previousState, setCurrentState, STATES);
-      break;
-    case MENU_OPTIONS.LOAD_GAME:
-      handleLoadGame();
-      break;
-    case MENU_OPTIONS.SETTINGS:
-      handleSettings();
-      break;
-    case MENU_OPTIONS.EXIT:
-      handleExit();
-      break;
-    default:
-      console.warn("Invalid menu option selected");
-  }
 }
 
 function updateSelectedOption(keys, selectedMenuOption, setSelectedMenuOption, menuLength) {
