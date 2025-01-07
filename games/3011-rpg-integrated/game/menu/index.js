@@ -24,7 +24,7 @@ export function handleMenu(menuState, setSelectedMenuOption, handleMenuSelection
   handleEnterKey(keys, handleMenuSelection);
 }
 
-export function handleMenuSelection(selectedMenuOption, previousState, currentState, isGameStarted, setCurrentState, setIsGameStarted) {
+export function handleMenuSelection(selectedMenuOption, previousState, isGameStarted, setCurrentState, setIsGameStarted) {
   const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
   const selected = menu[selectedMenuOption];
 

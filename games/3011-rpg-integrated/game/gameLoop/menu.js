@@ -12,7 +12,6 @@ export function loadMenu(menu) {
       handleMenuSelection(
         gameState.selectedMenuOption,
         gameState.previousState,
-        gameState.currentState,
         gameState.isGameStarted,
         (newState) => (gameState.currentState = newState),
         (newGameStarted) => (gameState.isGameStarted = newGameStarted)
