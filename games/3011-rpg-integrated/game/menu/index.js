@@ -6,16 +6,7 @@ import { handleReturnToGame } from "./handleReturnToGame.js";
 import { handleLoadGame } from "./handleLoadGame.js";
 import { handleSettings } from "./handleSettings.js";
 import { handleExit } from "./handleExit.js";
-
-const MENU_OPTIONS = {
-  START_NEW_GAME: "Start New Game",
-  RETURN_TO_GAME: "Return to Game",
-  LOAD_GAME: "Load Game",
-  SETTINGS: "Settings",
-  EXIT: "Exit",
-};
-
-const BASE_MENU = [MENU_OPTIONS.START_NEW_GAME, MENU_OPTIONS.LOAD_GAME, MENU_OPTIONS.SETTINGS, MENU_OPTIONS.EXIT];
+import { MENU_OPTIONS, BASE_MENU } from "../gameLoop/menu.js";
 
 export function updateMenu(menuState) {
   let { keys, gameState } = menuState;

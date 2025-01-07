@@ -1,4 +1,6 @@
 // draw.js
+import { MENU_OPTIONS, BASE_MENU } from "../game/gameLoop/menu.js";
+
 const playerSpriteSheet = new Image();
 playerSpriteSheet.src = "assets/images/player.png";
 
@@ -8,16 +10,6 @@ const DIRECTIONS = {
   left: 2,
   right: 3,
 };
-
-const MENU_OPTIONS = {
-  START_NEW_GAME: "Start New Game",
-  RETURN_TO_GAME: "Return to Game",
-  LOAD_GAME: "Load Game",
-  SETTINGS: "Settings",
-  EXIT: "Exit",
-};
-
-const BASE_MENU = [MENU_OPTIONS.START_NEW_GAME, MENU_OPTIONS.LOAD_GAME, MENU_OPTIONS.SETTINGS, MENU_OPTIONS.EXIT];
 
 export function drawOverworld(ctx, canvas, player, currentFrame, FRAME_SETTINGS, mriMachine, xrayMachine) {
   const { FRAME_WIDTH, FRAME_HEIGHT } = FRAME_SETTINGS;
