@@ -2,27 +2,27 @@
 
 import { drawText } from "../../draw.js";
 
-function drawScanScreen(ctx, canvas, mriImg, scanProgress, maxScanProgress) {
-  clearCanvas(ctx, canvas);
-  drawMRIImage(ctx, canvas, mriImg);
-  drawProgressBar(ctx, canvas, scanProgress, maxScanProgress);
+function drawScanScreen(canvas, ctx, mriImg, scanProgress, maxScanProgress) {
+  clearCanvas(canvas, ctx);
+  drawMRIImage(canvas, ctx, mriImg);
+  drawProgressBar(canvas, ctx, scanProgress, maxScanProgress);
   if (scanProgress >= maxScanProgress) {
     drawText(ctx, "Scanning Complete! Press SPACE to return.", canvas.width / 2, 350, "center", "20px Arial");
   }
 }
 
-function clearCanvas(ctx, canvas) {
+function clearCanvas(canvas, ctx) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-export function drawMedScan(ctx, canvas, scanProgress, maxScanProgress) {
+export function drawMedScan(canvas, ctx, scanProgress, maxScanProgress) {
   const mriImg = new Image();
   mriImg.src = "assets/images/mri.png";
-  mriImg.onload = () => drawScanScreen(ctx, canvas, mriImg, scanProgress, maxScanProgress);
+  mriImg.onload = () => drawScanScreen(canvas, ctx, mriImg, scanProgress, maxScanProgress);
   mriImg.onerror = () => console.error("Failed to load image: mri.png");
 }
 
-function drawMRIImage(ctx, canvas, mriImg) {
+function drawMRIImage(canvas, ctx, mriImg) {
   const imageWidth = 458;
   const imageHeight = 248;
   const x = (canvas.width - imageWidth) / 2;
@@ -30,7 +30,7 @@ function drawMRIImage(ctx, canvas, mriImg) {
   ctx.drawImage(mriImg, 0, 0, imageWidth, imageHeight, x, y, imageWidth, imageHeight);
 }
 
-function drawProgressBar(ctx, canvas, scanProgress, maxScanProgress) {
+function drawProgressBar(canvas, ctx, scanProgress, maxScanProgress) {
   const barWidth = 400;
   const barHeight = 24;
   const x = (canvas.width - barWidth) / 2;

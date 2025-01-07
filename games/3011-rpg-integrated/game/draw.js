@@ -11,7 +11,7 @@ const DIRECTIONS = {
   right: 3,
 };
 
-export function drawOverworld(ctx, canvas, player, currentFrame, FRAME_SETTINGS, mriMachine, xrayMachine) {
+export function drawOverworld(canvas, ctx, player, currentFrame, FRAME_SETTINGS, mriMachine, xrayMachine) {
   const { FRAME_WIDTH, FRAME_HEIGHT } = FRAME_SETTINGS;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawPlayerSprite(ctx, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT);
@@ -19,7 +19,7 @@ export function drawOverworld(ctx, canvas, player, currentFrame, FRAME_SETTINGS,
   drawMachine(ctx, xrayMachine);
 }
 
-export function drawHUD(ctx, canvas, currentState, STATES) {
+export function drawHUD(canvas, ctx, currentState, STATES) {
   ctx.fillStyle = "lightgray";
   ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
   const hudText = currentState === STATES.OVERWORLD ? "Arrow Keys to Move | Space to Interact | ESC for Main Menu" : "Hold SPACE to Scan | X to Exit to Overworld | ESC for Main Menu";
@@ -27,7 +27,7 @@ export function drawHUD(ctx, canvas, currentState, STATES) {
 }
 
 export function drawMenu(drawMenuState) {
-  let { ctx, canvas, isGameStarted, selectedOption } = drawMenuState;
+  let { canvas, ctx, isGameStarted, selectedOption } = drawMenuState;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawText(ctx, "Welcome to the Game", canvas.width / 2, canvas.height / 4, "30px Arial");
   const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;

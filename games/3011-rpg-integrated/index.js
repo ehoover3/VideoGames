@@ -6,9 +6,9 @@ import { setupKeyboard } from "./utils/keyboard.js";
 import { initGameObjects } from "./game/gameObjects.js";
 import { gameState } from "./utils/gameState.js";
 
-const { ctx, canvas } = setupCanvas("gameCanvas");
+const { canvas, ctx } = setupCanvas("gameCanvas");
 const keys = setupKeyboard();
 const gameObjects = initGameObjects();
-let game = { ctx: ctx, canvas: canvas, keys: keys, gameState: gameState, gameObjects: gameObjects };
+let game = { canvas, ctx, keys, gameState, gameObjects };
 
 startGame(game);
