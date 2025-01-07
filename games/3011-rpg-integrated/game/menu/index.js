@@ -17,7 +17,7 @@ const MENU_OPTIONS = {
 
 const BASE_MENU = [MENU_OPTIONS.START_NEW_GAME, MENU_OPTIONS.LOAD_GAME, MENU_OPTIONS.SETTINGS, MENU_OPTIONS.EXIT];
 
-export function handleMainMenu(keys, selectedMenuOption, setSelectedMenuOption, handleMenuSelection) {
+export function handleMenu(keys, selectedMenuOption, setSelectedMenuOption, handleMenuSelection) {
   updateSelectedOption(keys, selectedMenuOption, setSelectedMenuOption, BASE_MENU.length);
   handleEnterKey(keys, handleMenuSelection);
 }
@@ -46,15 +46,6 @@ export function handleMenuSelection(selectedMenuOption, previousState, currentSt
       console.warn("Invalid menu option selected");
   }
 }
-
-// export function drawMenu(ctx, canvas, drawText, isGameStarted, selectedOption) {
-//   ctx.clearRect(0, 0, canvas.width, canvas.height);
-//   drawText("Welcome to the Game", canvas.width / 2, canvas.height / 4, "30px Arial");
-//   const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
-//   menu.forEach((option, index) => {
-//     drawText(option, canvas.width / 2, canvas.height / 2 + index * 30, "20px Arial", index === selectedOption ? "blue" : "black");
-//   });
-// }
 
 function updateSelectedOption(keys, selectedMenuOption, setSelectedMenuOption, menuLength) {
   if (keys["ArrowUp"]) {

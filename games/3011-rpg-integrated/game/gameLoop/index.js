@@ -1,8 +1,8 @@
 // games/loop.js
 import { STATES, WALK_FRAMES, ATTACK_FRAMES, FRAME_WIDTH, FRAME_HEIGHT } from "../../config/constants.js";
-import { handleOverworld } from "./handleOverworld.js";
-import { handleScanGame } from "./handleScanGame.js";
-import { handleMenu } from "./handleMenu.js";
+import { loadOverworld } from "./overworld.js";
+import { loadScanGame } from "./scanGame.js";
+import { loadMenu } from "./menu.js";
 
 export function startGame({ ctx, canvas, keys, gameState, gameObjects }) {
   function drawText(text, x, y, font = "16px Arial", color = "black", align = "center") {
@@ -15,13 +15,13 @@ export function startGame({ ctx, canvas, keys, gameState, gameObjects }) {
   function gameLoop() {
     switch (gameState.currentState) {
       case STATES.MAIN_MENU:
-        handleMenu(keys, gameState, ctx, canvas, drawText);
+        loadMenu(keys, gameState, ctx, canvas, drawText);
         break;
       case STATES.OVERWORLD:
-        handleOverworld(gameObjects, keys, gameState, WALK_FRAMES, ATTACK_FRAMES, FRAME_WIDTH, FRAME_HEIGHT, STATES, ctx, canvas, drawText);
+        loadOverworld(gameObjects, keys, gameState, WALK_FRAMES, ATTACK_FRAMES, FRAME_WIDTH, FRAME_HEIGHT, STATES, ctx, canvas, drawText);
         break;
       case STATES.SCAN_GAME:
-        handleScanGame(gameObjects, keys, gameState, STATES, drawText, ctx, canvas);
+        loadScanGame(gameObjects, keys, gameState, STATES, ctx, canvas);
         break;
     }
     requestAnimationFrame(gameLoop);

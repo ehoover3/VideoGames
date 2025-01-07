@@ -46,13 +46,6 @@ export function drawHUD(ctx, canvas, currentState, STATES) {
   drawText(ctx, hudText, canvas.width / 2, canvas.height - 20);
 }
 
-function drawText(ctx, text, x, y, font = "16px Arial", color = "black", align = "center") {
-  ctx.fillStyle = color;
-  ctx.font = font;
-  ctx.textAlign = align;
-  ctx.fillText(text, x, y);
-}
-
 export function drawMenu(ctx, canvas, drawText, isGameStarted, selectedOption) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawText("Welcome to the Game", canvas.width / 2, canvas.height / 4, "30px Arial");
@@ -60,4 +53,11 @@ export function drawMenu(ctx, canvas, drawText, isGameStarted, selectedOption) {
   menu.forEach((option, index) => {
     drawText(option, canvas.width / 2, canvas.height / 2 + index * 30, "20px Arial", index === selectedOption ? "blue" : "black");
   });
+}
+
+function drawText(ctx, text, x, y, font = "16px Arial", color = "black", align = "center") {
+  ctx.fillStyle = color;
+  ctx.font = font;
+  ctx.textAlign = align;
+  ctx.fillText(text, x, y);
 }
