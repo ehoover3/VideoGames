@@ -47,14 +47,14 @@ export function handleMenuSelection(selectedMenuOption, previousState, currentSt
   }
 }
 
-export function drawMenu(ctx, canvas, drawText, isGameStarted, selectedOption) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawText("Welcome to the Game", canvas.width / 2, canvas.height / 4, "30px Arial");
-  const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
-  menu.forEach((option, index) => {
-    drawText(option, canvas.width / 2, canvas.height / 2 + index * 30, "20px Arial", index === selectedOption ? "blue" : "black");
-  });
-}
+// export function drawMenu(ctx, canvas, drawText, isGameStarted, selectedOption) {
+//   ctx.clearRect(0, 0, canvas.width, canvas.height);
+//   drawText("Welcome to the Game", canvas.width / 2, canvas.height / 4, "30px Arial");
+//   const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
+//   menu.forEach((option, index) => {
+//     drawText(option, canvas.width / 2, canvas.height / 2 + index * 30, "20px Arial", index === selectedOption ? "blue" : "black");
+//   });
+// }
 
 function updateSelectedOption(keys, selectedMenuOption, setSelectedMenuOption, menuLength) {
   if (keys["ArrowUp"]) {

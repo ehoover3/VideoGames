@@ -10,5 +10,5 @@ export function handleOverworld(gameObjects, keys, gameState, WALK_FRAMES, ATTAC
     savedPlayerPosition: updatedState.savedPlayerPosition,
   });
   drawOverworld(ctx, canvas, player, gameState.currentFrame, FRAME_WIDTH, FRAME_HEIGHT, mriMachine, xrayMachine);
-  drawHUD(ctx, canvas, gameState.currentState, STATES, drawText);
+  drawHUD(ctx, canvas, gameState.currentState, STATES);
 }

@@ -14,5 +14,5 @@ export function handleScanGame(gameObjects, keys, gameState, STATES, drawText, c
   });
 
   drawMedScan(ctx, canvas, gameState.scanProgress, gameState.maxScanProgress);
-  drawHUD(ctx, canvas, gameState.currentState, STATES, drawText);
+  drawHUD(ctx, canvas, gameState.currentState, STATES);
 }

@@ -1,4 +1,5 @@
-import { handleMainMenu, handleMenuSelection, drawMenu } from "../menu/index.js";
+import { handleMainMenu, handleMenuSelection } from "../menu/index.js";
+import { drawMenu } from "../draw.js";
 
 export function handleMenu(keys, gameState, ctx, canvas, drawText) {
   handleMainMenu(

@@ -9,6 +9,16 @@ const DIRECTIONS = {
   right: 3,
 };
 
+const MENU_OPTIONS = {
+  START_NEW_GAME: "Start New Game",
+  RETURN_TO_GAME: "Return to Game",
+  LOAD_GAME: "Load Game",
+  SETTINGS: "Settings",
+  EXIT: "Exit",
+};
+
+const BASE_MENU = [MENU_OPTIONS.START_NEW_GAME, MENU_OPTIONS.LOAD_GAME, MENU_OPTIONS.SETTINGS, MENU_OPTIONS.EXIT];
+
 export function drawOverworld(ctx, canvas, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT, mriMachine, xrayMachine) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawPlayerSprite(ctx, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT);
@@ -29,9 +39,25 @@ function drawMachine(ctx, machine) {
   ctx.fillRect(machine.x, machine.y, machine.width, machine.height);
 }
 
-export function drawHUD(ctx, canvas, currentState, STATES, drawText) {
+export function drawHUD(ctx, canvas, currentState, STATES) {
   ctx.fillStyle = "lightgray";
   ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
   const hudText = currentState === STATES.OVERWORLD ? "Arrow Keys to Move | Space to Interact | ESC for Main Menu" : "Hold SPACE to Scan | X to Exit to Overworld | ESC for Main Menu";
-  drawText(hudText, canvas.width / 2, canvas.height - 20);
+  drawText(ctx, hudText, canvas.width / 2, canvas.height - 20);
+}
+
+function drawText(ctx, text, x, y, font = "16px Arial", color = "black", align = "center") {
+  ctx.fillStyle = color;
+  ctx.font = font;
+  ctx.textAlign = align;
+  ctx.fillText(text, x, y);
+}
+
+export function drawMenu(ctx, canvas, drawText, isGameStarted, selectedOption) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawText("Welcome to the Game", canvas.width / 2, canvas.height / 4, "30px Arial");
+  const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
+  menu.forEach((option, index) => {
+    drawText(option, canvas.width / 2, canvas.height / 2 + index * 30, "20px Arial", index === selectedOption ? "blue" : "black");
+  });
 }
