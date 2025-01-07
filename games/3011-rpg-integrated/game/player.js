@@ -1,13 +1,17 @@
 // player.js
 
-// export function createPlayer(x, y, width, height, color, speed, direction) {
-//   return { x, y, width, height, color, speed, direction };
-// }
-
 import { ACTIONS, DIRECTION } from "../config/constants.js";
 import { checkCollisionWithGameObject } from "../game/game.js";
 
-export function updatePlayer(player, keys, currentAction, animationTimer, animationSpeed, WALK_FRAMES, ATTACK_FRAMES, currentFrame, mriMachine, STATES, currentState, previousState, savedPlayerPosition) {
+export function updatePlayer(player, mriMachine, STATES, keys, WALK_FRAMES, ATTACK_FRAMES, gameState) {
+  let currentAction = gameState.currentAction;
+  let animationTimer = gameState.animationTimer;
+  let animationSpeed = gameState.animationSpeed;
+  let currentFrame = gameState.currentFrame;
+  let currentState = gameState.currentState;
+  let previousState = gameState.previousState;
+  let savedPlayerPosition = gameState.savedPlayerPosition;
+
   handleMovement(player, keys);
   handleAction(keys, currentAction);
   handleAnimation(currentAction, animationTimer, animationSpeed, WALK_FRAMES, ATTACK_FRAMES, currentFrame);
