@@ -9,11 +9,6 @@ import { gameState } from "./utils/gameState.js";
 const { ctx, canvas } = setupCanvas("gameCanvas");
 const keys = setupKeyboard();
 const gameObjects = initGameObjects();
+let game = { ctx: ctx, canvas: canvas, keys: keys, gameState: gameState, gameObjects: gameObjects };
 
-startGame({
-  ctx,
-  canvas,
-  keys,
-  gameState,
-  gameObjects,
-});
+startGame(game);

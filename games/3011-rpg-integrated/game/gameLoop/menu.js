@@ -1,7 +1,8 @@
 import { handleMenu, handleMenuSelection } from "../menu/index.js";
 import { drawMenu } from "../draw.js";
 
-export function loadMenu(keys, gameState, ctx, canvas) {
+export function loadMenu(menu) {
+  let { keys, gameState, ctx, canvas } = menu;
   handleMenu(
     keys,
     gameState.selectedMenuOption,
