@@ -19,19 +19,6 @@ export function drawOverworld(ctx, canvas, player, currentFrame, FRAME_SETTINGS,
   drawMachine(ctx, xrayMachine);
 }
 
-function drawPlayerSprite(ctx, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT) {
-  const spriteRow = DIRECTIONS[player.direction];
-  const sourceX = currentFrame * FRAME_WIDTH;
-  const sourceY = spriteRow * FRAME_HEIGHT;
-
-  ctx.drawImage(playerSpriteSheet, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, player.x, player.y, player.width, player.height);
-}
-
-function drawMachine(ctx, machine) {
-  ctx.fillStyle = machine.color;
-  ctx.fillRect(machine.x, machine.y, machine.width, machine.height);
-}
-
 export function drawHUD(ctx, canvas, currentState, STATES) {
   ctx.fillStyle = "lightgray";
   ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
@@ -54,4 +41,17 @@ export function drawText(ctx, text, x, y, font = "16px Arial", color = "black", 
   ctx.font = font;
   ctx.textAlign = align;
   ctx.fillText(text, x, y);
+}
+
+function drawPlayerSprite(ctx, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT) {
+  const spriteRow = DIRECTIONS[player.direction];
+  const sourceX = currentFrame * FRAME_WIDTH;
+  const sourceY = spriteRow * FRAME_HEIGHT;
+
+  ctx.drawImage(playerSpriteSheet, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, player.x, player.y, player.width, player.height);
+}
+
+function drawMachine(ctx, machine) {
+  ctx.fillStyle = machine.color;
+  ctx.fillRect(machine.x, machine.y, machine.width, machine.height);
 }

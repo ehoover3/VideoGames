@@ -1,6 +1,13 @@
 // game/minigames/medScan.js
 
-export function updateMedScanLogic(keys, scanning, scanProgress, maxScanProgress, currentState, player, previousState, STATES, savedPlayerPosition) {
+export function runMedScanLogic(keys, player, STATES, gameState) {
+  let scanning = gameState.scanning;
+  let scanProgress = gameState.scanProgress;
+  let maxScanProgress = gameState.maxScanProgress;
+  let currentState = gameState.currentState;
+  let previousState = gameState.previousState;
+  let savedPlayerPosition = gameState.savedPlayerPosition;
+
   if (keys[" "]) {
     scanning = true;
     if (scanProgress < maxScanProgress) {

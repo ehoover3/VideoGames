@@ -2,7 +2,7 @@
 
 import { drawText } from "../../draw.js";
 
-function renderScanScreen(ctx, canvas, mriImg, scanProgress, maxScanProgress) {
+function drawScanScreen(ctx, canvas, mriImg, scanProgress, maxScanProgress) {
   clearCanvas(ctx, canvas);
   drawMRIImage(ctx, canvas, mriImg);
   drawProgressBar(ctx, canvas, scanProgress, maxScanProgress);
@@ -18,7 +18,7 @@ function clearCanvas(ctx, canvas) {
 export function drawMedScan(ctx, canvas, scanProgress, maxScanProgress) {
   const mriImg = new Image();
   mriImg.src = "assets/images/mri.png";
-  mriImg.onload = () => renderScanScreen(ctx, canvas, mriImg, scanProgress, maxScanProgress);
+  mriImg.onload = () => drawScanScreen(ctx, canvas, mriImg, scanProgress, maxScanProgress);
   mriImg.onerror = () => console.error("Failed to load image: mri.png");
 }
 
