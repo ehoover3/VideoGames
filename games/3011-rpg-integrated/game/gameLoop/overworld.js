@@ -8,8 +8,7 @@ export function loadOverworld(gameObjects, keys, gameState, FRAME_SETTINGS, STAT
   const FRAME_HEIGHT = FRAME_SETTINGS.FRAME_HEIGHT;
 
   const { player, mriMachine, xrayMachine } = gameObjects;
-  // const updatedState = updatePlayer(player, mriMachine, STATES, keys, WALK_FRAMES, ATTACK_FRAMES, gameState.currentAction, gameState.animationTimer, gameState.animationSpeed, gameState.currentFrame, gameState.currentState, gameState.previousState, gameState.savedPlayerPosition);
-  const updatedState = updatePlayer(player, mriMachine, STATES, keys, WALK_FRAMES, ATTACK_FRAMES, gameState);
+  const updatedState = updatePlayer(player, mriMachine, STATES, keys, FRAME_SETTINGS, gameState);
   Object.assign(gameState, {
     currentState: updatedState.currentState,
     previousState: updatedState.previousState,

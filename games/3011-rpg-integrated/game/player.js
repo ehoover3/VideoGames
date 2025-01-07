@@ -3,19 +3,18 @@
 import { ACTIONS, DIRECTION } from "../config/constants.js";
 import { checkCollisionWithGameObject } from "../game/game.js";
 
-export function updatePlayer(player, mriMachine, STATES, keys, WALK_FRAMES, ATTACK_FRAMES, gameState) {
+export function updatePlayer(player, mriMachine, STATES, keys, FRAME_SETTINGS, gameState) {
   let currentAction = gameState.currentAction;
-  let animationTimer = gameState.animationTimer;
-  let animationSpeed = gameState.animationSpeed;
-  let currentFrame = gameState.currentFrame;
   let currentState = gameState.currentState;
   let previousState = gameState.previousState;
   let savedPlayerPosition = gameState.savedPlayerPosition;
 
   handleMovement(player, keys);
   handleAction(keys, currentAction);
-  handleAnimation(currentAction, animationTimer, animationSpeed, WALK_FRAMES, ATTACK_FRAMES, currentFrame);
-  const collisionResult = handleCollision(player, keys, mriMachine, STATES, currentState, previousState, savedPlayerPosition);
+  handleAnimation(FRAME_SETTINGS, gameState);
+
+  const collisionResult = handleCollision(player, keys, mriMachine, STATES, currentState);
+
   if (collisionResult) {
     savedPlayerPosition = collisionResult.savedPlayerPosition;
     previousState = collisionResult.previousState;
@@ -36,7 +35,7 @@ export function updatePlayer(player, mriMachine, STATES, keys, WALK_FRAMES, ATTA
   };
 }
 
-export function handleMovement(player, keys) {
+function handleMovement(player, keys) {
   let isMoving = false;
   let moveX = 0,
     moveY = 0;
@@ -76,7 +75,7 @@ export function handleMovement(player, keys) {
   player.y += moveY;
 }
 
-export function handleAction(keys, currentAction) {
+function handleAction(keys, currentAction) {
   if (keys["z"] || keys["Z"]) {
     currentAction = ACTIONS.ATTACKING;
   } else if (keys["ArrowUp"] || keys["ArrowDown"] || keys["ArrowLeft"] || keys["ArrowRight"]) {
@@ -86,7 +85,14 @@ export function handleAction(keys, currentAction) {
   }
 }
 
-export function handleAnimation(currentAction, animationTimer, animationSpeed, WALK_FRAMES, ATTACK_FRAMES, currentFrame) {
+function handleAnimation(FRAME_SETTINGS, gameState) {
+  const WALK_FRAMES = FRAME_SETTINGS.WALK_FRAMES;
+  const ATTACK_FRAMES = FRAME_SETTINGS.ATTACK_FRAMES;
+  let currentAction = gameState.currentAction;
+  let animationTimer = gameState.animationTimer;
+  let animationSpeed = gameState.animationSpeed;
+  let currentFrame = gameState.currentFrame;
+
   if (currentAction === ACTIONS.WALKING || currentAction === ACTIONS.ATTACKING) {
     animationTimer++;
     if (animationTimer >= animationSpeed) {
@@ -101,7 +107,7 @@ export function handleAnimation(currentAction, animationTimer, animationSpeed, W
   }
 }
 
-export function handleCollision(player, keys, mriMachine, STATES, currentState, previousState, savedPlayerPosition) {
+function handleCollision(player, keys, mriMachine, STATES, currentState) {
   if (checkCollisionWithGameObject(player, mriMachine) && keys[" "]) {
     return {
       savedPlayerPosition: { x: player.x, y: player.y },
@@ -111,16 +117,15 @@ export function handleCollision(player, keys, mriMachine, STATES, currentState, 
   }
 }
 
-export function handleEscapeKeyLogic(keys, player, STATES, currentState, previousState, savedPlayerPosition) {
+function handleEscapeKeyLogic(keys, player, STATES, currentState, previousState, savedPlayerPosition) {
   if (keys["Escape"]) {
     return {
-      savedPlayerPosition: { x: player.x, y: player.y }, // Save the current player position
+      savedPlayerPosition: { x: player.x, y: player.y },
       previousState: currentState,
-      currentState: STATES.MAIN_MENU, // Switch to the MAIN_MENU state
+      currentState: STATES.MAIN_MENU,
     };
   }
 
-  // If Escape is not pressed, return the current states unchanged
   return {
     savedPlayerPosition: savedPlayerPosition,
     previousState: previousState,
