@@ -1,7 +1,7 @@
 import { handleMenu, handleMenuSelection } from "../menu/index.js";
 import { drawMenu } from "../draw.js";
 
-export function loadMenu(keys, gameState, ctx, canvas, drawText) {
+export function loadMenu(keys, gameState, ctx, canvas) {
   handleMenu(
     keys,
     gameState.selectedMenuOption,
@@ -17,5 +17,5 @@ export function loadMenu(keys, gameState, ctx, canvas, drawText) {
       );
     }
   );
-  drawMenu(ctx, canvas, drawText, gameState.isGameStarted, gameState.selectedMenuOption);
+  drawMenu(ctx, canvas, gameState.isGameStarted, gameState.selectedMenuOption);
 }
