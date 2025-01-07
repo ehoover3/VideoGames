@@ -3,7 +3,8 @@ import { drawHUD, drawOverworld } from "../draw.js";
 
 export function loadOverworld({ gameObjects, keys, gameState, FRAME_SETTINGS, STATES, ctx, canvas }) {
   const { player, mriMachine, xrayMachine } = gameObjects;
-  const updatedState = updatePlayer(player, mriMachine, STATES, keys, FRAME_SETTINGS, gameState);
+  let playerState = { player, mriMachine, STATES, keys, FRAME_SETTINGS, gameState };
+  const updatedState = updatePlayer(playerState);
   Object.assign(gameState, {
     currentState: updatedState.currentState,
     previousState: updatedState.previousState,
