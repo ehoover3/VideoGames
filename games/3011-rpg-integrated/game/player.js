@@ -4,11 +4,7 @@ import { ACTIONS, DIRECTION } from "../config/constants.js";
 import { checkCollisionWithGameObject } from "../game/game.js";
 
 export function updatePlayer(player, mriMachine, STATES, keys, FRAME_SETTINGS, gameState) {
-  let currentAction = gameState.currentAction;
-  let currentState = gameState.currentState;
-  let previousState = gameState.previousState;
-  let savedPlayerPosition = gameState.savedPlayerPosition;
-
+  let { currentAction, currentState, previousState, savedPlayerPosition } = gameState;
   handleMovement(player, keys);
   handleAction(keys, currentAction);
   handleAnimation(FRAME_SETTINGS, gameState);
@@ -29,9 +25,9 @@ export function updatePlayer(player, mriMachine, STATES, keys, FRAME_SETTINGS, g
   }
 
   return {
-    currentState: currentState,
-    previousState: previousState,
-    savedPlayerPosition: savedPlayerPosition,
+    currentState,
+    previousState,
+    savedPlayerPosition,
   };
 }
 
@@ -88,10 +84,7 @@ function handleAction(keys, currentAction) {
 function handleAnimation(FRAME_SETTINGS, gameState) {
   const WALK_FRAMES = FRAME_SETTINGS.WALK_FRAMES;
   const ATTACK_FRAMES = FRAME_SETTINGS.ATTACK_FRAMES;
-  let currentAction = gameState.currentAction;
-  let animationTimer = gameState.animationTimer;
-  let animationSpeed = gameState.animationSpeed;
-  let currentFrame = gameState.currentFrame;
+  let { currentAction, animationTimer, animationSpeed, currentFrame } = gameState;
 
   if (currentAction === ACTIONS.WALKING || currentAction === ACTIONS.ATTACKING) {
     animationTimer++;

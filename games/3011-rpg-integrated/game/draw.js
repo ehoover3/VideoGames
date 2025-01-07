@@ -19,7 +19,8 @@ const MENU_OPTIONS = {
 
 const BASE_MENU = [MENU_OPTIONS.START_NEW_GAME, MENU_OPTIONS.LOAD_GAME, MENU_OPTIONS.SETTINGS, MENU_OPTIONS.EXIT];
 
-export function drawOverworld(ctx, canvas, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT, mriMachine, xrayMachine) {
+export function drawOverworld(ctx, canvas, player, currentFrame, FRAME_SETTINGS, mriMachine, xrayMachine) {
+  const { FRAME_WIDTH, FRAME_HEIGHT } = FRAME_SETTINGS;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawPlayerSprite(ctx, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT);
   drawMachine(ctx, mriMachine);
