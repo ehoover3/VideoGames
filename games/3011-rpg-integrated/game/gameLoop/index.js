@@ -4,8 +4,7 @@ import { loadOverworld } from "./overworld.js";
 import { loadScanGame } from "./scanGame.js";
 import { loadMenu } from "./menu.js";
 
-export function startGame(game) {
-  let { ctx, canvas, keys, gameState, gameObjects } = game;
+export function startGame({ ctx, canvas, keys, gameState, gameObjects }) {
   let menu = { keys, gameState, ctx, canvas };
   let overworld = { gameObjects, keys, gameState, FRAME_SETTINGS, STATES, ctx, canvas };
   let scanGame = { gameObjects, keys, gameState, STATES, ctx, canvas };

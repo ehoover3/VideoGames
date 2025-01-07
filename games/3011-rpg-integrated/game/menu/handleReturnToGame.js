@@ -1,4 +1,6 @@
-export function handleReturnToGame(previousState, setCurrentState, STATES) {
+import { STATES } from "../../config/constants.js";
+
+export function handleReturnToGame(previousState, setCurrentState) {
   const stateMap = {
     [STATES.SCAN_GAME]: STATES.SCAN_GAME,
   };

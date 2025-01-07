@@ -1,6 +1,5 @@
 // game/menu/index.js
 
-import { STATES } from "../../config/constants.js";
 import { handleStartNewGame } from "./handleStartNewGame.js";
 import { handleReturnToGame } from "./handleReturnToGame.js";
 import { handleLoadGame } from "./handleLoadGame.js";
@@ -8,8 +7,7 @@ import { handleSettings } from "./handleSettings.js";
 import { handleExit } from "./handleExit.js";
 import { MENU_OPTIONS, BASE_MENU } from "../gameLoop/menu.js";
 
-export function updateMenu(menuState) {
-  let { keys, gameState } = menuState;
+export function updateMenu({ keys, gameState }) {
   let selectedMenuOption = gameState.selectedMenuOption;
 
   function setCurrentState(newState) {
@@ -30,10 +28,10 @@ export function updateMenu(menuState) {
 
     switch (selected) {
       case MENU_OPTIONS.START_NEW_GAME:
-        handleStartNewGame(setCurrentState, setIsGameStarted, STATES);
+        handleStartNewGame(setCurrentState, setIsGameStarted);
         break;
       case MENU_OPTIONS.RETURN_TO_GAME:
-        handleReturnToGame(gameState.previousState, setCurrentState, STATES);
+        handleReturnToGame(gameState.previousState, setCurrentState);
         break;
       case MENU_OPTIONS.LOAD_GAME:
         handleLoadGame();
@@ -49,11 +47,14 @@ export function updateMenu(menuState) {
     }
   }
 
-  updateSelectedOption(keys, selectedMenuOption, setSelectedMenuOption, BASE_MENU.length);
+  let menuLength = BASE_MENU.length;
+  let selectedOptionsState = { keys, selectedMenuOption, setSelectedMenuOption, menuLength };
+
+  updateSelectedOption(selectedOptionsState);
   handleEnterKey(keys, handleMenuSelection);
 }
 
-function updateSelectedOption(keys, selectedMenuOption, setSelectedMenuOption, menuLength) {
+function updateSelectedOption({ keys, selectedMenuOption, setSelectedMenuOption, menuLength }) {
   if (keys["ArrowUp"]) {
     setSelectedMenuOption((selectedMenuOption - 1 + menuLength) % menuLength);
     keys["ArrowUp"] = false;
