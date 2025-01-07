@@ -3,9 +3,10 @@ import { drawMenu } from "../draw.js";
 
 export function loadMenu(menu) {
   let { keys, gameState, ctx, canvas } = menu;
+  let menuState = { keys, gameState };
+
   handleMenu(
-    keys,
-    gameState.selectedMenuOption,
+    menuState,
     (newSelected) => (gameState.selectedMenuOption = newSelected),
     () => {
       handleMenuSelection(

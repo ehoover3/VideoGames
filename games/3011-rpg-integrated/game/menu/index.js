@@ -17,7 +17,9 @@ const MENU_OPTIONS = {
 
 const BASE_MENU = [MENU_OPTIONS.START_NEW_GAME, MENU_OPTIONS.LOAD_GAME, MENU_OPTIONS.SETTINGS, MENU_OPTIONS.EXIT];
 
-export function handleMenu(keys, selectedMenuOption, setSelectedMenuOption, handleMenuSelection) {
+export function handleMenu(menuState, setSelectedMenuOption, handleMenuSelection) {
+  let { keys, gameState } = menuState;
+  let selectedMenuOption = gameState.selectedMenuOption;
   updateSelectedOption(keys, selectedMenuOption, setSelectedMenuOption, BASE_MENU.length);
   handleEnterKey(keys, handleMenuSelection);
 }
