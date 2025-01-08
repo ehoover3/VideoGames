@@ -3,7 +3,7 @@ import { drawHUD } from "../draw.js";
 import { runMedScanLogic } from "../minigames/medScan/logic.js";
 import { drawMedScan } from "../minigames/medScan/draw.js";
 
-export function loadScanGame({ canvas, ctx, gameObjects, keys, gameState }) {
+export function loadScanGame({ canvas, ctx, keys, gameState, gameObjects }) {
   const { player } = gameObjects;
   const updatedValues = runMedScanLogic(keys, player, gameState);
   Object.assign(gameState, updatedValues);

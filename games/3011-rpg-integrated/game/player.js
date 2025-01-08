@@ -3,7 +3,7 @@
 import { ACTIONS, DIRECTION } from "../config/constants.js";
 import { STATES, FRAME_SETTINGS } from "../config/constants.js";
 
-export function updatePlayer({ gameObjects, keys, gameState }) {
+export function updatePlayer({ keys, gameState, gameObjects }) {
   let { currentAction, currentState, previousState, savedPlayerPosition } = gameState;
   let { player, mriMachine } = gameObjects;
 
