@@ -1,12 +1,12 @@
 // games/loop.js
-import { STATES, FRAME_SETTINGS } from "../../config/constants.js";
+import { STATES } from "../../config/constants.js";
 import { loadOverworld } from "./overworld.js";
 import { loadScanGame } from "./scanGame.js";
 import { loadMenu } from "./menu.js";
 
 export function startGame({ canvas, ctx, keys, gameState, gameObjects }) {
   let menu = { canvas, ctx, keys, gameState };
-  let overworld = { canvas, ctx, gameObjects, keys, gameState, FRAME_SETTINGS };
+  let overworld = { canvas, ctx, gameObjects, keys, gameState };
   let scanGame = { canvas, ctx, gameObjects, keys, gameState };
 
   const handleGameState = {

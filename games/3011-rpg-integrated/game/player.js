@@ -1,15 +1,15 @@
 // player.js
 
 import { ACTIONS, DIRECTION } from "../config/constants.js";
-import { STATES } from "../config/constants.js";
+import { STATES, FRAME_SETTINGS } from "../config/constants.js";
 
-export function updatePlayer({ gameObjects, keys, FRAME_SETTINGS, gameState }) {
+export function updatePlayer({ gameObjects, keys, gameState }) {
   let { currentAction, currentState, previousState, savedPlayerPosition } = gameState;
   let { player, mriMachine } = gameObjects;
 
   let movement = { player, keys };
   let action = { keys, currentAction };
-  let animation = { FRAME_SETTINGS, gameState };
+  let animation = { gameState };
   let collision = { player, keys, mriMachine, currentState };
 
   handleMovement(movement);
@@ -88,7 +88,7 @@ function handleAction({ keys, currentAction }) {
   }
 }
 
-function handleAnimation({ FRAME_SETTINGS, gameState }) {
+function handleAnimation({ gameState }) {
   const WALK_FRAMES = FRAME_SETTINGS.WALK_FRAMES;
   const ATTACK_FRAMES = FRAME_SETTINGS.ATTACK_FRAMES;
   let { currentAction, animationTimer, animationSpeed, currentFrame } = gameState;

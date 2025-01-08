@@ -39,7 +39,6 @@ export function drawPlayer(ctx, player, currentFrame) {
   const spriteRow = DIRECTIONS[player.direction];
   const sourceX = currentFrame * FRAME_WIDTH;
   const sourceY = spriteRow * FRAME_HEIGHT;
-
   ctx.drawImage(playerSpriteSheet, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, player.x, player.y, player.width, player.height);
 }
 
