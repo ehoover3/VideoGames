@@ -1,10 +1,10 @@
 // game/menu/index.js
 
-import { handleStartNewGame } from "./handleStartNewGame.js";
-import { handleReturnToGame } from "./handleReturnToGame.js";
-import { handleLoadGame } from "./handleLoadGame.js";
-import { handleSettings } from "./handleSettings.js";
-import { handleExit } from "./handleExit.js";
+import { handleStartNewGame } from "./startNewGame.js";
+import { handleReturnToGame } from "./returnToGame.js";
+import { handleLoadGame } from "./loadGame.js";
+import { handleSettings } from "./settings.js";
+import { handleExit } from "./exit.js";
 import { MENU_OPTIONS, BASE_MENU } from "../gameLoop/menu.js";
 
 export function updateMenu({ keys, gameState }) {

@@ -2,8 +2,9 @@
 
 import { ACTIONS, DIRECTION } from "../config/constants.js";
 
-export function updatePlayer({ player, mriMachine, STATES, keys, FRAME_SETTINGS, gameState }) {
+export function updatePlayer({ gameObjects, STATES, keys, FRAME_SETTINGS, gameState }) {
   let { currentAction, currentState, previousState, savedPlayerPosition } = gameState;
+  let { player, mriMachine } = gameObjects;
 
   let movement = { player, keys };
   let action = { keys, currentAction };
@@ -115,6 +116,10 @@ function handleCollision({ player, keys, mriMachine, STATES, currentState }) {
   }
 }
 
+function checkCollisionWithGameObject(player, gameObject) {
+  return player.x < gameObject.x + gameObject.width && player.x + player.width > gameObject.x && player.y < gameObject.y + gameObject.height && player.y + player.height > gameObject.y;
+}
+
 function handleEscapeKeyLogic(keys, player, STATES, currentState, previousState, savedPlayerPosition) {
   if (keys["Escape"]) {
     return {
@@ -129,8 +134,4 @@ function handleEscapeKeyLogic(keys, player, STATES, currentState, previousState,
     previousState: previousState,
     currentState: currentState,
   };
-}
-
-function checkCollisionWithGameObject(player, gameObject) {
-  return player.x < gameObject.x + gameObject.width && player.x + player.width > gameObject.x && player.y < gameObject.y + gameObject.height && player.y + player.height > gameObject.y;
 }

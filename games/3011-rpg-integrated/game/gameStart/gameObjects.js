@@ -1,5 +1,5 @@
 // game/gameObjects.js
-import { DIRECTION } from "../config/constants.js";
+import { DIRECTION } from "../../config/constants.js";
 
 export function initGameObjects() {
   const player = createPlayer(100, 100, 32, 32, "blue", 4, DIRECTION.DOWN);

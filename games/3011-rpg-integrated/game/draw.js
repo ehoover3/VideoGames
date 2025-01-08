@@ -11,7 +11,8 @@ const DIRECTIONS = {
   right: 3,
 };
 
-export function drawOverworld(canvas, ctx, player, currentFrame, FRAME_SETTINGS, mriMachine, xrayMachine) {
+export function drawOverworld(canvas, ctx, gameObjects, currentFrame, FRAME_SETTINGS) {
+  let { player, mriMachine, xrayMachine } = gameObjects;
   const { FRAME_WIDTH, FRAME_HEIGHT } = FRAME_SETTINGS;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawPlayerSprite(ctx, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT);
