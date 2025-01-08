@@ -5,6 +5,9 @@ import { STATES, FRAME_SETTINGS } from "../config/constants.js";
 const playerSpriteSheet = new Image();
 playerSpriteSheet.src = "assets/images/player.png";
 
+const menuBackground = new Image();
+menuBackground.src = "assets/images/menu.jpeg";
+
 const DIRECTIONS = {
   down: 0,
   up: 1,
@@ -15,16 +18,25 @@ const DIRECTIONS = {
 export function drawMenu(drawMenuState) {
   let { canvas, ctx, isGameStarted, selectedOption } = drawMenuState;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawText(ctx, "Welcome to the Game", canvas.width / 2, canvas.height / 4, "30px Arial");
+
+  // background image
+  ctx.drawImage(menuBackground, 0, 0, menuBackground.width, menuBackground.height, 0, 0, canvas.width, canvas.height);
+
+  // menu text
+  drawText(ctx, "Science Game", canvas.width / 2, canvas.height / 4, "36px Arial");
   const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
   menu.forEach((option, index) => {
-    drawText(ctx, option, canvas.width / 2, canvas.height / 2 + index * 30, "20px Arial", index === selectedOption ? "blue" : "black");
+    drawText(ctx, option, canvas.width / 2, 143 + index * 23, "20px Arial", index === selectedOption ? "white" : "rgba(155,157,156,255)");
   });
+}
+
+export function drawWorld({ canvas, ctx }) {
+  ctx.fillStyle = "lightblue";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 export function drawGameObjects({ canvas, ctx, gameObjects }) {
   let { mriMachine, xrayMachine } = gameObjects;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawGameObject(ctx, mriMachine);
   drawGameObject(ctx, xrayMachine);
 }
