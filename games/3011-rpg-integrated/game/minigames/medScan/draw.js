@@ -2,6 +2,15 @@
 
 import { drawText } from "../../draw.js";
 
+export function drawMinigame({ canvas, ctx, gameState }) {
+  let { scanProgress, maxScanProgress } = gameState;
+
+  const mriImg = new Image();
+  mriImg.src = "assets/images/mri.png";
+  mriImg.onload = () => drawScanScreen(canvas, ctx, mriImg, scanProgress, maxScanProgress);
+  mriImg.onerror = () => console.error("Failed to load image: mri.png");
+}
+
 function drawScanScreen(canvas, ctx, mriImg, scanProgress, maxScanProgress) {
   clearCanvas(canvas, ctx);
   drawMRIImage(canvas, ctx, mriImg);
@@ -13,13 +22,6 @@ function drawScanScreen(canvas, ctx, mriImg, scanProgress, maxScanProgress) {
 
 function clearCanvas(canvas, ctx) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-export function drawMedScan(canvas, ctx, scanProgress, maxScanProgress) {
-  const mriImg = new Image();
-  mriImg.src = "assets/images/mri.png";
-  mriImg.onload = () => drawScanScreen(canvas, ctx, mriImg, scanProgress, maxScanProgress);
-  mriImg.onerror = () => console.error("Failed to load image: mri.png");
 }
 
 function drawMRIImage(canvas, ctx, mriImg) {

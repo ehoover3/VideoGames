@@ -1,13 +1,14 @@
 // game/gameLoop/scanGame.js
 import { drawHUD } from "../draw.js";
-import { runMedScanLogic } from "../minigames/medScan/logic.js";
-import { drawMedScan } from "../minigames/medScan/draw.js";
+import { runLogic } from "../minigames/medScan/logic.js";
+import { drawMinigame } from "../minigames/medScan/draw.js";
 
 export function loadScanGame({ canvas, ctx, keys, gameState, gameObjects }) {
   const { player } = gameObjects;
-  const updatedValues = runMedScanLogic(keys, player, gameState);
-  Object.assign(gameState, updatedValues);
 
-  drawMedScan(canvas, ctx, gameState.scanProgress, gameState.maxScanProgress);
+  const update = runLogic(keys, player, gameState);
+  Object.assign(gameState, update);
+
+  drawMinigame({ canvas, ctx, gameState });
   drawHUD(canvas, ctx, gameState.currentState);
 }

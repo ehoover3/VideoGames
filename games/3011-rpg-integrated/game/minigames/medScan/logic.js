@@ -1,8 +1,8 @@
-// game/minigames/medScan.js
+// game/minigames/medScan/logic.js
 
 import { STATES } from "../../../config/constants.js";
 
-export function runMedScanLogic(keys, player, gameState) {
+export function runLogic(keys, player, gameState) {
   let scanning = gameState.scanning;
   let scanProgress = gameState.scanProgress;
   let maxScanProgress = gameState.maxScanProgress;
