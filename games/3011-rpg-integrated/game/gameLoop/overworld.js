@@ -1,5 +1,5 @@
 import { updatePlayer } from "../player.js";
-import { drawOverworld, drawPlayer, drawHUD } from "../draw.js";
+import { drawGameObjects, drawPlayer, drawHUD } from "../draw.js";
 
 export function loadOverworld({ canvas, ctx, gameObjects, keys, gameState }) {
   let playerState = { gameObjects, keys, gameState };
@@ -10,7 +10,7 @@ export function loadOverworld({ canvas, ctx, gameObjects, keys, gameState }) {
     savedPlayerPosition: updatedState.savedPlayerPosition,
   });
 
-  drawOverworld({ canvas, ctx, gameObjects });
+  drawGameObjects({ canvas, ctx, gameObjects });
   drawPlayer(ctx, gameObjects.player, gameState.currentFrame);
   drawHUD(canvas, ctx, gameState.currentState);
 }

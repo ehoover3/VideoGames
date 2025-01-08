@@ -22,16 +22,16 @@ export function drawMenu(drawMenuState) {
   });
 }
 
-export function drawOverworld({ canvas, ctx, gameObjects }) {
+export function drawGameObjects({ canvas, ctx, gameObjects }) {
   let { mriMachine, xrayMachine } = gameObjects;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawMachine(ctx, mriMachine);
-  drawMachine(ctx, xrayMachine);
+  drawGameObject(ctx, mriMachine);
+  drawGameObject(ctx, xrayMachine);
 }
 
-function drawMachine(ctx, machine) {
-  ctx.fillStyle = machine.color;
-  ctx.fillRect(machine.x, machine.y, machine.width, machine.height);
+function drawGameObject(ctx, object) {
+  ctx.fillStyle = object.color;
+  ctx.fillRect(object.x, object.y, object.width, object.height);
 }
 
 export function drawPlayer(ctx, player, currentFrame) {
