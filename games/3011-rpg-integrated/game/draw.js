@@ -1,6 +1,6 @@
 // draw.js
 import { MENU_OPTIONS, BASE_MENU } from "../game/gameLoop/menu.js";
-import { STATES } from "../config/constants.js";
+import { STATES, FRAME_SETTINGS } from "../config/constants.js";
 
 const playerSpriteSheet = new Image();
 playerSpriteSheet.src = "assets/images/player.png";
@@ -12,11 +12,9 @@ const DIRECTIONS = {
   right: 3,
 };
 
-export function drawOverworld(canvas, ctx, gameObjects, currentFrame, FRAME_SETTINGS) {
-  let { player, mriMachine, xrayMachine } = gameObjects;
-  const { FRAME_WIDTH, FRAME_HEIGHT } = FRAME_SETTINGS;
+export function drawOverworld({ canvas, ctx, gameObjects }) {
+  let { mriMachine, xrayMachine } = gameObjects;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawPlayerSprite(ctx, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT);
   drawMachine(ctx, mriMachine);
   drawMachine(ctx, xrayMachine);
 }
@@ -45,7 +43,8 @@ export function drawText(ctx, text, x, y, font = "16px Arial", color = "black", 
   ctx.fillText(text, x, y);
 }
 
-function drawPlayerSprite(ctx, player, currentFrame, FRAME_WIDTH, FRAME_HEIGHT) {
+export function drawPlayer(ctx, player, currentFrame) {
+  const { FRAME_WIDTH, FRAME_HEIGHT } = FRAME_SETTINGS;
   const spriteRow = DIRECTIONS[player.direction];
   const sourceX = currentFrame * FRAME_WIDTH;
   const sourceY = spriteRow * FRAME_HEIGHT;
