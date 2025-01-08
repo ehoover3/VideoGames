@@ -1,15 +1,16 @@
 // player.js
 
 import { ACTIONS, DIRECTION } from "../config/constants.js";
+import { STATES } from "../config/constants.js";
 
-export function updatePlayer({ gameObjects, STATES, keys, FRAME_SETTINGS, gameState }) {
+export function updatePlayer({ gameObjects, keys, FRAME_SETTINGS, gameState }) {
   let { currentAction, currentState, previousState, savedPlayerPosition } = gameState;
   let { player, mriMachine } = gameObjects;
 
   let movement = { player, keys };
   let action = { keys, currentAction };
   let animation = { FRAME_SETTINGS, gameState };
-  let collision = { player, keys, mriMachine, STATES, currentState };
+  let collision = { player, keys, mriMachine, currentState };
 
   handleMovement(movement);
   handleAction(action);
@@ -22,7 +23,7 @@ export function updatePlayer({ gameObjects, STATES, keys, FRAME_SETTINGS, gameSt
     previousState = collisionResult.previousState;
     currentState = collisionResult.currentState;
   }
-  const escapeKeyResult = handleEscapeKeyLogic(keys, player, STATES, currentState, previousState, savedPlayerPosition);
+  const escapeKeyResult = handleEscapeKeyLogic(keys, player, currentState, previousState, savedPlayerPosition);
 
   if (escapeKeyResult) {
     savedPlayerPosition = escapeKeyResult.savedPlayerPosition;
@@ -106,7 +107,7 @@ function handleAnimation({ FRAME_SETTINGS, gameState }) {
   }
 }
 
-function handleCollision({ player, keys, mriMachine, STATES, currentState }) {
+function handleCollision({ player, keys, mriMachine, currentState }) {
   if (checkCollisionWithGameObject(player, mriMachine) && keys[" "]) {
     return {
       savedPlayerPosition: { x: player.x, y: player.y },
@@ -120,7 +121,7 @@ function checkCollisionWithGameObject(player, gameObject) {
   return player.x < gameObject.x + gameObject.width && player.x + player.width > gameObject.x && player.y < gameObject.y + gameObject.height && player.y + player.height > gameObject.y;
 }
 
-function handleEscapeKeyLogic(keys, player, STATES, currentState, previousState, savedPlayerPosition) {
+function handleEscapeKeyLogic(keys, player, currentState, previousState, savedPlayerPosition) {
   if (keys["Escape"]) {
     return {
       savedPlayerPosition: { x: player.x, y: player.y },
