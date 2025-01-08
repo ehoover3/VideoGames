@@ -2,8 +2,6 @@ import { updatePlayer } from "../player.js";
 import { drawHUD, drawOverworld } from "../draw.js";
 
 export function loadOverworld({ canvas, ctx, gameObjects, keys, gameState, FRAME_SETTINGS, STATES }) {
-  const { player, mriMachine, xrayMachine } = gameObjects;
-
   let playerState = { gameObjects, STATES, keys, FRAME_SETTINGS, gameState };
   const updatedState = updatePlayer(playerState);
   Object.assign(gameState, {
@@ -12,5 +10,5 @@ export function loadOverworld({ canvas, ctx, gameObjects, keys, gameState, FRAME
     savedPlayerPosition: updatedState.savedPlayerPosition,
   });
   drawOverworld(canvas, ctx, gameObjects, gameState.currentFrame, FRAME_SETTINGS);
-  drawHUD(canvas, ctx, gameState.currentState, STATES);
+  drawHUD(canvas, ctx, gameState.currentState);
 }

@@ -1,5 +1,6 @@
 // draw.js
 import { MENU_OPTIONS, BASE_MENU } from "../game/gameLoop/menu.js";
+import { STATES } from "../config/constants.js";
 
 const playerSpriteSheet = new Image();
 playerSpriteSheet.src = "assets/images/player.png";
@@ -20,7 +21,7 @@ export function drawOverworld(canvas, ctx, gameObjects, currentFrame, FRAME_SETT
   drawMachine(ctx, xrayMachine);
 }
 
-export function drawHUD(canvas, ctx, currentState, STATES) {
+export function drawHUD(canvas, ctx, currentState) {
   ctx.fillStyle = "lightgray";
   ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
   const hudText = currentState === STATES.OVERWORLD ? "Arrow Keys to Move | Space to Interact | ESC for Main Menu" : "Hold SPACE to Scan | X to Exit to Overworld | ESC for Main Menu";
