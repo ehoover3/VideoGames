@@ -1,7 +1,7 @@
 import { updatePlayer } from "../player.js";
 import { drawHUD, drawOverworld } from "../draw.js";
 
-export function loadOverworld({ canvas, ctx, gameObjects, keys, gameState, FRAME_SETTINGS, STATES }) {
+export function loadOverworld({ canvas, ctx, gameObjects, keys, gameState, FRAME_SETTINGS }) {
   let playerState = { gameObjects, keys, FRAME_SETTINGS, gameState };
   const updatedState = updatePlayer(playerState);
   Object.assign(gameState, {

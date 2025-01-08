@@ -6,8 +6,8 @@ import { loadMenu } from "./menu.js";
 
 export function startGame({ canvas, ctx, keys, gameState, gameObjects }) {
   let menu = { canvas, ctx, keys, gameState };
-  let overworld = { canvas, ctx, gameObjects, keys, gameState, FRAME_SETTINGS, STATES };
-  let scanGame = { canvas, ctx, gameObjects, keys, gameState, STATES };
+  let overworld = { canvas, ctx, gameObjects, keys, gameState, FRAME_SETTINGS };
+  let scanGame = { canvas, ctx, gameObjects, keys, gameState };
 
   const handleGameState = {
     [STATES.MAIN_MENU]: () => loadMenu(menu),
