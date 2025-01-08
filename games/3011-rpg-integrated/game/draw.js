@@ -12,20 +12,6 @@ const DIRECTIONS = {
   right: 3,
 };
 
-export function drawOverworld({ canvas, ctx, gameObjects }) {
-  let { mriMachine, xrayMachine } = gameObjects;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawMachine(ctx, mriMachine);
-  drawMachine(ctx, xrayMachine);
-}
-
-export function drawHUD(canvas, ctx, currentState) {
-  ctx.fillStyle = "lightgray";
-  ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
-  const hudText = currentState === STATES.OVERWORLD ? "Arrow Keys to Move | Space to Interact | ESC for Main Menu" : "Hold SPACE to Scan | X to Exit to Overworld | ESC for Main Menu";
-  drawText(ctx, hudText, canvas.width / 2, canvas.height - 20);
-}
-
 export function drawMenu(drawMenuState) {
   let { canvas, ctx, isGameStarted, selectedOption } = drawMenuState;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -36,11 +22,16 @@ export function drawMenu(drawMenuState) {
   });
 }
 
-export function drawText(ctx, text, x, y, font = "16px Arial", color = "black", align = "center") {
-  ctx.fillStyle = color;
-  ctx.font = font;
-  ctx.textAlign = align;
-  ctx.fillText(text, x, y);
+export function drawOverworld({ canvas, ctx, gameObjects }) {
+  let { mriMachine, xrayMachine } = gameObjects;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawMachine(ctx, mriMachine);
+  drawMachine(ctx, xrayMachine);
+}
+
+function drawMachine(ctx, machine) {
+  ctx.fillStyle = machine.color;
+  ctx.fillRect(machine.x, machine.y, machine.width, machine.height);
 }
 
 export function drawPlayer(ctx, player, currentFrame) {
@@ -52,7 +43,16 @@ export function drawPlayer(ctx, player, currentFrame) {
   ctx.drawImage(playerSpriteSheet, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, player.x, player.y, player.width, player.height);
 }
 
-function drawMachine(ctx, machine) {
-  ctx.fillStyle = machine.color;
-  ctx.fillRect(machine.x, machine.y, machine.width, machine.height);
+export function drawHUD(canvas, ctx, currentState) {
+  ctx.fillStyle = "lightgray";
+  ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
+  const hudText = currentState === STATES.OVERWORLD ? "Arrow Keys to Move | Space to Interact | ESC for Main Menu" : "Hold SPACE to Scan | X to Exit to Overworld | ESC for Main Menu";
+  drawText(ctx, hudText, canvas.width / 2, canvas.height - 20);
+}
+
+export function drawText(ctx, text, x, y, font = "16px Arial", color = "black", align = "center") {
+  ctx.fillStyle = color;
+  ctx.font = font;
+  ctx.textAlign = align;
+  ctx.fillText(text, x, y);
 }
