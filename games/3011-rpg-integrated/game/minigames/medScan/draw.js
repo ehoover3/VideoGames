@@ -1,6 +1,6 @@
 // game/minigames/medScan/draw.js
 
-import { drawText } from "../../draw/drawOverworld.js";
+import { drawText } from "../../draw/utils.js";
 
 export function drawMinigame({ canvas, ctx, gameState }) {
   let { scanProgress, maxScanProgress } = gameState;
