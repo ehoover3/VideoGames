@@ -1,7 +1,7 @@
 // draw.js
 import { MENU_OPTIONS, BASE_MENU } from "../game/gameLoop/menu.js";
 import { STATES, FRAME_SETTINGS } from "../config/constants.js";
-
+import { ASPECT_RATIO } from "../index.js";
 const playerSpriteSheet = new Image();
 playerSpriteSheet.src = "assets/images/player.png";
 
@@ -16,17 +16,35 @@ const DIRECTIONS = {
 };
 
 export function drawMenu(drawMenuState) {
-  let { canvas, ctx, isGameStarted, selectedOption } = drawMenuState;
+  const { canvas, ctx, isGameStarted, selectedOption } = drawMenuState;
+
+  // Clear the canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // background image
+  // Draw the background image
   ctx.drawImage(menuBackground, 0, 0, menuBackground.width, menuBackground.height, 0, 0, canvas.width, canvas.height);
 
-  // menu text
-  drawText(ctx, "Science Game", canvas.width / 2, canvas.height / 4, "36px Arial");
+  // Draw the title
+  const titleFontSize = Math.round(canvas.height / 12); // Scales with canvas size
+  drawText(ctx, "Science Game", canvas.width / 2, canvas.height / 5, `${titleFontSize}px Arial`, "black");
+
+  // Determine the menu options
   const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
+
+  // Dynamic menu item spacing
+  const menuStartY = canvas.height / 2.5; // Starting Y position for menu options
+  const menuSpacing = canvas.height / 15; // Space between menu options
+  const menuFontSize = Math.round(canvas.height / 20); // Font size based on canvas height
+
+  // Draw each menu option
   menu.forEach((option, index) => {
-    drawText(ctx, option, canvas.width / 2, 143 + index * 23, "20px Arial", index === selectedOption ? "white" : "rgba(155,157,156,255)");
+    const isSelected = index === selectedOption;
+    const textColor = isSelected ? "orange" : "darkgrey";
+    const fontStyle = isSelected
+      ? `${menuFontSize + 2}px Arial ` // Highlight selected option with bold and larger font
+      : `${menuFontSize}px Arial bold`;
+
+    drawText(ctx, option, canvas.width / 2, menuStartY + index * menuSpacing, fontStyle, textColor);
   });
 }
 
