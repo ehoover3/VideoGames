@@ -1,3 +1,2 @@
-1. Clean up player.js logic
-2. Refactor medScan to start the minigame in medScan/index.js
-3. Clean up medScan logic & drawing
+1. Remove magic numbers in the draw files (i.e. 640, 360, etc.)
+2. Clean up player.js logic
