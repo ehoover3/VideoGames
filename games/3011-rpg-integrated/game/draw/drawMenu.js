@@ -1,7 +1,7 @@
 // game/draw/drawMenu.js
 
 import { MENU_OPTIONS, BASE_MENU } from "../gameLoop/menu.js";
-import { drawText } from "./draw.js";
+import { drawText } from "./drawOverworld.js";
 
 const menuBackground = new Image();
 menuBackground.src = "assets/images/menu.jpeg";
