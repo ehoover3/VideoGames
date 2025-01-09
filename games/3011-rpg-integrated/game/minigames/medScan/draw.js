@@ -2,9 +2,15 @@
 
 import { drawText } from "../../draw/utils.js";
 
+const BASE_RESOLUTION = { width: 640, height: 360 };
+const MRI_IMAGE_DIMENSIONS = { width: 458, height: 248 };
+const PROGRESS_BAR_DIMENSIONS = { width: 400, height: 24 };
+const MRI_IMAGE_Y_OFFSET = 10;
+const PROGRESS_BAR_Y_OFFSET = 270;
+const MIN_FONT_SIZE = 20;
+
 export function drawMinigame({ canvas, ctx, gameState }) {
   let { scanProgress, maxScanProgress } = gameState;
-
   const mriImg = new Image();
   mriImg.src = "assets/images/mri.png";
   mriImg.onload = () => drawScanScreen(canvas, ctx, mriImg, scanProgress, maxScanProgress);
@@ -13,15 +19,9 @@ export function drawMinigame({ canvas, ctx, gameState }) {
 
 function drawScanScreen(canvas, ctx, mriImg, scanProgress, maxScanProgress) {
   clearCanvas(canvas, ctx);
-
-  // Scale the image, progress bar, and text based on canvas size
   drawMRIImage(canvas, ctx, mriImg);
   drawProgressBar(canvas, ctx, scanProgress, maxScanProgress);
-
-  if (scanProgress >= maxScanProgress) {
-    const scaledFontSize = Math.max(20 * (canvas.height / 360), 20) + "px Arial"; // Scale font size
-    drawText(ctx, "Scanning Complete! Press SPACE to return.", canvas.width / 2, 350 * (canvas.height / 360), "center", scaledFontSize);
-  }
+  if (scanProgress >= maxScanProgress) drawScanCompleteMessage(canvas, ctx);
 }
 
 function clearCanvas(canvas, ctx) {
@@ -29,37 +29,37 @@ function clearCanvas(canvas, ctx) {
 }
 
 function drawMRIImage(canvas, ctx, mriImg) {
-  const baseWidth = 458; // Base size for MRI image
-  const baseHeight = 248; // Base size for MRI image
-  const scaleX = canvas.width / 640; // Assuming base resolution is 640x360
-  const scaleY = canvas.height / 360;
-
-  // Scale image width and height based on canvas size
-  const imageWidth = baseWidth * scaleX;
-  const imageHeight = baseHeight * scaleY;
+  const scaleX = canvas.width / BASE_RESOLUTION.width;
+  const scaleY = canvas.height / BASE_RESOLUTION.height;
+  const imageWidth = MRI_IMAGE_DIMENSIONS.width * scaleX;
+  const imageHeight = MRI_IMAGE_DIMENSIONS.height * scaleY;
   const x = (canvas.width - imageWidth) / 2;
-  const y = 10 * scaleY; // Adjust vertical position
-
-  ctx.drawImage(mriImg, 0, 0, baseWidth, baseHeight, x, y, imageWidth, imageHeight);
+  const y = MRI_IMAGE_Y_OFFSET * scaleY;
+  ctx.drawImage(mriImg, 0, 0, MRI_IMAGE_DIMENSIONS.width, MRI_IMAGE_DIMENSIONS.height, x, y, imageWidth, imageHeight);
 }
 
 function drawProgressBar(canvas, ctx, scanProgress, maxScanProgress) {
-  const scaleX = canvas.width / 640; // Base scaling factor (adjust based on base resolution)
-  const scaleY = canvas.height / 360;
-
-  const baseBarWidth = 400; // Base width of progress bar
-  const baseBarHeight = 24; // Base height of progress bar
-  const barWidth = baseBarWidth * scaleX; // Scaled width
-  const barHeight = baseBarHeight * scaleY; // Scaled height
-
+  const scaleX = canvas.width / BASE_RESOLUTION.width;
+  const scaleY = canvas.height / BASE_RESOLUTION.height;
+  const barWidth = PROGRESS_BAR_DIMENSIONS.width * scaleX;
+  const barHeight = PROGRESS_BAR_DIMENSIONS.height * scaleY;
   const x = (canvas.width - barWidth) / 2;
-  const y = 270 * scaleY; // Adjust vertical position
+  const y = PROGRESS_BAR_Y_OFFSET * scaleY;
+  drawBackgroundProgressBar(ctx, x, y, barWidth, barHeight);
+  drawProgressFill(ctx, x, y, scanProgress, maxScanProgress, barWidth, barHeight);
+}
 
-  // Draw background bar
+function drawBackgroundProgressBar(ctx, x, y, barWidth, barHeight) {
   ctx.fillStyle = "lightgray";
   ctx.fillRect(x, y, barWidth, barHeight);
+}
 
-  // Draw progress
+function drawProgressFill(ctx, x, y, scanProgress, maxScanProgress, barWidth, barHeight) {
   ctx.fillStyle = "#13beec"; // Turquoise blue
   ctx.fillRect(x, y, (scanProgress / maxScanProgress) * barWidth, barHeight);
+}
+
+function drawScanCompleteMessage(canvas, ctx) {
+  const scaledFontSize = Math.max(MIN_FONT_SIZE * (canvas.height / BASE_RESOLUTION.height), MIN_FONT_SIZE) + "px Arial";
+  drawText(ctx, "Scanning Complete! Press SPACE to return.", canvas.width / 2, PROGRESS_BAR_Y_OFFSET * (canvas.height / BASE_RESOLUTION.height), "center", scaledFontSize);
 }
