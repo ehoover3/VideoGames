@@ -1,4 +1,4 @@
-// // index.js
+// index.js
 
 import { startGame } from "./game/gameLoop/index.js";
 import { setupCanvas } from "./game/gameStart/canvasSetup.js";

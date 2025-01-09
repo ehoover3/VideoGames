@@ -1,4 +1,4 @@
-// game/draw/draw.js
+// game/draw/drawOverworld.js
 
 import { STATES, FRAME_SETTINGS } from "../../config/constants.js";
 import { ASPECT_RATIO } from "../../index.js";
@@ -17,23 +17,55 @@ export function drawWorld({ canvas, ctx }) {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-export function drawGameObjects({ canvas, ctx, gameObjects }) {
-  let { mriMachine, xrayMachine } = gameObjects;
-  drawGameObject(ctx, mriMachine);
-  drawGameObject(ctx, xrayMachine);
-}
+// export function drawPlayer(ctx, player, currentFrame) {
+//   const { FRAME_WIDTH, FRAME_HEIGHT } = FRAME_SETTINGS;
+//   const spriteRow = DIRECTIONS[player.direction];
+//   const sourceX = currentFrame * FRAME_WIDTH;
+//   const sourceY = spriteRow * FRAME_HEIGHT;
+//   ctx.drawImage(playerSpriteSheet, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, player.x, player.y, player.width, player.height);
+// }
 
-function drawGameObject(ctx, object) {
-  ctx.fillStyle = object.color;
-  ctx.fillRect(object.x, object.y, object.width, object.height);
-}
-
-export function drawPlayer(ctx, player, currentFrame) {
+export function drawPlayer(ctx, player, currentFrame, canvas) {
   const { FRAME_WIDTH, FRAME_HEIGHT } = FRAME_SETTINGS;
   const spriteRow = DIRECTIONS[player.direction];
   const sourceX = currentFrame * FRAME_WIDTH;
   const sourceY = spriteRow * FRAME_HEIGHT;
-  ctx.drawImage(playerSpriteSheet, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, player.x, player.y, player.width, player.height);
+
+  // Scale player position and size based on canvas size
+  const scaleX = canvas.width / 640; // Base scale for width (assuming base resolution is 1920x1080)
+  const scaleY = canvas.height / 360; // Base scale for height (assuming base resolution is 1920x1080)
+
+  const scaledX = player.x * scaleX;
+  const scaledY = player.y * scaleY;
+  const scaledWidth = player.width * scaleX;
+  const scaledHeight = player.height * scaleY;
+
+  ctx.drawImage(playerSpriteSheet, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, scaledX, scaledY, scaledWidth, scaledHeight);
+}
+
+export function drawGameObjects({ canvas, ctx, gameObjects }) {
+  let { mriMachine, xrayMachine } = gameObjects;
+  drawGameObject(ctx, mriMachine, canvas);
+  drawGameObject(ctx, xrayMachine, canvas);
+}
+
+// function drawGameObject(ctx, object) {
+//   ctx.fillStyle = object.color;
+//   ctx.fillRect(object.x, object.y, object.width, object.height);
+// }
+
+function drawGameObject(ctx, object, canvas) {
+  // Scale object position and size based on canvas size
+  const scaleX = canvas.width / 640; // Base scale for width
+  const scaleY = canvas.height / 360; // Base scale for height
+
+  const scaledX = object.x * scaleX;
+  const scaledY = object.y * scaleY;
+  const scaledWidth = object.width * scaleX;
+  const scaledHeight = object.height * scaleY;
+
+  ctx.fillStyle = object.color;
+  ctx.fillRect(scaledX, scaledY, scaledWidth, scaledHeight);
 }
 
 export function drawHUD(canvas, ctx, currentState) {

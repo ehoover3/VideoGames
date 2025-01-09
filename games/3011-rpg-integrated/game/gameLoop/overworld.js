@@ -11,6 +11,6 @@ export function loadOverworld({ canvas, ctx, keys, gameState, gameObjects }) {
 
   drawWorld({ canvas, ctx });
   drawGameObjects({ canvas, ctx, gameObjects });
-  drawPlayer(ctx, gameObjects.player, gameState.currentFrame);
+  drawPlayer(ctx, gameObjects.player, gameState.currentFrame, canvas);
   drawHUD(canvas, ctx, gameState.currentState);
 }
