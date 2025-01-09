@@ -1,5 +1,5 @@
 // game/gameLoop/scanGame.js
-import { drawHUD } from "../draw.js";
+import { drawHUD } from "../draw/draw.js";
 import { runLogic } from "../minigames/medScan/logic.js";
 import { drawMinigame } from "../minigames/medScan/draw.js";
 

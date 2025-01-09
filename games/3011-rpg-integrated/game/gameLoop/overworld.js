@@ -1,5 +1,5 @@
 import { updatePlayer } from "../player.js";
-import { drawWorld, drawGameObjects, drawPlayer, drawHUD } from "../draw.js";
+import { drawWorld, drawGameObjects, drawPlayer, drawHUD } from "../draw/draw.js";
 
 export function loadOverworld({ canvas, ctx, keys, gameState, gameObjects }) {
   let playerState = { keys, gameState, gameObjects };
