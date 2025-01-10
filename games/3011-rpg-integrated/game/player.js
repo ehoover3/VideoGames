@@ -79,32 +79,35 @@ function handleMovement({ player, keys }) {
 }
 
 function handleAction({ keys, currentAction }) {
-  if (keys["z"] || keys["Z"]) {
-    currentAction = ACTIONS.ATTACKING;
-  } else if (keys["ArrowUp"] || keys["ArrowDown"] || keys["ArrowLeft"] || keys["ArrowRight"]) {
+  if (keys["ArrowUp"] || keys["ArrowDown"] || keys["ArrowLeft"] || keys["ArrowRight"]) {
+    console.log("Walking action detected");
     currentAction = ACTIONS.WALKING;
   } else {
+    console.log("Idle action detected");
     currentAction = ACTIONS.IDLE;
   }
 }
 
 function handleAnimation({ gameState }) {
   const WALK_FRAMES = FRAME_SETTINGS.WALK_FRAMES;
-  const ATTACK_FRAMES = FRAME_SETTINGS.ATTACK_FRAMES;
   let { currentAction, animationTimer, animationSpeed, currentFrame } = gameState;
 
-  if (currentAction === ACTIONS.WALKING || currentAction === ACTIONS.ATTACKING) {
+  if (currentAction === ACTIONS.WALKING) {
     animationTimer++;
     if (animationTimer >= animationSpeed) {
-      animationTimer = 0;
-      currentFrame++;
-      if ((currentAction === ACTIONS.WALKING && currentFrame >= WALK_FRAMES) || (currentAction === ACTIONS.ATTACKING && currentFrame >= ATTACK_FRAMES)) {
-        currentFrame = 0;
-      }
+      animationTimer = 0; // Reset timer
+      currentFrame = (currentFrame + 1) % WALK_FRAMES; // Loop through frames
+      console.log(`Walking Frame: ${currentFrame}`); // Debug frame updates
     }
   } else {
-    currentFrame = 0;
+    animationTimer = 0;
+    currentFrame = 0; // Default to idle frame when not walking
+    console.log("Idle Frame");
   }
+
+  // Update gameState
+  gameState.animationTimer = animationTimer;
+  gameState.currentFrame = currentFrame;
 }
 
 function handleCollision({ player, keys, mriMachine, currentState }) {
