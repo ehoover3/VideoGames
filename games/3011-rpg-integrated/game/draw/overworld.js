@@ -12,6 +12,13 @@ const DIRECTIONS = {
   right: 3,
 };
 
+export function drawOverworld({ canvas, ctx, gameObjects, gameState }) {
+  let { player, currentFrame } = gameObjects;
+  drawWorld({ canvas, ctx });
+  drawGameObjects({ canvas, ctx, gameObjects });
+  drawPlayer(canvas, ctx, gameObjects.player, gameState.currentFrame);
+}
+
 export function drawWorld({ canvas, ctx }) {
   ctx.fillStyle = "darkseagreen";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
