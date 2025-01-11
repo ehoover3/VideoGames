@@ -4,7 +4,7 @@ import { MENU_OPTIONS, BASE_MENU } from "../gameLoop/menu.js";
 import { drawText } from "./utils.js";
 
 const menuBackground = new Image();
-menuBackground.src = "assets/images/menu.jpeg";
+menuBackground.src = "assets/images/menu/menu.jpeg";
 
 const TITLE_HEIGHT_RATIO = 1 / 12;
 const MENU_START_Y_RATIO = 1 / 2.5;

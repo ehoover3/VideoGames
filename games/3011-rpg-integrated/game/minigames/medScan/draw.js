@@ -12,7 +12,7 @@ const MIN_FONT_SIZE = 20;
 export function drawMinigame({ canvas, ctx, gameState }) {
   let { scanProgress, maxScanProgress } = gameState;
   const mriImg = new Image();
-  mriImg.src = "assets/images/mri.png";
+  mriImg.src = "assets/images/scanGame/mri.png";
   mriImg.onload = () => drawScanScreen(canvas, ctx, mriImg, scanProgress, maxScanProgress);
   mriImg.onerror = () => console.error("Failed to load image: mri.png");
 }

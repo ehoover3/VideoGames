@@ -3,7 +3,7 @@ import { STATES, FRAME_SETTINGS } from "../../config/constants.js";
 import { drawText } from "./utils.js";
 
 const playerSpriteSheet = new Image();
-playerSpriteSheet.src = "assets/images/player.png";
+playerSpriteSheet.src = "assets/images/overworld/player.png";
 
 const DIRECTIONS = {
   down: 0,
@@ -13,7 +13,6 @@ const DIRECTIONS = {
 };
 
 export function drawOverworld({ canvas, ctx, gameObjects, gameState }) {
-  let { player, currentFrame } = gameObjects;
   drawWorld({ canvas, ctx });
   drawGameObjects({ canvas, ctx, gameObjects });
   drawPlayer(canvas, ctx, gameObjects.player, gameState.currentFrame);
