@@ -1,13 +1,7 @@
 // game/draw/overworld.js
-import { STATES, FRAME_SETTINGS } from "../../config/constants.js";
+import { STATES } from "../../config/constants.js";
 import { drawText } from "./utils.js";
-
-const DIRECTIONS = {
-  down: 0,
-  up: 1,
-  left: 2,
-  right: 3,
-};
+import { drawPlayer } from "../gameStart/PlayerObject.js";
 
 export function drawOverworld({ canvas, ctx, gameObjects, gameState }) {
   drawWorld({ canvas, ctx });
@@ -20,23 +14,6 @@ function drawWorld({ canvas, ctx }) {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-function drawPlayer(canvas, ctx, player, currentFrame) {
-  const { FRAME_WIDTH, FRAME_HEIGHT } = FRAME_SETTINGS;
-  const spriteRow = DIRECTIONS[player.direction];
-  const sourceX = (currentFrame % 4) * FRAME_WIDTH;
-  const sourceY = spriteRow * FRAME_HEIGHT;
-
-  const scaleX = canvas.width / 640;
-  const scaleY = canvas.height / 360;
-
-  const scaledX = player.x * scaleX;
-  const scaledY = player.y * scaleY;
-  const scaledWidth = player.width * scaleX;
-  const scaledHeight = player.height * scaleY;
-
-  ctx.drawImage(player.image, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, scaledX, scaledY, scaledWidth, scaledHeight);
-}
-
 function drawGameObjects({ canvas, ctx, gameObjects }) {
   let { mriMachine } = gameObjects;
   const scaleX = canvas.width / 640;
@@ -45,7 +22,6 @@ function drawGameObjects({ canvas, ctx, gameObjects }) {
 }
 
 export function drawHUD(canvas, ctx, currentState) {
-  const scaleX = canvas.width / 640;
   const scaleY = canvas.height / 360;
 
   const hudHeight = 50 * scaleY;

@@ -1,6 +1,6 @@
 // game/gameLoop/overworld.js
 
-import { updatePlayer } from "../player.js";
+import { updatePlayer } from "../gameStart/PlayerObject.js";
 import { drawOverworld, drawHUD } from "../draw/overworld.js";
 
 export function loadOverworld({ canvas, ctx, keys, gameState, gameObjects }) {

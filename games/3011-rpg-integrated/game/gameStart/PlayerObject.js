@@ -1,7 +1,25 @@
-// game/player.js
+// game/gameStart/PlayerObject.js
 
-import { ACTIONS, DIRECTION } from "../config/constants.js";
-import { STATES, FRAME_SETTINGS } from "../config/constants.js";
+import { ACTIONS, DIRECTION } from "../../config/constants.js";
+import { STATES, FRAME_SETTINGS } from "../../config/constants.js";
+const DIRECTIONS = {
+  down: 0,
+  up: 1,
+  left: 2,
+  right: 3,
+};
+
+export function createPlayer(image, x, y, width, height, speed, direction) {
+  return {
+    image,
+    x,
+    y,
+    width,
+    height,
+    speed,
+    direction,
+  };
+}
 
 export function updatePlayer({ keys, gameState, gameObjects }) {
   let { currentAction, currentState, previousState, savedPlayerPosition } = gameState;
@@ -132,4 +150,21 @@ function handleEscapeKeyLogic(keys, player, currentState, previousState, savedPl
     previousState: previousState,
     currentState: currentState,
   };
+}
+
+export function drawPlayer(canvas, ctx, player, currentFrame) {
+  const { FRAME_WIDTH, FRAME_HEIGHT } = FRAME_SETTINGS;
+  const spriteRow = DIRECTIONS[player.direction];
+  const sourceX = (currentFrame % 4) * FRAME_WIDTH;
+  const sourceY = spriteRow * FRAME_HEIGHT;
+
+  const scaleX = canvas.width / 640;
+  const scaleY = canvas.height / 360;
+
+  const scaledX = player.x * scaleX;
+  const scaledY = player.y * scaleY;
+  const scaledWidth = player.width * scaleX;
+  const scaledHeight = player.height * scaleY;
+
+  ctx.drawImage(player.image, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, scaledX, scaledY, scaledWidth, scaledHeight);
 }
