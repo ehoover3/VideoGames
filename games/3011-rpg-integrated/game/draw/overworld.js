@@ -5,6 +5,9 @@ import { drawText } from "./utils.js";
 const playerSpriteSheet = new Image();
 playerSpriteSheet.src = "assets/images/overworld/player.png";
 
+const mriImg = new Image();
+mriImg.src = "assets/images/overworld.mri.png";
+
 const DIRECTIONS = {
   down: 0,
   up: 1,
@@ -47,6 +50,8 @@ function drawGameObjects({ canvas, ctx, gameObjects }) {
 }
 
 function drawGameObject(canvas, ctx, object) {
+  const { sourceX, sourceY, sourceWidth, sourceHeight, destinationX, destinationY, destinationWidth, destinationHeight } = object.image;
+
   const scaleX = canvas.width / 640;
   const scaleY = canvas.height / 360;
 
@@ -55,8 +60,17 @@ function drawGameObject(canvas, ctx, object) {
   const scaledWidth = object.width * scaleX;
   const scaledHeight = object.height * scaleY;
 
-  ctx.fillStyle = object.color;
-  ctx.fillRect(scaledX, scaledY, scaledWidth, scaledHeight);
+  ctx.drawImage(
+    object.image.imagePath, // Correctly pass the Image object
+    sourceX,
+    sourceY,
+    sourceWidth,
+    sourceHeight,
+    scaledX,
+    scaledY,
+    scaledWidth,
+    scaledHeight
+  );
 }
 
 export function drawHUD(canvas, ctx, currentState) {
