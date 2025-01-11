@@ -4,10 +4,11 @@ import { DIRECTION } from "../../config/constants.js";
 
 const loadedImages = {
   mri: loadImage("assets/images/overworld/mri.png"),
+  player: loadImage("assets/images/overworld/player.png"),
 };
 
 export function initGameObjects() {
-  const player = createPlayer(100, 100, 32, 32, 4, DIRECTION.DOWN);
+  const player = createPlayer(100, 100, 32, 32, 4, DIRECTION.DOWN, "player");
 
   const mriMachine = createGameObject(130, 130, 64, 64, "mri", {
     sourceX: 0,
@@ -40,8 +41,16 @@ function loadImage(src) {
   return img;
 }
 
-export function createPlayer(x, y, width, height, speed, direction) {
-  return { x, y, width, height, speed, direction };
+export function createPlayer(x, y, width, height, speed, direction, imageKey) {
+  return {
+    x,
+    y,
+    width,
+    height,
+    speed,
+    direction,
+    image: loadedImages[imageKey],
+  };
 }
 
 function createGameObject(x, y, width, height, imageKey, imageConfig, interactCallback) {

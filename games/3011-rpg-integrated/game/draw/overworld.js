@@ -2,12 +2,6 @@
 import { STATES, FRAME_SETTINGS } from "../../config/constants.js";
 import { drawText } from "./utils.js";
 
-const playerSpriteSheet = new Image();
-playerSpriteSheet.src = "assets/images/overworld/player.png";
-
-const mriImg = new Image();
-mriImg.src = "assets/images/overworld.mri.png";
-
 const DIRECTIONS = {
   down: 0,
   up: 1,
@@ -40,7 +34,7 @@ function drawPlayer(canvas, ctx, player, currentFrame) {
   const scaledWidth = player.width * scaleX;
   const scaledHeight = player.height * scaleY;
 
-  ctx.drawImage(playerSpriteSheet, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, scaledX, scaledY, scaledWidth, scaledHeight);
+  ctx.drawImage(player.image, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, scaledX, scaledY, scaledWidth, scaledHeight);
 }
 
 function drawGameObjects({ canvas, ctx, gameObjects }) {
