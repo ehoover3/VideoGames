@@ -1,11 +1,7 @@
 // game/menu/index.js
 
-import { handleStartNewGame } from "./startNewGame.js";
-import { handleReturnToGame } from "./returnToGame.js";
-import { handleLoadGame } from "./loadGame.js";
-import { handleSettings } from "./settings.js";
-import { handleExit } from "./exit.js";
 import { MENU_OPTIONS, BASE_MENU } from "../gameLoop/menu.js";
+import { STATES } from "../../config/constants.js";
 
 export function updateMenu({ keys, gameState }) {
   let selectedMenuOption = gameState.selectedMenuOption;
@@ -20,6 +16,10 @@ export function updateMenu({ keys, gameState }) {
 
   function setSelectedMenuOption(newSelected) {
     gameState.selectedMenuOption = newSelected;
+  }
+
+  function handleLoadGame() {
+    alert("Load Game functionality is not implemented yet.");
   }
 
   function handleMenuSelection() {
@@ -70,4 +70,25 @@ function handleEnterKey(keys, handleMenuSelection) {
     handleMenuSelection();
     keys["Enter"] = false; // Prevent multiple triggers
   }
+}
+
+function handleReturnToGame(previousState, setCurrentState) {
+  const stateMap = {
+    [STATES.SCAN_GAME]: STATES.SCAN_GAME,
+  };
+  const state = stateMap[previousState] || previousState;
+  setCurrentState(state);
+}
+
+function handleSettings() {
+  alert("Settings functionality is not implemented yet.");
+}
+
+function handleStartNewGame(setCurrentState, setIsGameStarted) {
+  setCurrentState(STATES.OVERWORLD);
+  setIsGameStarted(true);
+}
+
+function handleExit() {
+  alert("Exiting the game...");
 }
