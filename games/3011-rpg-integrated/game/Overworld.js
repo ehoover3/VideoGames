@@ -1,16 +1,17 @@
 // game/Overworld.js
 
-import { drawHUD } from "./HUD.js";
+import HUD from "./HUD.js";
 
 export function loadOverworld({ canvas, ctx, keys, gameState, gameObjects }) {
   const update = gameObjects.player.update({ keys, gameState, gameObjects });
+  const hud = new HUD(canvas, ctx);
 
   gameState.currentState = update.currentState;
   gameState.previousState = update.previousState;
   gameState.savedPlayerPosition = update.savedPlayerPosition;
 
   drawOverworld({ canvas, ctx, gameObjects, gameState });
-  drawHUD(canvas, ctx, gameState.currentState);
+  hud.draw(gameState.currentState);
 }
 
 function drawOverworld({ canvas, ctx, gameObjects, gameState }) {

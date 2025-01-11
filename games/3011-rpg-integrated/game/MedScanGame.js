@@ -1,6 +1,7 @@
 // game/MedScanGame.js
 
-import { drawHUD } from "./HUD.js";
+import HUD from "./HUD.js";
+// import { drawHUD } from "./HUD.js";
 import { drawText } from "./utils/drawText.js";
 import { STATES } from "../config/constants.js";
 
@@ -13,10 +14,13 @@ const MIN_FONT_SIZE = 20;
 
 export function loadScanGame({ canvas, ctx, keys, gameState, gameObjects }) {
   const { player } = gameObjects;
+  const hud = new HUD(canvas, ctx);
+
   const update = runLogic(keys, player, gameState);
   Object.assign(gameState, update);
+
   drawMinigame({ canvas, ctx, gameState });
-  drawHUD(canvas, ctx, gameState.currentState);
+  hud.draw(gameState.currentState);
 }
 
 function drawMinigame({ canvas, ctx, gameState }) {

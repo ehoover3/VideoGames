@@ -1,11 +1,11 @@
 // game/Game.js
 
 import { STATES, ACTIONS } from "../config/constants.js";
-import { GameObject } from "./GameObject.js";
+import GameObject from "./GameObject.js";
 import { DIRECTION } from "../config/constants.js";
 import { Player } from "./Player.js";
 
-class Game {
+export default class Game {
   constructor() {
     this.gameState = {
       currentState: STATES.MAIN_MENU,
@@ -54,5 +54,3 @@ class Game {
     return { player, mriMachine };
   }
 }
-
-export default Game;
