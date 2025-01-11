@@ -142,38 +142,35 @@ export class Player {
 
     ctx.drawImage(this.image, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, scaledX, scaledY, scaledWidth, scaledHeight);
   }
-}
 
-export function updatePlayer({ keys, gameState, gameObjects }) {
-  let { currentAction, currentState, previousState, savedPlayerPosition } = gameState;
-  let { player, mriMachine } = gameObjects;
+  update({ keys, gameState, gameObjects }) {
+    let { currentAction, currentState, previousState, savedPlayerPosition } = gameState;
+    const { mriMachine } = gameObjects;
 
-  let movement = { player, keys };
-  let action = { keys, currentAction };
-  let collision = { player, keys, mriMachine, currentState };
+    this.handleMovement(keys);
+    currentAction = this.handleAction(keys);
+    this.handleAnimation(gameState, currentAction);
 
-  player.handleMovement(keys);
-  currentAction = player.handleAction(keys);
-  player.handleAnimation(gameState, currentAction);
+    const collisionResult = this.handleCollision(keys, mriMachine, currentState);
 
-  const collisionResult = player.handleCollision(keys, mriMachine, currentState);
+    if (collisionResult) {
+      savedPlayerPosition = collisionResult.savedPlayerPosition;
+      previousState = collisionResult.previousState;
+      currentState = collisionResult.currentState;
+    }
 
-  if (collisionResult) {
-    savedPlayerPosition = collisionResult.savedPlayerPosition;
-    previousState = collisionResult.previousState;
-    currentState = collisionResult.currentState;
+    const escapeKeyResult = this.handleEscapeKeyLogic(keys, currentState, previousState, savedPlayerPosition);
+
+    if (escapeKeyResult) {
+      savedPlayerPosition = escapeKeyResult.savedPlayerPosition;
+      previousState = escapeKeyResult.previousState;
+      currentState = escapeKeyResult.currentState;
+    }
+
+    return {
+      currentState,
+      previousState,
+      savedPlayerPosition,
+    };
   }
-  const escapeKeyResult = player.handleEscapeKeyLogic(keys, currentState, previousState, savedPlayerPosition);
-
-  if (escapeKeyResult) {
-    savedPlayerPosition = escapeKeyResult.savedPlayerPosition;
-    previousState = escapeKeyResult.previousState;
-    currentState = escapeKeyResult.currentState;
-  }
-
-  return {
-    currentState,
-    previousState,
-    savedPlayerPosition,
-  };
 }

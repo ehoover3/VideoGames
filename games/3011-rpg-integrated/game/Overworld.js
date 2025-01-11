@@ -1,11 +1,9 @@
 // game/Overworld.js
 
-import { updatePlayer } from "./Player.js";
 import { drawHUD } from "./HUD.js";
 
 export function loadOverworld({ canvas, ctx, keys, gameState, gameObjects }) {
-  let playerState = { keys, gameState, gameObjects };
-  const update = updatePlayer(playerState);
+  const update = gameObjects.player.update({ keys, gameState, gameObjects });
 
   gameState.currentState = update.currentState;
   gameState.previousState = update.previousState;
