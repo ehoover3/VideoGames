@@ -1,6 +1,6 @@
 // game/MedScanGame.js
 
-import { drawHUD_2 } from "./HUD.js";
+import { drawHUD } from "./HUD.js";
 import { drawText } from "./utils/drawText.js";
 import { STATES } from "../config/constants.js";
 
@@ -16,7 +16,7 @@ export function loadScanGame({ canvas, ctx, keys, gameState, gameObjects }) {
   const update = runLogic(keys, player, gameState);
   Object.assign(gameState, update);
   drawMinigame({ canvas, ctx, gameState });
-  drawHUD_2(canvas, ctx, gameState.currentState);
+  drawHUD(canvas, ctx, gameState.currentState);
 }
 
 function drawMinigame({ canvas, ctx, gameState }) {
