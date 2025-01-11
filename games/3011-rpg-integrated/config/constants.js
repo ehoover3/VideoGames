@@ -18,8 +18,3 @@ export const DIRECTION = {
   LEFT: "left",
   RIGHT: "right",
 };
-
-export const FRAME_WIDTH = 133.5;
-export const FRAME_HEIGHT = 200;
-export const WALK_FRAMES = 4;
-export const ATTACK_FRAMES = 4;

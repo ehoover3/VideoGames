@@ -10,36 +10,44 @@ Main Monitor Sizes
 
 ├── assets/
 │ ├── images/
+│ │ ├── menu/
+│ │ │ ├── menu.jpeg
+│ │ ├── overworld/
+│ │ │ ├── mri.png
+│ │ │ ├── player.png
+│ │ ├── scanGame/
+│ │ │ ├── mri.png
 │ ├── sounds/
 ├── config/
 │ ├── constants.js
-│ ├── settings.js
-├── events/
-│ ├── cutscene.js
-│ ├── eventsManager.js
-│ ├── npcInteractions.js
 ├── game/
-│ ├── menu/
-│ │ ├── handleExit.js
-│ │ ├── handleLoadGame.js
-│ │ ├── handleReturnToGame.js
-│ │ ├── handleSettings.js
-│ │ ├── handleStartNewGame.js
+│ ├── draw/
+│ │ ├── menu.js
+│ │ ├── overworld.js
+│ │ ├── utils.js
+│ ├── gameLoop/
 │ │ ├── index.js
+│ │ ├── menu.js
+│ │ ├── overworld.js
+│ │ ├── scanGame.js
+│ ├── gameStart/
+│ │ ├── canvasSetup.js
+│ │ ├── gameObjects.js
+│ │ ├── gameState.js
+│ │ ├── keyboard.js
+│ ├── menu/
+│ │ ├── exit.js
+│ │ ├── index.js
+│ │ ├── loadGame.js
+│ │ ├── returnToGame.js
+│ │ ├── settings.js
+│ │ ├── startNewGame.js
 │ ├── minigames/
 │ │ ├── medScan.js
-│ ├── enemy.js
-│ ├── game.js
-│ ├── hud.js
-│ ├── item.js
+│ │ ├── draw.js
+│ │ ├── logic.js
 │ ├── player.js
-│ ├── world.js
-├── utils/
-│ ├── camera.js
-│ ├── math.js
-│ ├── pathfinding.js
-│ ├── timer.js
 ├── index.html
 ├── index.js
-├── README.md
 ├── styles.css
+├── README.md
