@@ -3,15 +3,15 @@
 import { STATES } from "../config/constants.js";
 import { loadOverworld } from "./Overworld.js";
 import { loadScanGame } from "./MedScanGame.js";
-import { loadMenu } from "./Menu.js";
+import { Menu } from "./Menu.js";
 
 export function startGame({ canvas, ctx, keys, gameState, gameObjects }) {
-  let menu = { canvas, ctx, keys, gameState };
+  let menu = new Menu(canvas, ctx, keys, gameState);
   let overworld = { canvas, ctx, keys, gameState, gameObjects };
   let scanGame = { canvas, ctx, keys, gameState, gameObjects };
 
   const handleGameState = {
-    [STATES.MAIN_MENU]: () => loadMenu(menu),
+    [STATES.MAIN_MENU]: () => menu.load(),
     [STATES.OVERWORLD]: () => loadOverworld(overworld),
     [STATES.SCAN_GAME]: () => loadScanGame(scanGame),
   };

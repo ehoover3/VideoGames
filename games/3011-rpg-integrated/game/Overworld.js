@@ -1,4 +1,4 @@
-// game/gameLoop/overworld.js
+// game/Overworld.js
 
 import { updatePlayer } from "./Player.js";
 import { drawHUD } from "./HUD.js";

@@ -1,9 +1,7 @@
-// game/menu/index.js
+// game/Menu.js
 
 import { STATES } from "../config/constants.js";
 import { drawText } from "./utils/drawText.js";
-const menuBackground = new Image();
-menuBackground.src = "assets/images/menu/menu.jpeg";
 
 const TITLE_HEIGHT_RATIO = 1 / 12;
 const MENU_START_Y_RATIO = 1 / 2.5;
@@ -30,156 +28,306 @@ const MENU_OPTIONS = {
   EXIT: "Exit",
 };
 
+const menuBackground = new Image();
+menuBackground.src = "assets/images/menu/menu.jpeg";
+
 const BASE_MENU = [MENU_OPTIONS.START_NEW_GAME, MENU_OPTIONS.LOAD_GAME, MENU_OPTIONS.SETTINGS, MENU_OPTIONS.EXIT];
 
-export function loadMenu({ canvas, ctx, keys, gameState }) {
-  let menuState = { keys, gameState };
-  let drawMenuState = { canvas: canvas, ctx: ctx, isGameStarted: gameState.isGameStarted, selectedOption: gameState.selectedMenuOption };
+// export function loadMenu({ canvas, ctx, keys, gameState }) {
+//   let menuState = { keys, gameState };
+//   let drawMenuState = { canvas: canvas, ctx: ctx, isGameStarted: gameState.isGameStarted, selectedOption: gameState.selectedMenuOption };
 
-  updateMenu(menuState);
-  drawMenu(drawMenuState);
-}
+//   updateMenu(menuState);
+//   drawMenu(drawMenuState);
+// }
 
-function updateMenu({ keys, gameState }) {
-  let selectedMenuOption = gameState.selectedMenuOption;
+// function updateMenu({ keys, gameState }) {
+//   let selectedMenuOption = gameState.selectedMenuOption;
 
-  function setCurrentState(newState) {
-    gameState.currentState = newState;
+//   function setCurrentState(newState) {
+//     gameState.currentState = newState;
+//   }
+
+//   function setIsGameStarted(newGameStarted) {
+//     gameState.isGameStarted = newGameStarted;
+//   }
+
+//   function setSelectedMenuOption(newSelected) {
+//     gameState.selectedMenuOption = newSelected;
+//   }
+
+//   function handleLoadGame() {
+//     alert("Load Game functionality is not implemented yet.");
+//   }
+
+//   function handleMenuSelection() {
+//     const menu = gameState.isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
+//     const selected = menu[selectedMenuOption];
+
+//     switch (selected) {
+//       case MENU_OPTIONS.START_NEW_GAME:
+//         handleStartNewGame(setCurrentState, setIsGameStarted);
+//         break;
+//       case MENU_OPTIONS.RETURN_TO_GAME:
+//         handleReturnToGame(gameState.previousState, setCurrentState);
+//         break;
+//       case MENU_OPTIONS.LOAD_GAME:
+//         handleLoadGame();
+//         break;
+//       case MENU_OPTIONS.SETTINGS:
+//         handleSettings();
+//         break;
+//       case MENU_OPTIONS.EXIT:
+//         handleExit();
+//         break;
+//       default:
+//         console.warn("Invalid menu option selected");
+//     }
+//   }
+
+//   let menuLength = BASE_MENU.length;
+//   let selectedOptionsState = { keys, selectedMenuOption, setSelectedMenuOption, menuLength };
+
+//   updateSelectedOption(selectedOptionsState);
+//   handleEnterKey(keys, handleMenuSelection);
+// }
+
+// function updateSelectedOption({ keys, selectedMenuOption, setSelectedMenuOption, menuLength }) {
+//   if (keys["ArrowUp"]) {
+//     setSelectedMenuOption((selectedMenuOption - 1 + menuLength) % menuLength);
+//     keys["ArrowUp"] = false;
+//   }
+//   if (keys["ArrowDown"]) {
+//     setSelectedMenuOption((selectedMenuOption + 1) % menuLength);
+//     keys["ArrowDown"] = false;
+//   }
+// }
+
+// function handleEnterKey(keys, handleMenuSelection) {
+//   if (keys["Enter"]) {
+//     handleMenuSelection();
+//     keys["Enter"] = false; // Prevent multiple triggers
+//   }
+// }
+
+// function handleReturnToGame(previousState, setCurrentState) {
+//   const stateMap = {
+//     [STATES.SCAN_GAME]: STATES.SCAN_GAME,
+//   };
+//   const state = stateMap[previousState] || previousState;
+//   setCurrentState(state);
+// }
+
+// function handleSettings() {
+//   alert("Settings functionality is not implemented yet.");
+// }
+
+// function handleStartNewGame(setCurrentState, setIsGameStarted) {
+//   setCurrentState(STATES.OVERWORLD);
+//   setIsGameStarted(true);
+// }
+
+// function handleExit() {
+//   alert("Exiting the game...");
+// }
+
+// function drawMenu(drawMenuState) {
+//   const { canvas, ctx, isGameStarted, selectedOption } = drawMenuState;
+
+//   // Clear the canvas
+//   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+//   // Draw the background image
+//   ctx.drawImage(menuBackground, 0, 0, menuBackground.width, menuBackground.height, 0, 0, canvas.width, canvas.height);
+
+//   // Draw the title
+//   const titleFontSize = Math.round(canvas.height * TITLE_HEIGHT_RATIO);
+//   drawText(ctx, "Science Game", canvas.width / 2, canvas.height / 4, `${titleFontSize}px Arial`, "black");
+
+//   // Determine the menu options
+//   const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
+
+//   // Dynamic menu item spacing
+//   const menuStartY = canvas.height * MENU_START_Y_RATIO;
+//   const menuSpacing = canvas.height * MENU_SPACING_RATIO;
+//   const menuFontSize = Math.round(canvas.height * MENU_FONT_SIZE_RATIO);
+//   const buttonPadding = canvas.height * BUTTON_PADDING_RATIO;
+
+//   // Draw each menu option
+//   menu.forEach((option, index) => {
+//     const isSelected = index === selectedOption;
+
+//     // Calculate button dimensions
+//     const buttonWidth = canvas.width * BUTTON_WIDTH_RATIO;
+//     const buttonHeight = menuFontSize + buttonPadding;
+//     const buttonX = (canvas.width - buttonWidth) * BUTTON_RADIUS_RATIO;
+//     const buttonY = menuStartY + index * menuSpacing - buttonHeight;
+
+//     // Set colors for the button and text
+//     const buttonColor = isSelected ? BUTTON_COLOR_SELECTED : BUTTON_COLOR_DEFAULT;
+//     const textColor = isSelected ? TEXT_COLOR_SELECTED : TEXT_COLOR_DEFAULT;
+//     const shadowColor = SHADOW_COLOR;
+
+//     // Draw the button with rounded corners
+//     ctx.beginPath();
+//     ctx.roundRect(buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
+//     ctx.fillStyle = buttonColor;
+//     ctx.fill();
+//     ctx.shadowColor = shadowColor;
+//     ctx.shadowBlur = SHADOW_BLUR;
+//     ctx.shadowOffsetX = SHADOW_OFFSET_X;
+//     ctx.shadowOffsetY = SHADOW_OFFSET_Y;
+//     ctx.strokeStyle = STROKE_COLOR;
+//     ctx.stroke();
+//     ctx.shadowBlur = SHADOW_BLUR;
+
+//     drawText(ctx, option, canvas.width / 2, buttonY + buttonHeight / 2 + menuFontSize / 3, `${menuFontSize}px Arial`, textColor);
+//   });
+// }
+
+//
+//
+//
+
+export class Menu {
+  constructor(canvas, ctx, keys, gameState) {
+    this.canvas = canvas;
+    this.ctx = ctx;
+    this.keys = keys;
+    this.gameState = gameState;
   }
 
-  function setIsGameStarted(newGameStarted) {
-    gameState.isGameStarted = newGameStarted;
+  load() {
+    this.updateMenu();
+    this.drawMenu();
   }
 
-  function setSelectedMenuOption(newSelected) {
-    gameState.selectedMenuOption = newSelected;
-  }
+  updateMenu() {
+    const { keys, gameState } = this;
+    let { selectedMenuOption } = gameState;
 
-  function handleLoadGame() {
-    alert("Load Game functionality is not implemented yet.");
-  }
+    const setCurrentState = (newState) => {
+      gameState.currentState = newState;
+    };
 
-  function handleMenuSelection() {
-    const menu = gameState.isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
-    const selected = menu[selectedMenuOption];
+    const setIsGameStarted = (newGameStarted) => {
+      gameState.isGameStarted = newGameStarted;
+    };
 
-    switch (selected) {
-      case MENU_OPTIONS.START_NEW_GAME:
-        handleStartNewGame(setCurrentState, setIsGameStarted);
-        break;
-      case MENU_OPTIONS.RETURN_TO_GAME:
-        handleReturnToGame(gameState.previousState, setCurrentState);
-        break;
-      case MENU_OPTIONS.LOAD_GAME:
-        handleLoadGame();
-        break;
-      case MENU_OPTIONS.SETTINGS:
-        handleSettings();
-        break;
-      case MENU_OPTIONS.EXIT:
-        handleExit();
-        break;
-      default:
-        console.warn("Invalid menu option selected");
+    const setSelectedMenuOption = (newSelected) => {
+      gameState.selectedMenuOption = newSelected;
+    };
+
+    const handleLoadGame = () => {
+      alert("Load Game functionality is not implemented yet.");
+    };
+
+    const handleMenuSelection = () => {
+      const menu = gameState.isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
+      const selected = menu[selectedMenuOption];
+
+      switch (selected) {
+        case MENU_OPTIONS.START_NEW_GAME:
+          this.handleStartNewGame(setCurrentState, setIsGameStarted);
+          break;
+        case MENU_OPTIONS.RETURN_TO_GAME:
+          this.handleReturnToGame(gameState.previousState, setCurrentState);
+          break;
+        case MENU_OPTIONS.LOAD_GAME:
+          handleLoadGame();
+          break;
+        case MENU_OPTIONS.SETTINGS:
+          this.handleSettings();
+          break;
+        case MENU_OPTIONS.EXIT:
+          this.handleExit();
+          break;
+        default:
+          console.warn("Invalid menu option selected");
+      }
+    };
+
+    const menuLength = BASE_MENU.length;
+
+    if (keys["ArrowUp"]) {
+      setSelectedMenuOption((selectedMenuOption - 1 + menuLength) % menuLength);
+      keys["ArrowUp"] = false;
+    }
+    if (keys["ArrowDown"]) {
+      setSelectedMenuOption((selectedMenuOption + 1) % menuLength);
+      keys["ArrowDown"] = false;
+    }
+
+    if (keys["Enter"]) {
+      handleMenuSelection();
+      keys["Enter"] = false;
     }
   }
 
-  let menuLength = BASE_MENU.length;
-  let selectedOptionsState = { keys, selectedMenuOption, setSelectedMenuOption, menuLength };
-
-  updateSelectedOption(selectedOptionsState);
-  handleEnterKey(keys, handleMenuSelection);
-}
-
-function updateSelectedOption({ keys, selectedMenuOption, setSelectedMenuOption, menuLength }) {
-  if (keys["ArrowUp"]) {
-    setSelectedMenuOption((selectedMenuOption - 1 + menuLength) % menuLength);
-    keys["ArrowUp"] = false;
+  handleReturnToGame(previousState, setCurrentState) {
+    const stateMap = {
+      [STATES.SCAN_GAME]: STATES.SCAN_GAME,
+    };
+    const state = stateMap[previousState] || previousState;
+    setCurrentState(state);
   }
-  if (keys["ArrowDown"]) {
-    setSelectedMenuOption((selectedMenuOption + 1) % menuLength);
-    keys["ArrowDown"] = false;
+
+  handleSettings() {
+    alert("Settings functionality is not implemented yet.");
   }
-}
 
-function handleEnterKey(keys, handleMenuSelection) {
-  if (keys["Enter"]) {
-    handleMenuSelection();
-    keys["Enter"] = false; // Prevent multiple triggers
+  handleStartNewGame(setCurrentState, setIsGameStarted) {
+    setCurrentState(STATES.OVERWORLD);
+    setIsGameStarted(true);
   }
-}
 
-function handleReturnToGame(previousState, setCurrentState) {
-  const stateMap = {
-    [STATES.SCAN_GAME]: STATES.SCAN_GAME,
-  };
-  const state = stateMap[previousState] || previousState;
-  setCurrentState(state);
-}
+  handleExit() {
+    alert("Exiting the game...");
+  }
 
-function handleSettings() {
-  alert("Settings functionality is not implemented yet.");
-}
+  drawMenu() {
+    const { canvas, ctx, gameState } = this;
+    const isGameStarted = gameState.isGameStarted;
+    const selectedOption = gameState.selectedMenuOption;
 
-function handleStartNewGame(setCurrentState, setIsGameStarted) {
-  setCurrentState(STATES.OVERWORLD);
-  setIsGameStarted(true);
-}
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-function handleExit() {
-  alert("Exiting the game...");
-}
+    ctx.drawImage(menuBackground, 0, 0, menuBackground.width, menuBackground.height, 0, 0, canvas.width, canvas.height);
 
-function drawMenu(drawMenuState) {
-  const { canvas, ctx, isGameStarted, selectedOption } = drawMenuState;
+    const titleFontSize = Math.round(canvas.height * TITLE_HEIGHT_RATIO);
+    drawText(ctx, "Science Game", canvas.width / 2, canvas.height / 4, `${titleFontSize}px Arial`, "black");
 
-  // Clear the canvas
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
 
-  // Draw the background image
-  ctx.drawImage(menuBackground, 0, 0, menuBackground.width, menuBackground.height, 0, 0, canvas.width, canvas.height);
+    const menuStartY = canvas.height * MENU_START_Y_RATIO;
+    const menuSpacing = canvas.height * MENU_SPACING_RATIO;
+    const menuFontSize = Math.round(canvas.height * MENU_FONT_SIZE_RATIO);
+    const buttonPadding = canvas.height * BUTTON_PADDING_RATIO;
 
-  // Draw the title
-  const titleFontSize = Math.round(canvas.height * TITLE_HEIGHT_RATIO);
-  drawText(ctx, "Science Game", canvas.width / 2, canvas.height / 4, `${titleFontSize}px Arial`, "black");
+    menu.forEach((option, index) => {
+      const isSelected = index === selectedOption;
 
-  // Determine the menu options
-  const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
+      const buttonWidth = canvas.width * BUTTON_WIDTH_RATIO;
+      const buttonHeight = menuFontSize + buttonPadding;
+      const buttonX = (canvas.width - buttonWidth) * BUTTON_RADIUS_RATIO;
+      const buttonY = menuStartY + index * menuSpacing - buttonHeight;
 
-  // Dynamic menu item spacing
-  const menuStartY = canvas.height * MENU_START_Y_RATIO;
-  const menuSpacing = canvas.height * MENU_SPACING_RATIO;
-  const menuFontSize = Math.round(canvas.height * MENU_FONT_SIZE_RATIO);
-  const buttonPadding = canvas.height * BUTTON_PADDING_RATIO;
+      const buttonColor = isSelected ? BUTTON_COLOR_SELECTED : BUTTON_COLOR_DEFAULT;
+      const textColor = isSelected ? TEXT_COLOR_SELECTED : TEXT_COLOR_DEFAULT;
 
-  // Draw each menu option
-  menu.forEach((option, index) => {
-    const isSelected = index === selectedOption;
+      ctx.beginPath();
+      ctx.roundRect(buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
+      ctx.fillStyle = buttonColor;
+      ctx.fill();
+      ctx.shadowColor = SHADOW_COLOR;
+      ctx.shadowBlur = SHADOW_BLUR;
+      ctx.shadowOffsetX = SHADOW_OFFSET_X;
+      ctx.shadowOffsetY = SHADOW_OFFSET_Y;
+      ctx.strokeStyle = STROKE_COLOR;
+      ctx.stroke();
+      ctx.shadowBlur = SHADOW_BLUR;
 
-    // Calculate button dimensions
-    const buttonWidth = canvas.width * BUTTON_WIDTH_RATIO;
-    const buttonHeight = menuFontSize + buttonPadding;
-    const buttonX = (canvas.width - buttonWidth) * BUTTON_RADIUS_RATIO;
-    const buttonY = menuStartY + index * menuSpacing - buttonHeight;
-
-    // Set colors for the button and text
-    const buttonColor = isSelected ? BUTTON_COLOR_SELECTED : BUTTON_COLOR_DEFAULT;
-    const textColor = isSelected ? TEXT_COLOR_SELECTED : TEXT_COLOR_DEFAULT;
-    const shadowColor = SHADOW_COLOR;
-
-    // Draw the button with rounded corners
-    ctx.beginPath();
-    ctx.roundRect(buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
-    ctx.fillStyle = buttonColor;
-    ctx.fill();
-    ctx.shadowColor = shadowColor;
-    ctx.shadowBlur = SHADOW_BLUR;
-    ctx.shadowOffsetX = SHADOW_OFFSET_X;
-    ctx.shadowOffsetY = SHADOW_OFFSET_Y;
-    ctx.strokeStyle = STROKE_COLOR;
-    ctx.stroke();
-    ctx.shadowBlur = SHADOW_BLUR;
-
-    drawText(ctx, option, canvas.width / 2, buttonY + buttonHeight / 2 + menuFontSize / 3, `${menuFontSize}px Arial`, textColor);
-  });
+      drawText(ctx, option, canvas.width / 2, buttonY + buttonHeight / 2 + menuFontSize / 3, `${menuFontSize}px Arial`, textColor);
+    });
+  }
 }

@@ -1,4 +1,4 @@
-// game/gameStart/Player.js
+// game/Player.js
 
 import { STATES } from "../config/constants.js";
 import { ACTIONS, DIRECTION } from "../config/constants.js";

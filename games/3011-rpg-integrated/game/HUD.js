@@ -1,4 +1,5 @@
-// game/draw/HUD.js
+// game/HUD.js
+
 import { drawText } from "./utils/drawText.js";
 import { STATES } from "../config/constants.js";
 
