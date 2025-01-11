@@ -4,13 +4,6 @@ import { DIRECTION } from "../../config/constants.js";
 const mriImg = new Image();
 mriImg.src = "assets/images/overworld/mri.png";
 
-mriImg.onload = () => {
-  console.log("MRI image loaded successfully.");
-};
-mriImg.onerror = (e) => {
-  console.error("Failed to load MRI image.", e);
-};
-
 export function initGameObjects() {
   const player = createPlayer(100, 100, 32, 32, "blue", 4, DIRECTION.DOWN);
   const mriMachine = {
@@ -52,4 +45,15 @@ export function initGameObjects() {
 
 export function createPlayer(x, y, width, height, color, speed, direction) {
   return { x, y, width, height, color, speed, direction };
+}
+
+function createGameObject(x, y, width, height, imageKey, interactCallback) {
+  return {
+    x,
+    y,
+    width,
+    height,
+    image: loadedImages[imageKey],
+    interact: interactCallback || (() => {}),
+  };
 }
