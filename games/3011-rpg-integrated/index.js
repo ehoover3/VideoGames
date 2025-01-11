@@ -1,10 +1,8 @@
 // index.js
 
 import { startGame } from "./game/gameLoop/index.js";
-import { setupCanvas } from "./game/gameStart/canvasSetup.js";
-import { setupKeyboard } from "./game/gameStart/keyboard.js";
-import { initGameObjects } from "./game/gameStart/gameObjects.js";
-import { gameState } from "./game/gameStart/gameState.js";
+import { initGameObjects } from "./game/gameStart/Game.js";
+import { gameState } from "./game/gameStart/Game.js";
 
 export const ASPECT_RATIO = 16 / 9;
 const { canvas, ctx } = setupCanvas("gameCanvas");
@@ -28,4 +26,17 @@ function resizeCanvas() {
     canvas.height = width / ASPECT_RATIO;
   }
   ctx.imageSmoothingEnabled = false;
+}
+
+function setupKeyboard() {
+  const keys = {};
+  window.addEventListener("keydown", (e) => (keys[e.key] = true));
+  window.addEventListener("keyup", (e) => (keys[e.key] = false));
+  return keys;
+}
+
+function setupCanvas(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext("2d");
+  return { canvas, ctx };
 }

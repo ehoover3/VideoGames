@@ -1,7 +1,7 @@
 // games/loop.js
 import { STATES } from "../../config/constants.js";
-import { loadOverworld } from "./overworld.js";
-import { loadScanGame } from "./scanGame.js";
+import { loadOverworld } from "../gameStart/Overworld.js";
+import { loadScanGame } from "../gameStart/MedScanGame.js";
 import { loadMenu } from "./menu.js";
 
 export function startGame({ canvas, ctx, keys, gameState, gameObjects }) {

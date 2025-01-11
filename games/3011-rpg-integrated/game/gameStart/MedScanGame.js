@@ -1,6 +1,6 @@
 // game/gameLoop/scanGame.js
-import { drawHUD_2 } from "../gameStart/HUD.js";
-import { drawText } from "../draw/drawText.js";
+import { drawHUD_2 } from "./HUD.js";
+import { drawText } from "../utils/drawText.js";
 import { STATES } from "../../config/constants.js";
 
 const BASE_RESOLUTION = { width: 640, height: 360 };
