@@ -15,7 +15,7 @@ export function loadOverworld({ canvas, ctx, keys, gameState, gameObjects }) {
   drawHUD(canvas, ctx, gameState.currentState);
 }
 
-export function drawOverworld({ canvas, ctx, gameObjects, gameState }) {
+function drawOverworld({ canvas, ctx, gameObjects, gameState }) {
   drawWorld({ canvas, ctx });
   drawGameObjects({ canvas, ctx, gameObjects });
   gameObjects.player.drawPlayer(canvas, ctx, gameState.currentFrame);
@@ -26,7 +26,7 @@ function drawWorld({ canvas, ctx }) {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-export function drawGameObjects({ canvas, ctx, gameObjects }) {
+function drawGameObjects({ canvas, ctx, gameObjects }) {
   let { mriMachine } = gameObjects;
   const scaleX = canvas.width / 640;
   const scaleY = canvas.height / 360;
