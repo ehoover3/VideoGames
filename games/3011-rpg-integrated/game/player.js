@@ -1,4 +1,4 @@
-// player.js
+// game/player.js
 
 import { ACTIONS, DIRECTION } from "../config/constants.js";
 import { STATES, FRAME_SETTINGS } from "../config/constants.js";
@@ -13,8 +13,8 @@ export function updatePlayer({ keys, gameState, gameObjects }) {
   let collision = { player, keys, mriMachine, currentState };
 
   handleMovement(movement);
-  handleAction(action);
-  handleAnimation(animation);
+  currentAction = handleAction(action); // Ensure currentAction is updated
+  handleAnimation({ gameState, currentAction });
 
   const collisionResult = handleCollision(collision);
 
@@ -81,16 +81,16 @@ function handleMovement({ player, keys }) {
 function handleAction({ keys, currentAction }) {
   if (keys["ArrowUp"] || keys["ArrowDown"] || keys["ArrowLeft"] || keys["ArrowRight"]) {
     console.log("Walking action detected");
-    currentAction = ACTIONS.WALKING;
+    return ACTIONS.WALKING; // Return walking action
   } else {
     console.log("Idle action detected");
-    currentAction = ACTIONS.IDLE;
+    return ACTIONS.IDLE; // Return idle action
   }
 }
 
-function handleAnimation({ gameState }) {
+function handleAnimation({ gameState, currentAction }) {
   const WALK_FRAMES = FRAME_SETTINGS.WALK_FRAMES;
-  let { currentAction, animationTimer, animationSpeed, currentFrame } = gameState;
+  let { animationTimer, animationSpeed, currentFrame } = gameState;
 
   if (currentAction === ACTIONS.WALKING) {
     animationTimer++;
