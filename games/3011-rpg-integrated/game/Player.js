@@ -1,7 +1,7 @@
 // game/gameStart/Player.js
 
-import { STATES } from "../../config/constants.js";
-import { ACTIONS, DIRECTION } from "../../config/constants.js";
+import { STATES } from "../config/constants.js";
+import { ACTIONS, DIRECTION } from "../config/constants.js";
 
 const FRAME_SETTINGS = {
   FRAME_WIDTH: 102,

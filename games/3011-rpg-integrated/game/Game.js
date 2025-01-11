@@ -21,7 +21,7 @@ export const gameState = {
 
 import { GameObject } from "./GameObject.js";
 import { DIRECTION } from "../config/constants.js";
-import { Player } from "./gameStart/Player.js";
+import { Player } from "./Player.js";
 
 export function initGameObjects() {
   const player = new Player(loadedImages["player"], 100, 100, 32, 32, 4, DIRECTION.DOWN); // Use Player class here
