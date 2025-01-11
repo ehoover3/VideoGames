@@ -1,8 +1,8 @@
 // index.js
 
-import { startGame } from "./game/gameLoop/index.js";
-import { initGameObjects } from "./game/gameStart/Game.js";
-import { gameState } from "./game/gameStart/Game.js";
+import { startGame } from "./game/index.js";
+import { initGameObjects } from "./game/Game.js";
+import { gameState } from "./game/Game.js";
 
 export const ASPECT_RATIO = 16 / 9;
 const { canvas, ctx } = setupCanvas("gameCanvas");
