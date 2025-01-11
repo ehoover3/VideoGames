@@ -1,8 +1,8 @@
 // game/gameLoop/overworld.js
 
 import { updatePlayer } from "../gameStart/PlayerObject.js";
-import { drawOverworld, drawHUD } from "../draw/overworld.js";
-
+import { drawOverworld } from "../draw/overworld.js";
+import { drawHUD_2 } from "../gameStart/HUD.js";
 export function loadOverworld({ canvas, ctx, keys, gameState, gameObjects }) {
   let playerState = { keys, gameState, gameObjects };
   const update = updatePlayer(playerState);
@@ -12,5 +12,5 @@ export function loadOverworld({ canvas, ctx, keys, gameState, gameObjects }) {
   gameState.savedPlayerPosition = update.savedPlayerPosition;
 
   drawOverworld({ canvas, ctx, gameObjects, gameState });
-  drawHUD(canvas, ctx, gameState.currentState);
+  drawHUD_2(canvas, ctx, gameState.currentState);
 }
