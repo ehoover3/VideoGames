@@ -18,12 +18,12 @@ export function drawOverworld({ canvas, ctx, gameObjects, gameState }) {
   drawPlayer(canvas, ctx, gameObjects.player, gameState.currentFrame);
 }
 
-export function drawWorld({ canvas, ctx }) {
+function drawWorld({ canvas, ctx }) {
   ctx.fillStyle = "darkseagreen";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-export function drawPlayer(canvas, ctx, player, currentFrame) {
+function drawPlayer(canvas, ctx, player, currentFrame) {
   const { FRAME_WIDTH, FRAME_HEIGHT } = FRAME_SETTINGS;
   const spriteRow = DIRECTIONS[player.direction];
   const sourceX = (currentFrame % 4) * FRAME_WIDTH;
@@ -40,7 +40,7 @@ export function drawPlayer(canvas, ctx, player, currentFrame) {
   ctx.drawImage(playerSpriteSheet, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, scaledX, scaledY, scaledWidth, scaledHeight);
 }
 
-export function drawGameObjects({ canvas, ctx, gameObjects }) {
+function drawGameObjects({ canvas, ctx, gameObjects }) {
   let { mriMachine, xrayMachine } = gameObjects;
   drawGameObject(canvas, ctx, mriMachine);
   drawGameObject(canvas, ctx, xrayMachine);
