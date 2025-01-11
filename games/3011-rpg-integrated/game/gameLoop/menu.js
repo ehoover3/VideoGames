@@ -1,7 +1,7 @@
 // game/gameLoop/menu.js
 
 import { updateMenu } from "../menu/index.js";
-import { drawText } from "../draw/utils.js";
+import { drawText } from "../draw/drawText.js";
 
 export const MENU_OPTIONS = {
   START_NEW_GAME: "Start New Game",
