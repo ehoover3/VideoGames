@@ -1,4 +1,5 @@
-// game/gameLoop/scanGame.js
+// game/MedScanGame.js
+
 import { drawHUD_2 } from "./HUD.js";
 import { drawText } from "./utils/drawText.js";
 import { STATES } from "../config/constants.js";

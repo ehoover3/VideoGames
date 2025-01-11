@@ -2,7 +2,7 @@
 import { drawText } from "./utils/drawText.js";
 import { STATES } from "../config/constants.js";
 
-class HUD {
+export default class HUD {
   constructor(canvas, ctx) {
     this.canvas = canvas;
     this.ctx = ctx;
@@ -22,8 +22,6 @@ class HUD {
     drawText(this.ctx, hudText, this.canvas.width / 2, scaledTextY, scaledFontSize);
   }
 }
-
-export default HUD;
 
 export function drawHUD(canvas, ctx, currentState) {
   const hud = new HUD(canvas, ctx);

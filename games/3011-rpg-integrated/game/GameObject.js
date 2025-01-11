@@ -1,4 +1,4 @@
-// game/gameStart/GameObject.js
+// game/GameObject.js
 
 export class GameObject {
   constructor({ imgPath, imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight, x, y, width = 32, height = 32 }) {

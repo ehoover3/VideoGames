@@ -1,4 +1,5 @@
-// games/loop.js
+// game/index.js
+
 import { STATES } from "../config/constants.js";
 import { loadOverworld } from "./Overworld.js";
 import { loadScanGame } from "./MedScanGame.js";

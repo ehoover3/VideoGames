@@ -22,7 +22,7 @@ const TEXT_COLOR_SELECTED = "white";
 const TEXT_COLOR_DEFAULT = "black";
 const STROKE_COLOR = "lightgrey";
 
-export const MENU_OPTIONS = {
+const MENU_OPTIONS = {
   START_NEW_GAME: "Start New Game",
   RETURN_TO_GAME: "Return to Game",
   LOAD_GAME: "Load Game",
@@ -30,7 +30,7 @@ export const MENU_OPTIONS = {
   EXIT: "Exit",
 };
 
-export const BASE_MENU = [MENU_OPTIONS.START_NEW_GAME, MENU_OPTIONS.LOAD_GAME, MENU_OPTIONS.SETTINGS, MENU_OPTIONS.EXIT];
+const BASE_MENU = [MENU_OPTIONS.START_NEW_GAME, MENU_OPTIONS.LOAD_GAME, MENU_OPTIONS.SETTINGS, MENU_OPTIONS.EXIT];
 
 export function loadMenu({ canvas, ctx, keys, gameState }) {
   let menuState = { keys, gameState };
@@ -40,7 +40,7 @@ export function loadMenu({ canvas, ctx, keys, gameState }) {
   drawMenu(drawMenuState);
 }
 
-export function updateMenu({ keys, gameState }) {
+function updateMenu({ keys, gameState }) {
   let selectedMenuOption = gameState.selectedMenuOption;
 
   function setCurrentState(newState) {
@@ -130,7 +130,7 @@ function handleExit() {
   alert("Exiting the game...");
 }
 
-export function drawMenu(drawMenuState) {
+function drawMenu(drawMenuState) {
   const { canvas, ctx, isGameStarted, selectedOption } = drawMenuState;
 
   // Clear the canvas

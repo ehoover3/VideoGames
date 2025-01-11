@@ -1,6 +1,9 @@
-// gmae/gameStart/gameState.js
+// game/Game.js
 
 import { STATES, ACTIONS } from "../config/constants.js";
+import { GameObject } from "./GameObject.js";
+import { DIRECTION } from "../config/constants.js";
+import { Player } from "./Player.js";
 
 export const gameState = {
   currentState: STATES.MAIN_MENU,
@@ -16,12 +19,6 @@ export const gameState = {
   maxScanProgress: 100,
   scanning: false,
 };
-
-// game/gameObjects.js
-
-import { GameObject } from "./GameObject.js";
-import { DIRECTION } from "../config/constants.js";
-import { Player } from "./Player.js";
 
 export function initGameObjects() {
   const player = new Player(loadedImages["player"], 100, 100, 32, 32, 4, DIRECTION.DOWN); // Use Player class here
