@@ -1,8 +1,8 @@
 // games/loop.js
 import { STATES } from "../config/constants.js";
-import { loadOverworld } from "./gameStart/Overworld.js";
-import { loadScanGame } from "./gameStart/MedScanGame.js";
-import { loadMenu } from "./gameStart/Menu.js";
+import { loadOverworld } from "./Overworld.js";
+import { loadScanGame } from "./MedScanGame.js";
+import { loadMenu } from "./Menu.js";
 
 export function startGame({ canvas, ctx, keys, gameState, gameObjects }) {
   let menu = { canvas, ctx, keys, gameState };

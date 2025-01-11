@@ -1,7 +1,7 @@
 // game/gameLoop/scanGame.js
 import { drawHUD_2 } from "./HUD.js";
-import { drawText } from "../utils/drawText.js";
-import { STATES } from "../../config/constants.js";
+import { drawText } from "./utils/drawText.js";
+import { STATES } from "../config/constants.js";
 
 const BASE_RESOLUTION = { width: 640, height: 360 };
 const MRI_IMAGE_DIMENSIONS = { width: 458, height: 248 };

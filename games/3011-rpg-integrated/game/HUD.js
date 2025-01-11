@@ -1,6 +1,6 @@
 // game/draw/HUD.js
-import { drawText } from "../utils/drawText.js";
-import { STATES } from "../../config/constants.js";
+import { drawText } from "./utils/drawText.js";
+import { STATES } from "../config/constants.js";
 
 class HUD {
   constructor(canvas, ctx) {

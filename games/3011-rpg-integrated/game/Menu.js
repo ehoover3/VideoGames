@@ -1,7 +1,7 @@
 // game/menu/index.js
 
-import { STATES } from "../../config/constants.js";
-import { drawText } from "../utils/drawText.js";
+import { STATES } from "../config/constants.js";
+import { drawText } from "./utils/drawText.js";
 const menuBackground = new Image();
 menuBackground.src = "assets/images/menu/menu.jpeg";
 
