@@ -2,7 +2,7 @@
 import { STATES } from "../../config/constants.js";
 import { loadOverworld } from "../gameStart/Overworld.js";
 import { loadScanGame } from "../gameStart/MedScanGame.js";
-import { loadMenu } from "./menu.js";
+import { loadMenu } from "../gameStart/Menu.js";
 
 export function startGame({ canvas, ctx, keys, gameState, gameObjects }) {
   let menu = { canvas, ctx, keys, gameState };
