@@ -80,11 +80,9 @@ function handleMovement({ player, keys }) {
 
 function handleAction({ keys, currentAction }) {
   if (keys["ArrowUp"] || keys["ArrowDown"] || keys["ArrowLeft"] || keys["ArrowRight"]) {
-    console.log("Walking action detected");
-    return ACTIONS.WALKING; // Return walking action
+    return ACTIONS.WALKING;
   } else {
-    console.log("Idle action detected");
-    return ACTIONS.IDLE; // Return idle action
+    return ACTIONS.IDLE;
   }
 }
 
@@ -97,15 +95,12 @@ function handleAnimation({ gameState, currentAction }) {
     if (animationTimer >= animationSpeed) {
       animationTimer = 0; // Reset timer
       currentFrame = (currentFrame + 1) % WALK_FRAMES; // Loop through frames
-      console.log(`Walking Frame: ${currentFrame}`); // Debug frame updates
     }
   } else {
     animationTimer = 0;
     currentFrame = 0; // Default to idle frame when not walking
-    console.log("Idle Frame");
   }
 
-  // Update gameState
   gameState.animationTimer = animationTimer;
   gameState.currentFrame = currentFrame;
 }

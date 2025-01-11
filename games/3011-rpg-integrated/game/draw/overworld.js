@@ -27,13 +27,11 @@ export function drawWorld({ canvas, ctx }) {
 export function drawPlayer(canvas, ctx, player, currentFrame) {
   const { FRAME_WIDTH, FRAME_HEIGHT } = FRAME_SETTINGS;
   const spriteRow = DIRECTIONS[player.direction];
-  const sourceX = (currentFrame % 4) * FRAME_WIDTH; // Use frame within the row
+  const sourceX = (currentFrame % 4) * FRAME_WIDTH;
   const sourceY = spriteRow * FRAME_HEIGHT;
 
   const scaleX = canvas.width / 640;
   const scaleY = canvas.height / 360;
-
-  console.log(`Drawing Frame: ${currentFrame}, sourceX: ${sourceX}, sourceY: ${sourceY}`); // Debug
 
   const scaledX = player.x * scaleX;
   const scaledY = player.y * scaleY;
