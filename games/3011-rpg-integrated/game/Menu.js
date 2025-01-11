@@ -33,7 +33,7 @@ menuBackground.src = "assets/images/menu/menu.jpeg";
 
 const BASE_MENU = [MENU_OPTIONS.START_NEW_GAME, MENU_OPTIONS.LOAD_GAME, MENU_OPTIONS.SETTINGS, MENU_OPTIONS.EXIT];
 
-export class Menu {
+export default class Menu {
   constructor(canvas, ctx, keys, gameState) {
     this.canvas = canvas;
     this.ctx = ctx;

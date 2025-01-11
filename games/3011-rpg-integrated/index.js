@@ -1,19 +1,21 @@
 // index.js
+
 import Game from "./game/Game.js";
-import { Menu } from "./game/Menu.js";
+import Menu from "./game/Menu.js";
+import Overworld from "./game/Overworld.js";
 import { STATES } from "./config/constants.js";
-import { loadOverworld } from "./game/Overworld.js";
 import { loadScanGame } from "./game/MedScanGame.js";
 
 const ASPECT_RATIO = 16 / 9;
 const { canvas, ctx } = setupCanvas("gameCanvas");
 const keys = setupKeyboard();
 const gameInstance = new Game();
+const overworld = new Overworld(canvas, ctx, keys, gameInstance.gameState, gameInstance.gameObjects);
 
 window.addEventListener("resize", resizeCanvas);
 
 resizeCanvas();
-startGame({ canvas, ctx, keys, gameInstance });
+startGame();
 
 function resizeCanvas() {
   const width = window.innerWidth;
@@ -41,27 +43,20 @@ function setupCanvas(canvasId) {
   return { canvas, ctx };
 }
 
-function startGame({ canvas, ctx, keys, gameInstance }) {
-  let menu = new Menu(canvas, ctx, keys, gameInstance.gameState);
-  let overworld = {
-    canvas,
-    ctx,
-    keys,
-    gameState: gameInstance.gameState,
-    gameObjects: gameInstance.gameObjects,
-  };
-  let scanGame = {
-    canvas,
-    ctx,
-    keys,
-    gameState: gameInstance.gameState,
-    gameObjects: gameInstance.gameObjects,
-  };
+function startGame() {
+  const menu = new Menu(canvas, ctx, keys, gameInstance.gameState);
 
   const handleGameState = {
     [STATES.MAIN_MENU]: () => menu.load(),
-    [STATES.OVERWORLD]: () => loadOverworld(overworld),
-    [STATES.SCAN_GAME]: () => loadScanGame(scanGame),
+    [STATES.OVERWORLD]: () => overworld.load(),
+    [STATES.SCAN_GAME]: () =>
+      loadScanGame({
+        canvas,
+        ctx,
+        keys,
+        gameState: gameInstance.gameState,
+        gameObjects: gameInstance.gameObjects,
+      }),
   };
 
   function gameLoop() {
