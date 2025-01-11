@@ -1,7 +1,5 @@
 // index.js
-
-import { initGameObjects } from "./game/Game.js";
-import { gameState } from "./game/Game.js";
+import Game from "./game/Game.js";
 import { Menu } from "./game/Menu.js";
 import { STATES } from "./config/constants.js";
 import { loadOverworld } from "./game/Overworld.js";
@@ -10,13 +8,12 @@ import { loadScanGame } from "./game/MedScanGame.js";
 const ASPECT_RATIO = 16 / 9;
 const { canvas, ctx } = setupCanvas("gameCanvas");
 const keys = setupKeyboard();
-const gameObjects = initGameObjects();
-let game = { canvas, ctx, keys, gameState, gameObjects };
+const gameInstance = new Game();
 
 window.addEventListener("resize", resizeCanvas);
 
 resizeCanvas();
-startGame(game);
+startGame({ canvas, ctx, keys, gameInstance });
 
 function resizeCanvas() {
   const width = window.innerWidth;
@@ -44,10 +41,22 @@ function setupCanvas(canvasId) {
   return { canvas, ctx };
 }
 
-export function startGame({ canvas, ctx, keys, gameState, gameObjects }) {
-  let menu = new Menu(canvas, ctx, keys, gameState);
-  let overworld = { canvas, ctx, keys, gameState, gameObjects };
-  let scanGame = { canvas, ctx, keys, gameState, gameObjects };
+function startGame({ canvas, ctx, keys, gameInstance }) {
+  let menu = new Menu(canvas, ctx, keys, gameInstance.gameState);
+  let overworld = {
+    canvas,
+    ctx,
+    keys,
+    gameState: gameInstance.gameState,
+    gameObjects: gameInstance.gameObjects,
+  };
+  let scanGame = {
+    canvas,
+    ctx,
+    keys,
+    gameState: gameInstance.gameState,
+    gameObjects: gameInstance.gameObjects,
+  };
 
   const handleGameState = {
     [STATES.MAIN_MENU]: () => menu.load(),
@@ -56,7 +65,7 @@ export function startGame({ canvas, ctx, keys, gameState, gameObjects }) {
   };
 
   function gameLoop() {
-    const updateGameState = handleGameState[gameState.currentState];
+    const updateGameState = handleGameState[gameInstance.gameState.currentState];
     if (updateGameState) updateGameState();
     requestAnimationFrame(gameLoop);
   }
