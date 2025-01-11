@@ -1,3 +1,5 @@
+// gmae/gameStart/gameState.js
+
 import { STATES, ACTIONS } from "../../config/constants.js";
 
 export const gameState = {

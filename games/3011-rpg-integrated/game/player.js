@@ -9,11 +9,10 @@ export function updatePlayer({ keys, gameState, gameObjects }) {
 
   let movement = { player, keys };
   let action = { keys, currentAction };
-  let animation = { gameState };
   let collision = { player, keys, mriMachine, currentState };
 
   handleMovement(movement);
-  currentAction = handleAction(action); // Ensure currentAction is updated
+  currentAction = handleAction(action);
   handleAnimation({ gameState, currentAction });
 
   const collisionResult = handleCollision(collision);
@@ -78,7 +77,7 @@ function handleMovement({ player, keys }) {
   player.y += moveY;
 }
 
-function handleAction({ keys, currentAction }) {
+function handleAction({ keys }) {
   if (keys["ArrowUp"] || keys["ArrowDown"] || keys["ArrowLeft"] || keys["ArrowRight"]) {
     return ACTIONS.WALKING;
   } else {
@@ -93,12 +92,12 @@ function handleAnimation({ gameState, currentAction }) {
   if (currentAction === ACTIONS.WALKING) {
     animationTimer++;
     if (animationTimer >= animationSpeed) {
-      animationTimer = 0; // Reset timer
-      currentFrame = (currentFrame + 1) % WALK_FRAMES; // Loop through frames
+      animationTimer = 0;
+      currentFrame = (currentFrame + 1) % WALK_FRAMES;
     }
   } else {
     animationTimer = 0;
-    currentFrame = 0; // Default to idle frame when not walking
+    currentFrame = 0;
   }
 
   gameState.animationTimer = animationTimer;

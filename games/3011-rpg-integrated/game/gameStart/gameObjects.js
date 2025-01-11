@@ -10,29 +10,54 @@ const loadedImages = {
 export function initGameObjects() {
   const player = createPlayer(100, 100, 32, 32, 4, DIRECTION.DOWN, "player");
 
-  const mriMachine = createGameObject(130, 130, 64, 64, "mri", {
-    sourceX: 0,
-    sourceY: 0,
-    sourceWidth: 556,
-    sourceHeight: 449,
-    destinationX: 0,
-    destinationY: 0,
-    destinationWidth: 32,
-    destinationHeight: 32,
-  });
+  const mriMachine = new GameObject(
+    {
+      imageKey: "mri",
+      imgSourceX: 0,
+      imgSourceY: 0,
+      imgSourceWidth: 556,
+      imgSourceHeight: 449,
+      imgDestinationX: 0,
+      imgDestinationY: 0,
+      imgDestinationWidth: 32,
+      imgDestinationHeight: 32,
+    },
+    130,
+    130,
+    64,
+    64
+  );
 
-  const xrayMachine = createGameObject(70, 130, 32, 32, "mri", {
-    sourceX: 0,
-    sourceY: 0,
-    sourceWidth: 556,
-    sourceHeight: 449,
-    destinationX: 0,
-    destinationY: 0,
-    destinationWidth: 32,
-    destinationHeight: 32,
-  });
+  return { player, mriMachine };
+}
 
-  return { player, mriMachine, xrayMachine };
+class GameObject {
+  constructor(image, x, y, width, height) {
+    // image
+    this.imgPath = loadedImages[image.imageKey];
+    this.imgSourceY = image.imgSourceY;
+    this.imgSourceWidth = image.imgSourceWidth;
+    this.imgSourceX = image.imgSourceX;
+    this.imgSourceHeight = image.imgSourceHeight;
+    this.imgDestinationX = image.imgDestinationX;
+    this.imgDestinationY = image.imgDestinationY;
+    this.imgDestinationWidth = image.imgDestinationWidth;
+    this.imgDestinationHeight = image.imgDestinationHeight;
+    //
+    this.x = x;
+    this.y = y;
+    this.width = width || 32;
+    this.height = height || 32;
+  }
+
+  draw(ctx, scaleX, scaleY) {
+    const { imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight, imgDestinationX, imgDestinationY, imgDestinationWidth, imgDestinationHeight } = this;
+    const scaledX = this.x * scaleX;
+    const scaledY = this.y * scaleY;
+    const scaledWidth = this.width * scaleX;
+    const scaledHeight = this.height * scaleY;
+    ctx.drawImage(this.imgPath, imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight, scaledX, scaledY, scaledWidth, scaledHeight);
+  }
 }
 
 function loadImage(src) {
@@ -50,19 +75,5 @@ export function createPlayer(x, y, width, height, speed, direction, imageKey) {
     speed,
     direction,
     image: loadedImages[imageKey],
-  };
-}
-
-function createGameObject(x, y, width, height, imageKey, imageConfig, interactCallback) {
-  return {
-    x,
-    y,
-    width,
-    height,
-    image: {
-      imagePath: loadedImages[imageKey],
-      ...imageConfig,
-    },
-    interact: interactCallback || (() => {}),
   };
 }

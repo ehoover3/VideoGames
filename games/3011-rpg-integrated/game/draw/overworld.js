@@ -38,33 +38,10 @@ function drawPlayer(canvas, ctx, player, currentFrame) {
 }
 
 function drawGameObjects({ canvas, ctx, gameObjects }) {
-  let { mriMachine, xrayMachine } = gameObjects;
-  drawGameObject(canvas, ctx, mriMachine);
-  drawGameObject(canvas, ctx, xrayMachine);
-}
-
-function drawGameObject(canvas, ctx, object) {
-  const { sourceX, sourceY, sourceWidth, sourceHeight, destinationX, destinationY, destinationWidth, destinationHeight } = object.image;
-
+  let { mriMachine } = gameObjects;
   const scaleX = canvas.width / 640;
   const scaleY = canvas.height / 360;
-
-  const scaledX = object.x * scaleX;
-  const scaledY = object.y * scaleY;
-  const scaledWidth = object.width * scaleX;
-  const scaledHeight = object.height * scaleY;
-
-  ctx.drawImage(
-    object.image.imagePath, // Correctly pass the Image object
-    sourceX,
-    sourceY,
-    sourceWidth,
-    sourceHeight,
-    scaledX,
-    scaledY,
-    scaledWidth,
-    scaledHeight
-  );
+  mriMachine.draw(ctx, scaleX, scaleY);
 }
 
 export function drawHUD(canvas, ctx, currentState) {
