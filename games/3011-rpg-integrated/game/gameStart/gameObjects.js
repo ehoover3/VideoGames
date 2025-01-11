@@ -2,7 +2,7 @@
 
 import { GameObject } from "./GameObject.js";
 import { DIRECTION } from "../../config/constants.js";
-import { Player } from "./PlayerObject.js"; // Import Player class
+import { Player } from "./Player.js";
 
 const loadedImages = {
   mri: loadImage("assets/images/overworld/mri.png"),

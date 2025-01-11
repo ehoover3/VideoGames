@@ -1,20 +1,7 @@
 // game/gameLoop/scanGame.js
 import { drawHUD_2 } from "../gameStart/HUD.js";
 import { drawText } from "../draw/drawText.js";
-
 import { STATES } from "../../config/constants.js";
-
-export function loadScanGame({ canvas, ctx, keys, gameState, gameObjects }) {
-  const { player } = gameObjects;
-
-  const update = runLogic(keys, player, gameState);
-  Object.assign(gameState, update);
-
-  drawMinigame({ canvas, ctx, gameState });
-  drawHUD_2(canvas, ctx, gameState.currentState);
-}
-
-// game/minigames/medScan/draw.js
 
 const BASE_RESOLUTION = { width: 640, height: 360 };
 const MRI_IMAGE_DIMENSIONS = { width: 458, height: 248 };
@@ -23,7 +10,15 @@ const MRI_IMAGE_Y_OFFSET = 10;
 const PROGRESS_BAR_Y_OFFSET = 270;
 const MIN_FONT_SIZE = 20;
 
-export function drawMinigame({ canvas, ctx, gameState }) {
+export function loadScanGame({ canvas, ctx, keys, gameState, gameObjects }) {
+  const { player } = gameObjects;
+  const update = runLogic(keys, player, gameState);
+  Object.assign(gameState, update);
+  drawMinigame({ canvas, ctx, gameState });
+  drawHUD_2(canvas, ctx, gameState.currentState);
+}
+
+function drawMinigame({ canvas, ctx, gameState }) {
   let { scanProgress, maxScanProgress } = gameState;
   const mriImg = new Image();
   mriImg.src = "assets/images/scanGame/mri.png";
@@ -78,9 +73,7 @@ function drawScanCompleteMessage(canvas, ctx) {
   drawText(ctx, "Scanning Complete! Press SPACE to return.", canvas.width / 2, PROGRESS_BAR_Y_OFFSET * (canvas.height / BASE_RESOLUTION.height), "center", scaledFontSize);
 }
 
-// game/minigames/medScan/logic.js
-
-export function runLogic(keys, player, gameState) {
+function runLogic(keys, player, gameState) {
   let scanning = gameState.scanning;
   let scanProgress = gameState.scanProgress;
   let maxScanProgress = gameState.maxScanProgress;
