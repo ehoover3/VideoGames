@@ -4,7 +4,7 @@ import { startGame } from "./game/index.js";
 import { initGameObjects } from "./game/Game.js";
 import { gameState } from "./game/Game.js";
 
-export const ASPECT_RATIO = 16 / 9;
+const ASPECT_RATIO = 16 / 9;
 const { canvas, ctx } = setupCanvas("gameCanvas");
 const keys = setupKeyboard();
 const gameObjects = initGameObjects();

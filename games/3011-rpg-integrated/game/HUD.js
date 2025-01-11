@@ -23,11 +23,6 @@ export default class HUD {
   }
 }
 
-export function drawHUD(canvas, ctx, currentState) {
-  const hud = new HUD(canvas, ctx);
-  hud.draw(currentState);
-}
-
 export function drawHUD2(canvas, ctx, currentState) {
   const scaleY = canvas.height / 360;
 
