@@ -1,7 +1,11 @@
 // game/NPC.js
 export default class NPC {
-  constructor({ image, x, y, width, height, interactionText }) {
-    this.image = image;
+  constructor({ imgPath, imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight, x, y, width = 32, height = 32, interactionText }) {
+    this.imgPath = imgPath;
+    this.imgSourceX = imgSourceX;
+    this.imgSourceY = imgSourceY;
+    this.imgSourceWidth = imgSourceWidth;
+    this.imgSourceHeight = imgSourceHeight;
     this.x = x;
     this.y = y;
     this.width = width;
@@ -9,13 +13,19 @@ export default class NPC {
     this.interactionText = interactionText;
   }
 
-  draw(ctx, scaleX, scaleY) {
-    const scaledX = this.x * scaleX;
-    const scaledY = this.y * scaleY;
-    const scaledWidth = this.width * scaleX;
-    const scaledHeight = this.height * scaleY;
+  getScaledDimensions(scaleX, scaleY) {
+    return {
+      scaledX: this.x * scaleX,
+      scaledY: this.y * scaleY,
+      scaledWidth: this.width * scaleX,
+      scaledHeight: this.height * scaleY,
+    };
+  }
 
-    ctx.drawImage(this.image, 0, 0, this.width, this.height, scaledX, scaledY, scaledWidth, scaledHeight);
+  draw(ctx, scaleX, scaleY) {
+    const { imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight } = this;
+    const { scaledX, scaledY, scaledWidth, scaledHeight } = this.getScaledDimensions(scaleX, scaleY);
+    ctx.drawImage(this.imgPath, imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight, scaledX, scaledY, scaledWidth, scaledHeight);
   }
 
   interact() {

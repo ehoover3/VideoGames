@@ -1,5 +1,10 @@
-I have an image in assets/images/overworld/dog.png.
-I want the player to be able to pet the dog by pressing the spacebar, then the dog says "Woof woof!"
+NPC.js:28 Uncaught TypeError: Failed to execute 'drawImage' on 'CanvasRenderingContext2D': The provided value is not of type '(CSSImageValue or HTMLCanvasElement or HTMLImageElement or HTMLVideoElement or ImageBitmap or OffscreenCanvas or SVGImageElement or VideoFrame)'.
+    at NPC.draw (NPC.js:28:9)
+    at Overworld.drawGameObjects (Overworld.js:45:9)
+    at Overworld.draw (Overworld.js:31:10)
+    at Overworld.load (Overworld.js:25:10)
+    at overworld (GameEngine.js:42:48)
+    at gameLoop (GameEngine.js:71:26)
 
 // index.js
 import GameEngine from "./game/GameEngine.js";
@@ -51,7 +56,7 @@ export default class GameEngine {
       [STATES.OVERWORLD]: () => this.overworld.load(),
       [STATES.SCAN_GAME]: () => this.scanGame.load(),
       [STATES.INVENTORY]: () => {
-        this.inventory.update(); // Added this line to handle keypress logic
+        this.inventory.update();
         this.inventory.draw();
         this.hud.draw(this.gameInstance.gameState.currentState);
       },
@@ -86,6 +91,7 @@ export default class GameEngine {
     this.gameLoop();
   }
 }
+
 
 // game/Game.js
 import { ACTIONS, STATES } from "../config/constants.js";
@@ -367,7 +373,7 @@ export default class Player {
 
   handleAnimation(gameState, currentAction) {
     const WALK_FRAMES = FRAME_SETTINGS.WALK_FRAMES;
-    const ANIMATION_SPEED = 8; // Added constant for animation speed
+    const ANIMATION_SPEED = 8;
 
     if (currentAction === ACTIONS.WALKING) {
       this.animationTimer++;
@@ -382,7 +388,12 @@ export default class Player {
     gameState.currentFrame = this.currentFrame;
   }
 
-  handleCollision(keys, mriMachine, currentState) {
+  handleCollision(keys, dog, mriMachine, currentState) {
+    if (this.checkCollisionWithGameObject(dog) && keys[" "]) {
+      console.log(dog.interact());
+      return null;
+    }
+
     if (this.checkCollisionWithGameObject(mriMachine) && keys[" "]) {
       return {
         savedPlayerPosition: { x: this.x, y: this.y },
@@ -414,7 +425,7 @@ export default class Player {
   drawPlayer(canvas, ctx, currentFrame) {
     const { FRAME_WIDTH, FRAME_HEIGHT } = FRAME_SETTINGS;
     const spriteRow = DIRECTIONS[this.direction];
-    const sourceX = this.currentFrame * FRAME_WIDTH; // Use instance's currentFrame
+    const sourceX = this.currentFrame * FRAME_WIDTH;
     const sourceY = spriteRow * FRAME_HEIGHT;
 
     const scaleX = canvas.width / 640;
@@ -438,13 +449,13 @@ export default class Player {
     }
 
     let { currentAction, currentState, previousState, savedPlayerPosition } = gameState;
-    const { mriMachine } = gameObjects;
+    const { dog, mriMachine } = gameObjects;
 
     const isMoving = this.handleMovement(keys);
     currentAction = isMoving ? ACTIONS.WALKING : ACTIONS.IDLE;
     this.handleAnimation(gameState, currentAction);
 
-    const collisionResult = this.handleCollision(keys, mriMachine, currentState);
+    const collisionResult = this.handleCollision(keys, dog, mriMachine, currentState);
 
     if (collisionResult) {
       savedPlayerPosition = collisionResult.savedPlayerPosition;
@@ -469,10 +480,15 @@ export default class Player {
 }
 
 
+
 // game/NPC.js
 export default class NPC {
-    constructor({ image, x, y, width, height, interactionText }) {
-      this.image = image;
+    constructor({ imgPath, imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight, x, y, width = 32, height = 32, interactionText }) {
+      this.imgPath = imgPath;
+      this.imgSourceX = imgSourceX;
+      this.imgSourceY = imgSourceY;
+      this.imgSourceWidth = imgSourceWidth;
+      this.imgSourceHeight = imgSourceHeight;
       this.x = x;
       this.y = y;
       this.width = width;
@@ -480,17 +496,24 @@ export default class NPC {
       this.interactionText = interactionText;
     }
   
-    draw(ctx, scaleX, scaleY) {
-      const scaledX = this.x * scaleX;
-      const scaledY = this.y * scaleY;
-      const scaledWidth = this.width * scaleX;
-      const scaledHeight = this.height * scaleY;
+    getScaledDimensions(scaleX, scaleY) {
+      return {
+        scaledX: this.x * scaleX,
+        scaledY: this.y * scaleY,
+        scaledWidth: this.width * scaleX,
+        scaledHeight: this.height * scaleY,
+      };
+    }
   
-      ctx.drawImage(this.image, 0, 0, this.width, this.height, scaledX, scaledY, scaledWidth, scaledHeight);
+    draw(ctx, scaleX, scaleY) {
+      const { imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight } = this;
+      const { scaledX, scaledY, scaledWidth, scaledHeight } = this.getScaledDimensions(scaleX, scaleY);
+      ctx.drawImage(this.imgPath, imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight, scaledX, scaledY, scaledWidth, scaledHeight);
     }
   
     interact() {
       return this.interactionText;
     }
   }
+  
   

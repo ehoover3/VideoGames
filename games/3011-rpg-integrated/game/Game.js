@@ -53,7 +53,11 @@ export default class Game {
     });
 
     const dog = new NPC({
-      image: this.loadedImages["dog"],
+      imgPath: this.loadedImages["dog"],
+      imgSourceX: 0,
+      imgSourceY: 0,
+      imgSourceWidth: 489,
+      imgSourceHeight: 510,
       x: 50,
       y: 50,
       width: 32,
