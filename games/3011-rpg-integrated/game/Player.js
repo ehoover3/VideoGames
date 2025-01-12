@@ -79,7 +79,7 @@ export default class Player {
 
   handleAnimation(gameState, currentAction) {
     const WALK_FRAMES = FRAME_SETTINGS.WALK_FRAMES;
-    const ANIMATION_SPEED = 8; // Added constant for animation speed
+    const ANIMATION_SPEED = 8;
 
     if (currentAction === ACTIONS.WALKING) {
       this.animationTimer++;
@@ -131,7 +131,7 @@ export default class Player {
   drawPlayer(canvas, ctx, currentFrame) {
     const { FRAME_WIDTH, FRAME_HEIGHT } = FRAME_SETTINGS;
     const spriteRow = DIRECTIONS[this.direction];
-    const sourceX = this.currentFrame * FRAME_WIDTH; // Use instance's currentFrame
+    const sourceX = this.currentFrame * FRAME_WIDTH;
     const sourceY = spriteRow * FRAME_HEIGHT;
 
     const scaleX = canvas.width / 640;
