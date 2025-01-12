@@ -32,7 +32,21 @@ export default class HUD {
     const font = `${Math.floor(this.fontSize)}px Arial`;
     const textY = this.canvas.height - this.hudHeight / 2 + this.fontSize / 3;
 
-    const hudText = currentState === STATES.OVERWORLD ? "Arrow Keys to Move | Space to Interact | ESC for Main Menu" : "Hold SPACE to Scan | X to Exit | ESC for Main Menu";
+    let hudText;
+    switch (currentState) {
+      case STATES.OVERWORLD:
+        hudText = "Arrow Keys to Move | Space to Interact | ESC for Main Menu";
+        break;
+      case STATES.SCAN_GAME:
+        hudText = "Hold SPACE to Scan | X to Exit | ESC for Main Menu";
+        break;
+      case STATES.INVENTORY:
+        hudText = "X to Return to Overworld | ESC for Main Menu";
+        break;
+      default:
+        hudText = "ESC for Main Menu";
+    }
+
     drawText(this.ctx, hudText, this.canvas.width / 2, textY, font, "black", "center");
   }
 }

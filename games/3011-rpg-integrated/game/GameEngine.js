@@ -1,10 +1,11 @@
 // game/GameEngine.js
-
 import { STATES } from "../config/constants.js";
 import Game from "./Game.js";
 import MedScanGame from "./MedScanGame.js";
 import Menu from "./Menu.js";
 import Overworld from "./Overworld.js";
+import Inventory from "./Inventory.js";
+import HUD from "./HUD.js";
 
 export default class GameEngine {
   constructor(canvasId) {
@@ -33,11 +34,17 @@ export default class GameEngine {
     this.menu = new Menu(this.canvas, this.ctx, this.keys, this.gameInstance.gameState);
     this.overworld = new Overworld(this.canvas, this.ctx, this.keys, this.gameInstance.gameState, this.gameInstance.gameObjects);
     this.scanGame = new MedScanGame(this.canvas, this.ctx, this.keys, this.gameInstance.gameState, this.gameInstance.gameObjects);
+    this.inventory = new Inventory(this.canvas, this.ctx, this.keys, this.gameInstance.gameState);
+    this.hud = new HUD(this.canvas, this.ctx);
 
     this.handleGameState = {
       [STATES.MAIN_MENU]: () => this.menu.load(),
       [STATES.OVERWORLD]: () => this.overworld.load(),
       [STATES.SCAN_GAME]: () => this.scanGame.load(),
+      [STATES.INVENTORY]: () => {
+        this.inventory.draw();
+        this.hud.draw(this.gameInstance.gameState.currentState);
+      },
     };
   }
 
