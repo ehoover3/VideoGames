@@ -42,6 +42,7 @@ export default class GameEngine {
       [STATES.OVERWORLD]: () => this.overworld.load(),
       [STATES.SCAN_GAME]: () => this.scanGame.load(),
       [STATES.INVENTORY]: () => {
+        this.inventory.update(); // Added this line to handle keypress logic
         this.inventory.draw();
         this.hud.draw(this.gameInstance.gameState.currentState);
       },

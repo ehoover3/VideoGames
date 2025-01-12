@@ -141,6 +141,7 @@ export default class GameEngine {
 }
 
 
+
 // game/GameObject.js
 export default class GameObject {
     constructor({ imgPath, imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight, x, y, width = 32, height = 32 }) {
@@ -249,7 +250,8 @@ export default class Inventory {
 
   update() {
     if (this.keys["x"] || this.keys["X"]) {
-      this.gameState.currentState = STATES.OVERWORLD;
+      this.gameState.previousState = this.gameState.currentState; // Save the current state as previous
+      this.gameState.currentState = STATES.OVERWORLD; // Transition to the overworld
       this.keys["x"] = false;
       this.keys["X"] = false;
     }
@@ -303,6 +305,7 @@ export default class Inventory {
     }
   }
 }
+
 
 
 // game/Overworld.js
