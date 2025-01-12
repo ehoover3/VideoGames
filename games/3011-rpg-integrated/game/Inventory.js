@@ -24,10 +24,16 @@ export default class Inventory {
 
   update() {
     if (this.keys["x"] || this.keys["X"]) {
-      this.gameState.previousState = this.gameState.currentState; // Save the current state as previous
-      this.gameState.currentState = STATES.OVERWORLD; // Transition to the overworld
+      this.gameState.previousState = this.gameState.currentState;
+      this.gameState.currentState = STATES.OVERWORLD;
       this.keys["x"] = false;
       this.keys["X"] = false;
+    }
+
+    if (this.keys["Escape"]) {
+      this.gameState.previousState = this.gameState.currentState;
+      this.gameState.currentState = STATES.MAIN_MENU;
+      this.keys["Escape"] = false;
     }
   }
 
