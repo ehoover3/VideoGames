@@ -35,7 +35,7 @@ export default class HUD {
     let hudText;
     switch (currentState) {
       case STATES.OVERWORLD:
-        hudText = "Arrow Keys to Move | Space to Interact | ESC for Main Menu";
+        hudText = "Arrow Keys to Move | Space to Interact | I for Inventory | ESC for Main Menu";
         break;
       case STATES.SCAN_GAME:
         hudText = "Hold SPACE to Scan | X to Exit | ESC for Main Menu";
