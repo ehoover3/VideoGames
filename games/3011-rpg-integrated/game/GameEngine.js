@@ -1,0 +1,75 @@
+import Game from "./Game.js";
+import Menu from "./Menu.js";
+import Overworld from "./Overworld.js";
+import { loadScanGame } from "./MedScanGame.js";
+import { STATES } from "../config/constants.js";
+
+export default class GameEngine {
+  constructor(canvasId) {
+    this.ASPECT_RATIO = 16 / 9;
+    this.setupCanvas(canvasId);
+    this.keys = this.setupKeyboard();
+    this.gameInstance = new Game();
+    this.initializeGameComponents();
+    this.bindEvents();
+  }
+
+  setupCanvas(canvasId) {
+    this.canvas = document.getElementById(canvasId);
+    this.ctx = this.canvas.getContext("2d");
+    this.ctx.imageSmoothingEnabled = false;
+  }
+
+  setupKeyboard() {
+    const keys = {};
+    window.addEventListener("keydown", (e) => (keys[e.key] = true));
+    window.addEventListener("keyup", (e) => (keys[e.key] = false));
+    return keys;
+  }
+
+  initializeGameComponents() {
+    this.menu = new Menu(this.canvas, this.ctx, this.keys, this.gameInstance.gameState);
+    this.overworld = new Overworld(this.canvas, this.ctx, this.keys, this.gameInstance.gameState, this.gameInstance.gameObjects);
+
+    this.handleGameState = {
+      [STATES.MAIN_MENU]: () => this.menu.load(),
+      [STATES.OVERWORLD]: () => this.overworld.load(),
+      [STATES.SCAN_GAME]: () =>
+        loadScanGame({
+          canvas: this.canvas,
+          ctx: this.ctx,
+          keys: this.keys,
+          gameState: this.gameInstance.gameState,
+          gameObjects: this.gameInstance.gameObjects,
+        }),
+    };
+  }
+
+  resizeCanvas = () => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    if (width / height > this.ASPECT_RATIO) {
+      this.canvas.height = height;
+      this.canvas.width = height * this.ASPECT_RATIO;
+    } else {
+      this.canvas.width = width;
+      this.canvas.height = width / this.ASPECT_RATIO;
+    }
+  };
+
+  bindEvents() {
+    window.addEventListener("resize", this.resizeCanvas);
+  }
+
+  gameLoop = () => {
+    const updateGameState = this.handleGameState[this.gameInstance.gameState.currentState];
+    if (updateGameState) updateGameState();
+    requestAnimationFrame(this.gameLoop);
+  };
+
+  start() {
+    this.resizeCanvas();
+    this.gameLoop();
+  }
+}
