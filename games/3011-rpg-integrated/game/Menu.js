@@ -1,7 +1,7 @@
 // game/Menu.js
 
-import { STATES } from "../config/constants.js";
 import { drawText } from "./utils/drawText.js";
+import { STATES } from "../config/constants.js";
 
 const TITLE_HEIGHT_RATIO = 1 / 12;
 const MENU_START_Y_RATIO = 1 / 2.5;

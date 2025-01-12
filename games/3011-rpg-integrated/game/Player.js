@@ -1,7 +1,7 @@
 // game/Player.js
 
-import { STATES } from "../config/constants.js";
 import { ACTIONS, DIRECTION } from "../config/constants.js";
+import { STATES } from "../config/constants.js";
 
 const FRAME_SETTINGS = {
   FRAME_WIDTH: 102,
@@ -17,7 +17,7 @@ const DIRECTIONS = {
   right: 3,
 };
 
-export class Player {
+export default class Player {
   constructor(image, x, y, width, height, speed, direction) {
     this.image = image;
     this.x = x;

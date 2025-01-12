@@ -1,9 +1,9 @@
 // game/Game.js
 
-import { STATES, ACTIONS } from "../config/constants.js";
-import GameObject from "./GameObject.js";
+import { ACTIONS, STATES } from "../config/constants.js";
 import { DIRECTION } from "../config/constants.js";
-import { Player } from "./Player.js";
+import GameObject from "./GameObject.js";
+import Player from "./Player.js";
 
 export default class Game {
   constructor() {
