@@ -26,6 +26,8 @@ export default class Player {
     this.direction = direction;
     this.animationTimer = 0;
     this.currentFrame = 0;
+    this.isInteracting = false;
+    this.interactionMessage = null;
   }
 
   handleMovement(keys) {
@@ -77,6 +79,24 @@ export default class Player {
     }
   }
 
+  handleInteraction(keys, dog) {
+    if (this.checkCollisionWithGameObject(dog) && keys[" "]) {
+      this.isInteracting = true;
+      this.interactionMessage = dog.interact();
+      return this.interactionMessage;
+    }
+    return null;
+  }
+
+  handleEnterKey(keys) {
+    if (keys["Enter"] && this.isInteracting) {
+      this.isInteracting = false;
+      this.interactionMessage = null;
+      return true;
+    }
+    return false;
+  }
+
   handleAnimation(gameState, currentAction) {
     const WALK_FRAMES = FRAME_SETTINGS.WALK_FRAMES;
     const ANIMATION_SPEED = 8;
@@ -96,8 +116,14 @@ export default class Player {
 
   handleCollision(keys, dog, mriMachine, currentState) {
     if (this.checkCollisionWithGameObject(dog) && keys[" "]) {
-      console.log(dog.interact());
-      return null;
+      this.isInteracting = true;
+      this.interactionMessage = dog.interact();
+      return {
+        savedPlayerPosition: { x: this.x, y: this.y },
+        previousState: currentState,
+        currentState: currentState,
+        interactionMessage: this.interactionMessage,
+      };
     }
 
     if (this.checkCollisionWithGameObject(mriMachine) && keys[" "]) {
@@ -107,6 +133,8 @@ export default class Player {
         currentState: STATES.SCAN_GAME,
       };
     }
+
+    return null;
   }
 
   checkCollisionWithGameObject(gameObject) {
@@ -163,10 +191,14 @@ export default class Player {
 
     const collisionResult = this.handleCollision(keys, dog, mriMachine, currentState);
 
-    if (collisionResult) {
-      savedPlayerPosition = collisionResult.savedPlayerPosition;
-      previousState = collisionResult.previousState;
-      currentState = collisionResult.currentState;
+    // Handle Enter key to clear interaction message
+    if (this.handleEnterKey(keys)) {
+      return {
+        currentState,
+        previousState,
+        savedPlayerPosition,
+        interactionMessage: null,
+      };
     }
 
     const escapeKeyResult = this.handleEscapeKeyLogic(keys, currentState, previousState, savedPlayerPosition);
@@ -181,6 +213,7 @@ export default class Player {
       currentState,
       previousState,
       savedPlayerPosition,
+      interactionMessage: this.isInteracting ? this.interactionMessage : null,
     };
   }
 }

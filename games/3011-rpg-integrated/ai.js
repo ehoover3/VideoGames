@@ -1,10 +1,6 @@
-NPC.js:28 Uncaught TypeError: Failed to execute 'drawImage' on 'CanvasRenderingContext2D': The provided value is not of type '(CSSImageValue or HTMLCanvasElement or HTMLImageElement or HTMLVideoElement or ImageBitmap or OffscreenCanvas or SVGImageElement or VideoFrame)'.
-    at NPC.draw (NPC.js:28:9)
-    at Overworld.drawGameObjects (Overworld.js:45:9)
-    at Overworld.draw (Overworld.js:31:10)
-    at Overworld.load (Overworld.js:25:10)
-    at overworld (GameEngine.js:42:48)
-    at gameLoop (GameEngine.js:71:26)
+Instead of console logging "Woof woof!", I want this to render in the HUD.
+When the user presses Enter, the HUD returns to its normal message.
+
 
 // index.js
 import GameEngine from "./game/GameEngine.js";
@@ -148,7 +144,11 @@ export default class Game {
     });
 
     const dog = new NPC({
-      image: this.loadedImages["dog"],
+      imgPath: this.loadedImages["dog"],
+      imgSourceX: 0,
+      imgSourceY: 0,
+      imgSourceWidth: 489,
+      imgSourceHeight: 510,
       x: 50,
       y: 50,
       width: 32,
@@ -159,37 +159,6 @@ export default class Game {
     return { dog, mriMachine, player };
   }
 }
-
-
-// game/GameObject.js
-export default class GameObject {
-    constructor({ imgPath, imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight, x, y, width = 32, height = 32 }) {
-      this.imgPath = imgPath;
-      this.imgSourceX = imgSourceX;
-      this.imgSourceY = imgSourceY;
-      this.imgSourceWidth = imgSourceWidth;
-      this.imgSourceHeight = imgSourceHeight;
-      this.x = x;
-      this.y = y;
-      this.width = width;
-      this.height = height;
-    }
-  
-    getScaledDimensions(scaleX, scaleY) {
-      return {
-        scaledX: this.x * scaleX,
-        scaledY: this.y * scaleY,
-        scaledWidth: this.width * scaleX,
-        scaledHeight: this.height * scaleY,
-      };
-    }
-  
-    draw(ctx, scaleX, scaleY) {
-      const { imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight } = this;
-      const { scaledX, scaledY, scaledWidth, scaledHeight } = this.getScaledDimensions(scaleX, scaleY);
-      ctx.drawImage(this.imgPath, imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight, scaledX, scaledY, scaledWidth, scaledHeight);
-    }
-  }
 
 // game/HUD.js
 import { drawText } from "./utils/drawText.js";
@@ -215,7 +184,7 @@ export default class HUD {
     this.fontSize = Math.max(HUD.MIN_FONT_SIZE * this.scale, HUD.MIN_FONT_SIZE);
   }
 
-  draw(currentState) {
+  draw(currentState, interactionMessage) {
     this.calculateScaling();
 
     this.ctx.fillStyle = "rgba(211, 211, 211, 0.9)";
@@ -225,261 +194,27 @@ export default class HUD {
     const textY = this.canvas.height - this.hudHeight / 2 + this.fontSize / 3;
 
     let hudText;
-    switch (currentState) {
-      case STATES.OVERWORLD:
-        hudText = "Arrow Keys to Move | Space to Interact | I for Inventory | ESC for Main Menu";
-        break;
-      case STATES.SCAN_GAME:
-        hudText = "Hold SPACE to Scan | X to Exit | ESC for Main Menu";
-        break;
-      case STATES.INVENTORY:
-        hudText = "X to Return to Overworld | ESC for Main Menu";
-        break;
-      default:
-        hudText = "ESC for Main Menu";
+    if (interactionMessage) {
+      hudText = interactionMessage; // Display the interaction message
+    } else {
+      switch (currentState) {
+        case STATES.OVERWORLD:
+          hudText = "Arrow Keys to Move | Space to Interact | I for Inventory | ESC for Main Menu";
+          break;
+        case STATES.SCAN_GAME:
+          hudText = "Hold SPACE to Scan | X to Exit | ESC for Main Menu";
+          break;
+        case STATES.INVENTORY:
+          hudText = "X to Return to Overworld | ESC for Main Menu";
+          break;
+        default:
+          hudText = "ESC for Main Menu";
+      }
     }
 
     drawText(this.ctx, hudText, this.canvas.width / 2, textY, font, "black", "center");
   }
 }
-      
-// game/Overworld.js
-import HUD from "./HUD.js";
-
-export default class Overworld {
-  constructor(canvas, ctx, keys, gameState, gameObjects) {
-    this.canvas = canvas;
-    this.ctx = ctx;
-    this.keys = keys;
-    this.gameState = gameState;
-    this.gameObjects = gameObjects;
-    this.hud = new HUD(canvas, ctx);
-  }
-
-  load() {
-    const update = this.gameObjects.player.update({
-      keys: this.keys,
-      gameState: this.gameState,
-      gameObjects: this.gameObjects,
-    });
-
-    this.gameState.currentState = update.currentState;
-    this.gameState.previousState = update.previousState;
-    this.gameState.savedPlayerPosition = update.savedPlayerPosition;
-
-    this.draw();
-    this.hud.draw(this.gameState.currentState);
-  }
-
-  draw() {
-    this.drawWorld();
-    this.drawGameObjects();
-    this.gameObjects.player.drawPlayer(this.canvas, this.ctx, this.gameState.currentFrame);
-  }
-
-  drawWorld() {
-    this.ctx.fillStyle = "darkseagreen";
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-  }
-
-  drawGameObjects() {
-    const { dog, mriMachine } = this.gameObjects;
-    const scaleX = this.canvas.width / 640;
-    const scaleY = this.canvas.height / 360;
-    mriMachine.draw(this.ctx, scaleX, scaleY);
-    dog.draw(this.ctx, scaleX, scaleY);
-  }
-}
-
-
-// game/Player.js
-import { ACTIONS, DIRECTION, STATES } from "../config/constants.js";
-
-const FRAME_SETTINGS = {
-  FRAME_WIDTH: 102,
-  FRAME_HEIGHT: 152.75,
-  WALK_FRAMES: 4,
-  ATTACK_FRAMES: 1,
-};
-
-const DIRECTIONS = {
-  down: 0,
-  up: 1,
-  left: 2,
-  right: 3,
-};
-
-export default class Player {
-  constructor(image, x, y, width, height, speed, direction) {
-    this.image = image;
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.speed = speed;
-    this.direction = direction;
-    this.animationTimer = 0;
-    this.currentFrame = 0;
-  }
-
-  handleMovement(keys) {
-    let isMoving = false;
-    let moveX = 0,
-      moveY = 0;
-
-    if (keys["ArrowUp"]) {
-      moveY -= 1;
-      this.direction = DIRECTION.UP;
-      isMoving = true;
-    }
-    if (keys["ArrowDown"]) {
-      moveY += 1;
-      this.direction = DIRECTION.DOWN;
-      isMoving = true;
-    }
-    if (keys["ArrowLeft"]) {
-      moveX -= 1;
-      this.direction = DIRECTION.LEFT;
-      isMoving = true;
-    }
-    if (keys["ArrowRight"]) {
-      moveX += 1;
-      this.direction = DIRECTION.RIGHT;
-      isMoving = true;
-    }
-
-    if (moveX !== 0 && moveY !== 0) {
-      const SQUARE_ROOT_OF_TWO = 1.4142;
-      const diagonalSpeed = (SQUARE_ROOT_OF_TWO / 2) * this.speed;
-      moveX *= diagonalSpeed;
-      moveY *= diagonalSpeed;
-    } else {
-      moveX *= this.speed;
-      moveY *= this.speed;
-    }
-
-    this.x += moveX;
-    this.y += moveY;
-    return isMoving;
-  }
-
-  handleAction(keys) {
-    if (keys["ArrowUp"] || keys["ArrowDown"] || keys["ArrowLeft"] || keys["ArrowRight"]) {
-      return ACTIONS.WALKING;
-    } else {
-      return ACTIONS.IDLE;
-    }
-  }
-
-  handleAnimation(gameState, currentAction) {
-    const WALK_FRAMES = FRAME_SETTINGS.WALK_FRAMES;
-    const ANIMATION_SPEED = 8;
-
-    if (currentAction === ACTIONS.WALKING) {
-      this.animationTimer++;
-      if (this.animationTimer >= ANIMATION_SPEED) {
-        this.animationTimer = 0;
-        this.currentFrame = (this.currentFrame + 1) % WALK_FRAMES;
-      }
-    } else {
-      this.animationTimer = 0;
-      this.currentFrame = 0;
-    }
-    gameState.currentFrame = this.currentFrame;
-  }
-
-  handleCollision(keys, dog, mriMachine, currentState) {
-    if (this.checkCollisionWithGameObject(dog) && keys[" "]) {
-      console.log(dog.interact());
-      return null;
-    }
-
-    if (this.checkCollisionWithGameObject(mriMachine) && keys[" "]) {
-      return {
-        savedPlayerPosition: { x: this.x, y: this.y },
-        previousState: currentState,
-        currentState: STATES.SCAN_GAME,
-      };
-    }
-  }
-
-  checkCollisionWithGameObject(gameObject) {
-    return this.x < gameObject.x + gameObject.width && this.x + this.width > gameObject.x && this.y < gameObject.y + gameObject.height && this.y + this.height > gameObject.y;
-  }
-
-  handleEscapeKeyLogic(keys, currentState, previousState, savedPlayerPosition) {
-    if (keys["Escape"]) {
-      return {
-        savedPlayerPosition: { x: this.x, y: this.y },
-        previousState: currentState,
-        currentState: STATES.MAIN_MENU,
-      };
-    }
-    return {
-      savedPlayerPosition: savedPlayerPosition,
-      previousState: previousState,
-      currentState: currentState,
-    };
-  }
-
-  drawPlayer(canvas, ctx, currentFrame) {
-    const { FRAME_WIDTH, FRAME_HEIGHT } = FRAME_SETTINGS;
-    const spriteRow = DIRECTIONS[this.direction];
-    const sourceX = this.currentFrame * FRAME_WIDTH;
-    const sourceY = spriteRow * FRAME_HEIGHT;
-
-    const scaleX = canvas.width / 640;
-    const scaleY = canvas.height / 360;
-
-    const scaledX = this.x * scaleX;
-    const scaledY = this.y * scaleY;
-    const scaledWidth = this.width * scaleX;
-    const scaledHeight = this.height * scaleY;
-
-    ctx.drawImage(this.image, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, scaledX, scaledY, scaledWidth, scaledHeight);
-  }
-
-  update({ keys, gameState, gameObjects }) {
-    if (keys["i"] || keys["I"]) {
-      return {
-        savedPlayerPosition: { x: this.x, y: this.y },
-        previousState: gameState.currentState,
-        currentState: STATES.INVENTORY,
-      };
-    }
-
-    let { currentAction, currentState, previousState, savedPlayerPosition } = gameState;
-    const { dog, mriMachine } = gameObjects;
-
-    const isMoving = this.handleMovement(keys);
-    currentAction = isMoving ? ACTIONS.WALKING : ACTIONS.IDLE;
-    this.handleAnimation(gameState, currentAction);
-
-    const collisionResult = this.handleCollision(keys, dog, mriMachine, currentState);
-
-    if (collisionResult) {
-      savedPlayerPosition = collisionResult.savedPlayerPosition;
-      previousState = collisionResult.previousState;
-      currentState = collisionResult.currentState;
-    }
-
-    const escapeKeyResult = this.handleEscapeKeyLogic(keys, currentState, previousState, savedPlayerPosition);
-
-    if (escapeKeyResult) {
-      savedPlayerPosition = escapeKeyResult.savedPlayerPosition;
-      previousState = escapeKeyResult.previousState;
-      currentState = escapeKeyResult.currentState;
-    }
-
-    return {
-      currentState,
-      previousState,
-      savedPlayerPosition,
-    };
-  }
-}
-
-
 
 // game/NPC.js
 export default class NPC {
@@ -515,5 +250,260 @@ export default class NPC {
       return this.interactionText;
     }
   }
+
   
+  // game/Overworld.js
+  import HUD from "./HUD.js";
+  
+  export default class Overworld {
+    constructor(canvas, ctx, keys, gameState, gameObjects) {
+      this.canvas = canvas;
+      this.ctx = ctx;
+      this.keys = keys;
+      this.gameState = gameState;
+      this.gameObjects = gameObjects;
+      this.hud = new HUD(canvas, ctx);
+    }
+  
+    load() {
+      const update = this.gameObjects.player.update({
+        keys: this.keys,
+        gameState: this.gameState,
+        gameObjects: this.gameObjects,
+      });
+  
+      this.gameState.currentState = update.currentState;
+      this.gameState.previousState = update.previousState;
+      this.gameState.savedPlayerPosition = update.savedPlayerPosition;
+  
+      this.draw(update.interactionMessage);
+      this.hud.draw(this.gameState.currentState, update.interactionMessage);
+    }
+  
+    draw() {
+      this.drawWorld();
+      this.drawGameObjects();
+      this.gameObjects.player.drawPlayer(this.canvas, this.ctx, this.gameState.currentFrame);
+    }
+  
+    drawWorld() {
+      this.ctx.fillStyle = "darkseagreen";
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+  
+    drawGameObjects() {
+      const { dog, mriMachine } = this.gameObjects;
+      const scaleX = this.canvas.width / 640;
+      const scaleY = this.canvas.height / 360;
+      mriMachine.draw(this.ctx, scaleX, scaleY);
+      dog.draw(this.ctx, scaleX, scaleY);
+    }
+  }
+  
+  // game/Player.js
+  import { ACTIONS, DIRECTION, STATES } from "../config/constants.js";
+  
+  const FRAME_SETTINGS = {
+    FRAME_WIDTH: 102,
+    FRAME_HEIGHT: 152.75,
+    WALK_FRAMES: 4,
+    ATTACK_FRAMES: 1,
+  };
+  
+  const DIRECTIONS = {
+    down: 0,
+    up: 1,
+    left: 2,
+    right: 3,
+  };
+  
+  export default class Player {
+    constructor(image, x, y, width, height, speed, direction) {
+      this.image = image;
+      this.x = x;
+      this.y = y;
+      this.width = width;
+      this.height = height;
+      this.speed = speed;
+      this.direction = direction;
+      this.animationTimer = 0;
+      this.currentFrame = 0;
+      this.isInteracting = false;
+    }
+  
+    handleMovement(keys) {
+      let isMoving = false;
+      let moveX = 0,
+        moveY = 0;
+  
+      if (keys["ArrowUp"]) {
+        moveY -= 1;
+        this.direction = DIRECTION.UP;
+        isMoving = true;
+      }
+      if (keys["ArrowDown"]) {
+        moveY += 1;
+        this.direction = DIRECTION.DOWN;
+        isMoving = true;
+      }
+      if (keys["ArrowLeft"]) {
+        moveX -= 1;
+        this.direction = DIRECTION.LEFT;
+        isMoving = true;
+      }
+      if (keys["ArrowRight"]) {
+        moveX += 1;
+        this.direction = DIRECTION.RIGHT;
+        isMoving = true;
+      }
+  
+      if (moveX !== 0 && moveY !== 0) {
+        const SQUARE_ROOT_OF_TWO = 1.4142;
+        const diagonalSpeed = (SQUARE_ROOT_OF_TWO / 2) * this.speed;
+        moveX *= diagonalSpeed;
+        moveY *= diagonalSpeed;
+      } else {
+        moveX *= this.speed;
+        moveY *= this.speed;
+      }
+  
+      this.x += moveX;
+      this.y += moveY;
+      return isMoving;
+    }
+  
+    handleAction(keys) {
+      if (keys["ArrowUp"] || keys["ArrowDown"] || keys["ArrowLeft"] || keys["ArrowRight"]) {
+        return ACTIONS.WALKING;
+      } else {
+        return ACTIONS.IDLE;
+      }
+    }
+  
+    handleInteraction(keys, dog) {
+      if (this.checkCollisionWithGameObject(dog) && keys[" "]) {
+        // Start interaction when space is pressed near dog
+        this.isInteracting = true;
+        return dog.interact();
+      }
+      return null;
+    }
+  
+    handleEnterKey(keys) {
+      // If Enter key is pressed, return to the normal HUD message
+      if (keys["Enter"]) {
+        this.isInteracting = false;
+      }
+    }
+  
+    handleAnimation(gameState, currentAction) {
+      const WALK_FRAMES = FRAME_SETTINGS.WALK_FRAMES;
+      const ANIMATION_SPEED = 8;
+  
+      if (currentAction === ACTIONS.WALKING) {
+        this.animationTimer++;
+        if (this.animationTimer >= ANIMATION_SPEED) {
+          this.animationTimer = 0;
+          this.currentFrame = (this.currentFrame + 1) % WALK_FRAMES;
+        }
+      } else {
+        this.animationTimer = 0;
+        this.currentFrame = 0;
+      }
+      gameState.currentFrame = this.currentFrame;
+    }
+  
+    handleCollision(keys, dog, mriMachine, currentState) {
+      if (this.checkCollisionWithGameObject(dog) && keys[" "]) {
+        console.log(dog.interact());
+        return null;
+      }
+  
+      if (this.checkCollisionWithGameObject(mriMachine) && keys[" "]) {
+        return {
+          savedPlayerPosition: { x: this.x, y: this.y },
+          previousState: currentState,
+          currentState: STATES.SCAN_GAME,
+        };
+      }
+    }
+  
+    checkCollisionWithGameObject(gameObject) {
+      return this.x < gameObject.x + gameObject.width && this.x + this.width > gameObject.x && this.y < gameObject.y + gameObject.height && this.y + this.height > gameObject.y;
+    }
+  
+    handleEscapeKeyLogic(keys, currentState, previousState, savedPlayerPosition) {
+      if (keys["Escape"]) {
+        return {
+          savedPlayerPosition: { x: this.x, y: this.y },
+          previousState: currentState,
+          currentState: STATES.MAIN_MENU,
+        };
+      }
+      return {
+        savedPlayerPosition: savedPlayerPosition,
+        previousState: previousState,
+        currentState: currentState,
+      };
+    }
+  
+    drawPlayer(canvas, ctx, currentFrame) {
+      const { FRAME_WIDTH, FRAME_HEIGHT } = FRAME_SETTINGS;
+      const spriteRow = DIRECTIONS[this.direction];
+      const sourceX = this.currentFrame * FRAME_WIDTH;
+      const sourceY = spriteRow * FRAME_HEIGHT;
+  
+      const scaleX = canvas.width / 640;
+      const scaleY = canvas.height / 360;
+  
+      const scaledX = this.x * scaleX;
+      const scaledY = this.y * scaleY;
+      const scaledWidth = this.width * scaleX;
+      const scaledHeight = this.height * scaleY;
+  
+      ctx.drawImage(this.image, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, scaledX, scaledY, scaledWidth, scaledHeight);
+    }
+  
+    update({ keys, gameState, gameObjects }) {
+      if (keys["i"] || keys["I"]) {
+        return {
+          savedPlayerPosition: { x: this.x, y: this.y },
+          previousState: gameState.currentState,
+          currentState: STATES.INVENTORY,
+        };
+      }
+  
+      let { currentAction, currentState, previousState, savedPlayerPosition } = gameState;
+      const { dog, mriMachine } = gameObjects;
+  
+      const isMoving = this.handleMovement(keys);
+      currentAction = isMoving ? ACTIONS.WALKING : ACTIONS.IDLE;
+      this.handleAnimation(gameState, currentAction);
+  
+      const collisionResult = this.handleCollision(keys, dog, mriMachine, currentState);
+  
+      if (collisionResult) {
+        savedPlayerPosition = collisionResult.savedPlayerPosition;
+        previousState = collisionResult.previousState;
+        currentState = collisionResult.currentState;
+      }
+  
+      this.handleEnterKey(keys);
+  
+      const escapeKeyResult = this.handleEscapeKeyLogic(keys, currentState, previousState, savedPlayerPosition);
+  
+      if (escapeKeyResult) {
+        savedPlayerPosition = escapeKeyResult.savedPlayerPosition;
+        previousState = escapeKeyResult.previousState;
+        currentState = escapeKeyResult.currentState;
+      }
+  
+      return {
+        currentState,
+        previousState,
+        savedPlayerPosition,
+        interactionMessage: collisionResult ? collisionResult.interactionMessage : null, // Pass interaction message
+      };
+    }
+  }
   

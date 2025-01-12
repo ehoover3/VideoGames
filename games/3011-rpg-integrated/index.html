@@ -10,44 +10,9 @@
         margin: 0 auto;
         border: 2px solid black;
       }
-      .scanner {
-        position: absolute;
-        width: 200px;
-        height: 60px;
-        border: 3px dashed purple;
-        background-color: rgba(255, 255, 255, 0.3);
-        z-index: 2;
-        cursor: grab;
-      }
-      .progress-bar-container {
-        width: 200px;
-        height: 16px;
-        background-color: #ccc;
-        border-radius: 10px;
-        overflow: hidden;
-        margin-top: 10px;
-        position: relative;
-      }
-      .progress-bar {
-        width: 0;
-        height: 100%;
-        background-color: #4caf50;
-        transition: width 0.2s ease;
-        position: absolute;
-      }
-      .progress-label {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: white;
-        font-size: 12px;
-        font-weight: bold;
-      }
     </style>
   </head>
   <body>
-    <!-- <canvas id="gameCanvas" width="640" height="360"></canvas> -->
     <canvas id="gameCanvas"></canvas>
     <script type="module" src="index.js"></script>
   </body>

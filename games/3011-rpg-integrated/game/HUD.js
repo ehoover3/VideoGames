@@ -22,7 +22,7 @@ export default class HUD {
     this.fontSize = Math.max(HUD.MIN_FONT_SIZE * this.scale, HUD.MIN_FONT_SIZE);
   }
 
-  draw(currentState) {
+  draw(currentState, interactionMessage) {
     this.calculateScaling();
 
     this.ctx.fillStyle = "rgba(211, 211, 211, 0.9)";
@@ -32,18 +32,22 @@ export default class HUD {
     const textY = this.canvas.height - this.hudHeight / 2 + this.fontSize / 3;
 
     let hudText;
-    switch (currentState) {
-      case STATES.OVERWORLD:
-        hudText = "Arrow Keys to Move | Space to Interact | I for Inventory | ESC for Main Menu";
-        break;
-      case STATES.SCAN_GAME:
-        hudText = "Hold SPACE to Scan | X to Exit | ESC for Main Menu";
-        break;
-      case STATES.INVENTORY:
-        hudText = "X to Return to Overworld | ESC for Main Menu";
-        break;
-      default:
-        hudText = "ESC for Main Menu";
+    if (interactionMessage) {
+      hudText = interactionMessage; // Display the interaction message
+    } else {
+      switch (currentState) {
+        case STATES.OVERWORLD:
+          hudText = "Arrow Keys to Move | Space to Interact | I for Inventory | ESC for Main Menu";
+          break;
+        case STATES.SCAN_GAME:
+          hudText = "Hold SPACE to Scan | X to Exit | ESC for Main Menu";
+          break;
+        case STATES.INVENTORY:
+          hudText = "X to Return to Overworld | ESC for Main Menu";
+          break;
+        default:
+          hudText = "ESC for Main Menu";
+      }
     }
 
     drawText(this.ctx, hudText, this.canvas.width / 2, textY, font, "black", "center");

@@ -22,8 +22,8 @@ export default class Overworld {
     this.gameState.previousState = update.previousState;
     this.gameState.savedPlayerPosition = update.savedPlayerPosition;
 
-    this.draw();
-    this.hud.draw(this.gameState.currentState);
+    this.draw(update.interactionMessage);
+    this.hud.draw(this.gameState.currentState, update.interactionMessage);
   }
 
   draw() {
