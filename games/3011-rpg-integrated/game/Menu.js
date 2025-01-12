@@ -1,5 +1,4 @@
 // game/Menu.js
-
 import { drawText } from "./utils/drawText.js";
 import { STATES } from "../config/constants.js";
 

@@ -1,5 +1,4 @@
 // game/Player.js
-
 import { ACTIONS, DIRECTION, STATES } from "../config/constants.js";
 
 const FRAME_SETTINGS = {
@@ -95,7 +94,12 @@ export default class Player {
     gameState.currentFrame = this.currentFrame;
   }
 
-  handleCollision(keys, mriMachine, currentState) {
+  handleCollision(keys, dog, mriMachine, currentState) {
+    if (this.checkCollisionWithGameObject(dog) && keys[" "]) {
+      console.log(dog.interact());
+      return null;
+    }
+
     if (this.checkCollisionWithGameObject(mriMachine) && keys[" "]) {
       return {
         savedPlayerPosition: { x: this.x, y: this.y },
@@ -151,13 +155,13 @@ export default class Player {
     }
 
     let { currentAction, currentState, previousState, savedPlayerPosition } = gameState;
-    const { mriMachine } = gameObjects;
+    const { dog, mriMachine } = gameObjects;
 
     const isMoving = this.handleMovement(keys);
     currentAction = isMoving ? ACTIONS.WALKING : ACTIONS.IDLE;
     this.handleAnimation(gameState, currentAction);
 
-    const collisionResult = this.handleCollision(keys, mriMachine, currentState);
+    const collisionResult = this.handleCollision(keys, dog, mriMachine, currentState);
 
     if (collisionResult) {
       savedPlayerPosition = collisionResult.savedPlayerPosition;

@@ -1,5 +1,4 @@
 // game/Overworld.js
-
 import HUD from "./HUD.js";
 
 export default class Overworld {
@@ -39,9 +38,10 @@ export default class Overworld {
   }
 
   drawGameObjects() {
-    const { mriMachine } = this.gameObjects;
+    const { dog, mriMachine } = this.gameObjects;
     const scaleX = this.canvas.width / 640;
     const scaleY = this.canvas.height / 360;
     mriMachine.draw(this.ctx, scaleX, scaleY);
+    dog.draw(this.ctx, scaleX, scaleY);
   }
 }

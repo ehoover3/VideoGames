@@ -1,8 +1,8 @@
 // game/Game.js
-
 import { ACTIONS, STATES } from "../config/constants.js";
 import { DIRECTION } from "../config/constants.js";
 import GameObject from "./GameObject.js";
+import NPC from "./NPC.js";
 import Player from "./Player.js";
 
 export default class Game {
@@ -23,6 +23,7 @@ export default class Game {
     };
 
     this.loadedImages = {
+      dog: this.loadImage("assets/images/overworld/dog.png"),
       mri: this.loadImage("assets/images/overworld/mri.png"),
       player: this.loadImage("assets/images/overworld/player.png"),
     };
@@ -51,6 +52,15 @@ export default class Game {
       height: 64,
     });
 
-    return { player, mriMachine };
+    const dog = new NPC({
+      image: this.loadedImages["dog"],
+      x: 50,
+      y: 50,
+      width: 32,
+      height: 32,
+      interactionText: "Woof woof!",
+    });
+
+    return { dog, mriMachine, player };
   }
 }
