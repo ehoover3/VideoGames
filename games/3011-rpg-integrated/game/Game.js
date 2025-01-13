@@ -14,11 +14,11 @@ export default class Game {
     this.ASPECT_RATIO = 16 / 9;
     this.setupCanvas(canvasId);
     this.keys = this.setupKeyboard();
-    this.initializeGameState();
-    this.loadGameAssets();
+    this.startGameState();
+    this.loadImages();
     this.inventory = new Inventory(this.canvas, this.ctx, this.keys, this.gameState);
-    this.gameObjects = this.initGameObjects();
-    this.initializeGameComponents();
+    this.gameObjects = this.getGameObjects();
+    this.startGameComponents();
     this.bindEvents();
     window.gameInstance = this;
   }
@@ -36,7 +36,7 @@ export default class Game {
     return keys;
   }
 
-  initializeGameState() {
+  startGameState() {
     this.gameState = {
       currentState: STATES.MAIN_MENU,
       previousState: STATES.MAIN_MENU,
@@ -53,26 +53,25 @@ export default class Game {
     };
   }
 
-  loadGameAssets() {
-    this.loadedImages = {
-      ball: this.loadImage("assets/images/overworld/tennisBall.png"),
-      dog: this.loadImage("assets/images/overworld/dog.png"),
-      mri: this.loadImage("assets/images/overworld/mri.png"),
-      player: this.loadImage("assets/images/overworld/player.png"),
+  loadImages() {
+    const loadImage = (src) => {
+      const img = new Image();
+      img.src = src;
+      return img;
+    };
+    this.images = {
+      ball: loadImage("assets/images/overworld/tennisBall.png"),
+      dog: loadImage("assets/images/overworld/dog.png"),
+      mri: loadImage("assets/images/overworld/mri.png"),
+      player: loadImage("assets/images/overworld/player.png"),
     };
   }
 
-  loadImage(src) {
-    const img = new Image();
-    img.src = src;
-    return img;
-  }
-
-  initGameObjects() {
-    const player = new Player(this.loadedImages["player"], 100, 100, 32, 32, 4, DIRECTION.DOWN);
+  getGameObjects() {
+    const player = new Player(this.images["player"], 100, 100, 32, 32, 4, DIRECTION.DOWN);
 
     const dog = new NPC({
-      imgPath: this.loadedImages["dog"],
+      imgPath: this.images["dog"],
       imgSourceX: 0,
       imgSourceY: 0,
       imgSourceWidth: 489,
@@ -85,7 +84,7 @@ export default class Game {
     });
 
     const mri = new Item({
-      imgPath: this.loadedImages["mri"],
+      imgPath: this.images["mri"],
       imgSourceX: 0,
       imgSourceY: 0,
       imgSourceWidth: 556,
@@ -98,7 +97,7 @@ export default class Game {
     });
 
     const ball = new Item({
-      imgPath: this.loadedImages["ball"],
+      imgPath: this.images["ball"],
       imgSourceX: 0,
       imgSourceY: 0,
       imgSourceWidth: 155,
@@ -114,16 +113,16 @@ export default class Game {
     return { ball, dog, mri, player };
   }
 
-  initializeGameComponents() {
+  startGameComponents() {
     this.menu = new Menu(this.canvas, this.ctx, this.keys, this.gameState);
     this.overworld = new Overworld(this.canvas, this.ctx, this.keys, this.gameState, this.gameObjects, this.inventory);
-    this.scanGame = new MedScanGame(this.canvas, this.ctx, this.keys, this.gameState, this.gameObjects);
+    this.medScanGame = new MedScanGame(this.canvas, this.ctx, this.keys, this.gameState, this.gameObjects);
     this.hud = new HUD(this.canvas, this.ctx);
 
     this.handleGameState = {
       [STATES.MAIN_MENU]: () => this.menu.load(),
       [STATES.OVERWORLD]: () => this.overworld.load(),
-      [STATES.MED_SCAN_GAME]: () => this.scanGame.load(),
+      [STATES.MED_SCAN_GAME]: () => this.medScanGame.load(),
       [STATES.INVENTORY]: () => {
         this.inventory.update();
         this.inventory.draw();
