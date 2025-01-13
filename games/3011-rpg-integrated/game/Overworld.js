@@ -44,7 +44,10 @@ export default class Overworld {
     const scaleX = this.canvas.width / 640;
     const scaleY = this.canvas.height / 360;
 
-    ball.draw(this.ctx, scaleX, scaleY);
+    if (!ball.isPickedUp) {
+      ball.draw(this.ctx, scaleX, scaleY);
+    }
+    // ball.draw(this.ctx, scaleX, scaleY);
     dog.draw(this.ctx, scaleX, scaleY);
     mri.draw(this.ctx, scaleX, scaleY);
   }
