@@ -19,6 +19,15 @@ export default class Inventory {
     this.selectedSlot = -1;
   }
 
+  load() {
+    this.update(); // Handles input and game state changes
+    this.draw(); // Renders the inventory screen
+    const game = window.gameInstance;
+    if (game) {
+      game.hud.draw(this.gameState.currentState); // Render HUD if needed
+    }
+  }
+
   addItem(item) {
     if (this.items.length < Inventory.TOTAL_SLOTS) {
       this.items.push(item);
