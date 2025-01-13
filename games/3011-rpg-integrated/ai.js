@@ -1,3 +1,9 @@
+// index.js
+import Game from "./game/Game.js";
+
+const gameEngine = new Game("gameCanvas");
+gameEngine.start();
+
 // game/GameEngine.js
 import { STATES } from "../config/constants.js";
 import Game from "./Game.js";

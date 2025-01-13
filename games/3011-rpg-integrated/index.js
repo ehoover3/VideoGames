@@ -1,5 +1,5 @@
 // index.js
-import GameEngine from "./game/GameEngine.js";
+import Game from "./game/Game.js";
 
-const gameEngine = new GameEngine("gameCanvas");
-gameEngine.start();
+const game = new Game("gameCanvas");
+game.start();
