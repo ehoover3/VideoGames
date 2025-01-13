@@ -23,7 +23,9 @@ export default class Overworld {
     this.gameState.savedPlayerPosition = update.savedPlayerPosition;
 
     this.draw(update.interactionMessage);
-    this.hud.draw(this.gameState.currentState, update.interactionMessage);
+    // Pass the interacting NPC if there's an interaction message
+    const interactingNPC = update.interactionMessage ? this.gameObjects.dog : null;
+    this.hud.draw(this.gameState.currentState, update.interactionMessage, interactingNPC);
   }
 
   draw() {
