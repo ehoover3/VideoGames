@@ -23,6 +23,7 @@ export default class Game {
     };
 
     this.loadedImages = {
+      ball: this.loadImage("assets/images/overworld/tennisBall.png"),
       dog: this.loadImage("assets/images/overworld/dog.png"),
       mri: this.loadImage("assets/images/overworld/mri.png"),
       player: this.loadImage("assets/images/overworld/player.png"),
@@ -40,18 +41,6 @@ export default class Game {
   initGameObjects() {
     const player = new Player(this.loadedImages["player"], 100, 100, 32, 32, 4, DIRECTION.DOWN);
 
-    const mri = new GameObject({
-      imgPath: this.loadedImages["mri"],
-      imgSourceX: 0,
-      imgSourceY: 0,
-      imgSourceWidth: 556,
-      imgSourceHeight: 449,
-      x: 130,
-      y: 130,
-      width: 64,
-      height: 64,
-    });
-
     const dog = new NPC({
       imgPath: this.loadedImages["dog"],
       imgSourceX: 0,
@@ -65,6 +54,30 @@ export default class Game {
       interactionText: "Woof woof!",
     });
 
-    return { dog, mri, player };
+    const mri = new GameObject({
+      imgPath: this.loadedImages["mri"],
+      imgSourceX: 0,
+      imgSourceY: 0,
+      imgSourceWidth: 556,
+      imgSourceHeight: 449,
+      x: 130,
+      y: 130,
+      width: 64,
+      height: 64,
+    });
+
+    const ball = new GameObject({
+      imgPath: this.loadedImages["ball"],
+      imgSourceX: 0,
+      imgSourceY: 0,
+      imgSourceWidth: 155,
+      imgSourceHeight: 155,
+      x: 76,
+      y: 130,
+      width: 16,
+      height: 16,
+    });
+
+    return { ball, dog, mri, player };
   }
 }

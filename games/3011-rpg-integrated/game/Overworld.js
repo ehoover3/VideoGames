@@ -40,10 +40,11 @@ export default class Overworld {
   }
 
   drawGameObjects() {
-    const { dog, mri } = this.gameObjects;
+    const { ball, dog, mri } = this.gameObjects;
     const scaleX = this.canvas.width / 640;
     const scaleY = this.canvas.height / 360;
 
+    ball.draw(this.ctx, scaleX, scaleY);
     dog.draw(this.ctx, scaleX, scaleY);
     mri.draw(this.ctx, scaleX, scaleY);
   }
