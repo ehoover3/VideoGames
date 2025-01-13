@@ -1,6 +1,7 @@
 // game/Player.js
 import { DIRECTION, STATES } from "../config/constants.js";
 import GameObject from "./GameObject.js";
+import Inventory from "./Inventory.js";
 
 class Player extends GameObject {
   static FRAME_SETTINGS = {
@@ -123,9 +124,14 @@ class Player extends GameObject {
   }
 
   checkInteractions(keys, gameObjects, currentState) {
-    const { dog, mri } = gameObjects;
+    const { dog, mri, ball } = gameObjects;
 
-    // Using inherited isColliding method
+    const isWithinInteractionDistance = (object) => {
+      const dx = this.x - object.x;
+      const dy = this.y - object.y;
+      return Math.sqrt(dx * dx + dy * dy) <= Inventory.INTERACTION_DISTANCE;
+    };
+
     if (this.isColliding(mri) && keys[" "]) {
       return this.createStateUpdate(currentState, STATES.MED_SCAN_GAME);
     }
@@ -134,6 +140,19 @@ class Player extends GameObject {
       this.interaction.isInteracting = true;
       this.interaction.message = dog.interact();
       return this.createStateUpdate(currentState, currentState, this.interaction.message);
+    }
+
+    if (!ball.isPickedUp && keys[" "] && isWithinInteractionDistance(ball)) {
+      const game = window.gameInstance;
+      if (game && game.getInventory()) {
+        const result = game.getInventory().addItem(ball);
+        if (result.success) {
+          ball.isPickedUp = true;
+          this.interaction.isInteracting = true;
+          this.interaction.message = result.message;
+          return this.createStateUpdate(currentState, currentState, this.interaction.message);
+        }
+      }
     }
 
     return null;

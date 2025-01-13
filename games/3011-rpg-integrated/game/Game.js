@@ -16,9 +16,13 @@ export default class Game {
     this.keys = this.setupKeyboard();
     this.initializeGameState();
     this.loadGameAssets();
+    this.inventory = new Inventory(this.canvas, this.ctx, this.keys, this.gameState);
     this.gameObjects = this.initGameObjects();
     this.initializeGameComponents();
     this.bindEvents();
+
+    // Make the game instance globally accessible
+    window.gameInstance = this;
   }
 
   setupCanvas(canvasId) {
@@ -92,6 +96,7 @@ export default class Game {
       y: 130,
       width: 64,
       height: 64,
+      name: "MRI Machine",
     });
 
     const ball = new Item({
@@ -104,6 +109,8 @@ export default class Game {
       y: 130,
       width: 16,
       height: 16,
+      name: "Tennis Ball",
+      isPickedUp: false,
     });
 
     return { ball, dog, mri, player };
@@ -111,9 +118,8 @@ export default class Game {
 
   initializeGameComponents() {
     this.menu = new Menu(this.canvas, this.ctx, this.keys, this.gameState);
-    this.overworld = new Overworld(this.canvas, this.ctx, this.keys, this.gameState, this.gameObjects);
+    this.overworld = new Overworld(this.canvas, this.ctx, this.keys, this.gameState, this.gameObjects, this.inventory);
     this.scanGame = new MedScanGame(this.canvas, this.ctx, this.keys, this.gameState, this.gameObjects);
-    this.inventory = new Inventory(this.canvas, this.ctx, this.keys, this.gameState);
     this.hud = new HUD(this.canvas, this.ctx);
 
     this.handleGameState = {
@@ -154,5 +160,10 @@ export default class Game {
   start() {
     this.resizeCanvas();
     this.gameLoop();
+  }
+
+  // Method to get the inventory instance
+  getInventory() {
+    return this.inventory;
   }
 }
