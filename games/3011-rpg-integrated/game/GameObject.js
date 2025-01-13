@@ -27,7 +27,6 @@ export default class GameObject {
     };
   }
 
-  // Helper method for collision detection
   getBoundingBox() {
     return {
       x: this.x,
@@ -37,7 +36,6 @@ export default class GameObject {
     };
   }
 
-  // Method to check if this object collides with another game object
   isColliding(otherObject) {
     const box1 = this.getBoundingBox();
     const box2 = otherObject.getBoundingBox();
