@@ -20,8 +20,6 @@ export default class Game {
     this.gameObjects = this.initGameObjects();
     this.initializeGameComponents();
     this.bindEvents();
-
-    // Make the game instance globally accessible
     window.gameInstance = this;
   }
 
@@ -162,7 +160,6 @@ export default class Game {
     this.gameLoop();
   }
 
-  // Method to get the inventory instance
   getInventory() {
     return this.inventory;
   }

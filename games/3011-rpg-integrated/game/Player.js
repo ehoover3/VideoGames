@@ -20,11 +20,10 @@ class Player extends GameObject {
   };
 
   constructor(image, x, y, width, height, speed, direction) {
-    // Call parent constructor with required properties
     super({
       imgPath: image,
-      imgSourceX: 0, // Will be updated in draw method
-      imgSourceY: 0, // Will be updated in draw method
+      imgSourceX: 0,
+      imgSourceY: 0,
       imgSourceWidth: Player.FRAME_SETTINGS.FRAME_WIDTH,
       imgSourceHeight: Player.FRAME_SETTINGS.FRAME_HEIGHT,
       x,
@@ -96,8 +95,8 @@ class Player extends GameObject {
     if (!isMoving) return;
 
     const speed = this.calculateSpeed(x, y);
-    this.x += x * speed; // Using inherited x property
-    this.y += y * speed; // Using inherited y property
+    this.x += x * speed;
+    this.y += y * speed;
   }
 
   calculateSpeed(x, y) {
@@ -160,7 +159,7 @@ class Player extends GameObject {
 
   createStateUpdate(currentState, newState, interactionMessage = null) {
     return {
-      savedPlayerPosition: { x: this.x, y: this.y }, // Using inherited x,y properties
+      savedPlayerPosition: { x: this.x, y: this.y },
       previousState: currentState,
       currentState: newState,
       interactionMessage,
@@ -195,7 +194,6 @@ class Player extends GameObject {
     const { FRAME_WIDTH, FRAME_HEIGHT } = Player.FRAME_SETTINGS;
     const spriteRow = Player.DIRECTIONS[this.movement.direction];
 
-    // Update source coordinates
     this.imgSourceX = this.sprite.frame * FRAME_WIDTH;
     this.imgSourceY = spriteRow * FRAME_HEIGHT;
 
@@ -204,7 +202,6 @@ class Player extends GameObject {
       y: canvas.height / 360,
     };
 
-    // Call parent's draw method with calculated scale
     super.draw(ctx, scale.x, scale.y);
   }
 
