@@ -1,7 +1,7 @@
 // game/Game.js
 import { ACTIONS, STATES } from "../config/constants.js";
 import { DIRECTION } from "../config/constants.js";
-import GameObject from "./GameObject.js";
+import Item from "./Item.js";
 import NPC from "./NPC.js";
 import Player from "./Player.js";
 
@@ -54,7 +54,7 @@ export default class Game {
       interactionText: "Woof woof!",
     });
 
-    const mri = new GameObject({
+    const mri = new Item({
       imgPath: this.loadedImages["mri"],
       imgSourceX: 0,
       imgSourceY: 0,
@@ -66,7 +66,7 @@ export default class Game {
       height: 64,
     });
 
-    const ball = new GameObject({
+    const ball = new Item({
       imgPath: this.loadedImages["ball"],
       imgSourceX: 0,
       imgSourceY: 0,

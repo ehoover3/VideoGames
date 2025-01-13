@@ -1,5 +1,5 @@
-// game/GameObject.js
-export default class GameObject {
+// game/Item.js
+export default class Item {
   constructor({ imgPath, imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight, x, y, width = 32, height = 32 }) {
     this.imgPath = imgPath;
     this.imgSourceX = imgSourceX;

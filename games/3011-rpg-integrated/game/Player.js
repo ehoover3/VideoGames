@@ -1,5 +1,5 @@
 // game/Player.js
-import { ACTIONS, DIRECTION, STATES } from "../config/constants.js";
+import { DIRECTION, STATES } from "../config/constants.js";
 
 class Player {
   static FRAME_SETTINGS = {

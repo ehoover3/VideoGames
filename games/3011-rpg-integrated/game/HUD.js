@@ -66,7 +66,7 @@ export default class HUD {
     } else {
       switch (currentState) {
         case STATES.OVERWORLD:
-          hudText = "Arrow Keys to Move | Space to Interact | I for Inventory | ESC for Main Menu";
+          hudText = "↑ ↓ → ← to Move | Space to Interact | I for Inventory | ESC for Main Menu";
           break;
         case STATES.MED_SCAN_GAME:
           hudText = "Hold SPACE to Scan | X to Exit | ESC for Main Menu";
