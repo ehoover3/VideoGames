@@ -109,7 +109,7 @@ export default class Menu {
 
   handleReturnToGame(previousState, setCurrentState) {
     const stateMap = {
-      [STATES.SCAN_GAME]: STATES.SCAN_GAME,
+      [STATES.MED_SCAN_GAME]: STATES.MED_SCAN_GAME,
     };
     const state = stateMap[previousState] || previousState;
     setCurrentState(state);

@@ -68,7 +68,7 @@ export default class HUD {
         case STATES.OVERWORLD:
           hudText = "Arrow Keys to Move | Space to Interact | I for Inventory | ESC for Main Menu";
           break;
-        case STATES.SCAN_GAME:
+        case STATES.MED_SCAN_GAME:
           hudText = "Hold SPACE to Scan | X to Exit | ESC for Main Menu";
           break;
         case STATES.INVENTORY:

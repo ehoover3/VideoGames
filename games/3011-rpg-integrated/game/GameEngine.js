@@ -40,7 +40,7 @@ export default class GameEngine {
     this.handleGameState = {
       [STATES.MAIN_MENU]: () => this.menu.load(),
       [STATES.OVERWORLD]: () => this.overworld.load(),
-      [STATES.SCAN_GAME]: () => this.scanGame.load(),
+      [STATES.MED_SCAN_GAME]: () => this.scanGame.load(),
       [STATES.INVENTORY]: () => {
         this.inventory.update();
         this.inventory.draw();

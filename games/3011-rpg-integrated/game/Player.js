@@ -115,6 +115,17 @@ export default class Player {
   }
 
   handleCollision(keys, dog, mriMachine, currentState) {
+    // Check MRI machine collision first
+    if (this.checkCollisionWithGameObject(mriMachine) && keys[" "]) {
+      return {
+        savedPlayerPosition: { x: this.x, y: this.y },
+        previousState: currentState,
+        currentState: STATES.MED_SCAN_GAME,
+        interactionMessage: null,
+      };
+    }
+
+    // Then check dog collision
     if (this.checkCollisionWithGameObject(dog) && keys[" "]) {
       this.isInteracting = true;
       this.interactionMessage = dog.interact();
@@ -123,14 +134,6 @@ export default class Player {
         previousState: currentState,
         currentState: currentState,
         interactionMessage: this.interactionMessage,
-      };
-    }
-
-    if (this.checkCollisionWithGameObject(mriMachine) && keys[" "]) {
-      return {
-        savedPlayerPosition: { x: this.x, y: this.y },
-        previousState: currentState,
-        currentState: STATES.SCAN_GAME,
       };
     }
 
@@ -190,6 +193,9 @@ export default class Player {
     this.handleAnimation(gameState, currentAction);
 
     const collisionResult = this.handleCollision(keys, dog, mriMachine, currentState);
+    if (collisionResult) {
+      return collisionResult;
+    }
 
     // Handle Enter key to clear interaction message
     if (this.handleEnterKey(keys)) {
