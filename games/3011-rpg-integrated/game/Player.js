@@ -1,225 +1,225 @@
 // game/Player.js
 import { ACTIONS, DIRECTION, STATES } from "../config/constants.js";
 
-const FRAME_SETTINGS = {
-  FRAME_WIDTH: 102,
-  FRAME_HEIGHT: 152.75,
-  WALK_FRAMES: 4,
-  ATTACK_FRAMES: 1,
-};
+class Player {
+  static FRAME_SETTINGS = {
+    FRAME_WIDTH: 102,
+    FRAME_HEIGHT: 152.75,
+    WALK_FRAMES: 4,
+    ATTACK_FRAMES: 1,
+    ANIMATION_SPEED: 8,
+  };
 
-const DIRECTIONS = {
-  down: 0,
-  up: 1,
-  left: 2,
-  right: 3,
-};
+  static DIRECTIONS = {
+    [DIRECTION.DOWN]: 0,
+    [DIRECTION.UP]: 1,
+    [DIRECTION.LEFT]: 2,
+    [DIRECTION.RIGHT]: 3,
+  };
 
-export default class Player {
   constructor(image, x, y, width, height, speed, direction) {
-    this.image = image;
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.speed = speed;
-    this.direction = direction;
-    this.animationTimer = 0;
-    this.currentFrame = 0;
-    this.isInteracting = false;
-    this.interactionMessage = null;
+    // Sprite and position properties
+    this.sprite = {
+      image,
+      frame: 0,
+      animationTimer: 0,
+    };
+
+    this.position = { x, y };
+    this.dimensions = { width, height };
+    this.movement = {
+      speed,
+      direction,
+      isMoving: false,
+    };
+
+    // Interaction state
+    this.interaction = {
+      isInteracting: false,
+      message: null,
+    };
   }
 
-  handleMovement(keys) {
-    let isMoving = false;
-    let moveX = 0,
-      moveY = 0;
+  move(keys) {
+    const movement = this.calculateMovement(keys);
+    if (!movement.isMoving) return false;
+
+    this.updatePosition(movement);
+    this.movement.direction = movement.direction;
+    return true;
+  }
+
+  calculateMovement(keys) {
+    const movement = {
+      x: 0,
+      y: 0,
+      direction: this.movement.direction,
+      isMoving: false,
+    };
 
     if (keys["ArrowUp"]) {
-      moveY -= 1;
-      this.direction = DIRECTION.UP;
-      isMoving = true;
+      movement.y -= 1;
+      movement.direction = DIRECTION.UP;
+      movement.isMoving = true;
     }
     if (keys["ArrowDown"]) {
-      moveY += 1;
-      this.direction = DIRECTION.DOWN;
-      isMoving = true;
+      movement.y += 1;
+      movement.direction = DIRECTION.DOWN;
+      movement.isMoving = true;
     }
     if (keys["ArrowLeft"]) {
-      moveX -= 1;
-      this.direction = DIRECTION.LEFT;
-      isMoving = true;
+      movement.x -= 1;
+      movement.direction = DIRECTION.LEFT;
+      movement.isMoving = true;
     }
     if (keys["ArrowRight"]) {
-      moveX += 1;
-      this.direction = DIRECTION.RIGHT;
-      isMoving = true;
+      movement.x += 1;
+      movement.direction = DIRECTION.RIGHT;
+      movement.isMoving = true;
     }
 
-    if (moveX !== 0 && moveY !== 0) {
-      const SQUARE_ROOT_OF_TWO = 1.4142;
-      const diagonalSpeed = (SQUARE_ROOT_OF_TWO / 2) * this.speed;
-      moveX *= diagonalSpeed;
-      moveY *= diagonalSpeed;
-    } else {
-      moveX *= this.speed;
-      moveY *= this.speed;
-    }
-
-    this.x += moveX;
-    this.y += moveY;
-    return isMoving;
+    return movement;
   }
 
-  handleAction(keys) {
-    if (keys["ArrowUp"] || keys["ArrowDown"] || keys["ArrowLeft"] || keys["ArrowRight"]) {
-      return ACTIONS.WALKING;
-    } else {
-      return ACTIONS.IDLE;
-    }
+  updatePosition({ x, y, isMoving }) {
+    if (!isMoving) return;
+
+    const speed = this.calculateSpeed(x, y);
+    this.position.x += x * speed;
+    this.position.y += y * speed;
   }
 
-  handleInteraction(keys, dog) {
-    if (this.checkCollisionWithGameObject(dog) && keys[" "]) {
-      this.isInteracting = true;
-      this.interactionMessage = dog.interact();
-      return this.interactionMessage;
+  calculateSpeed(x, y) {
+    const isDiagonal = x !== 0 && y !== 0;
+    return isDiagonal ? this.movement.speed / Math.SQRT2 : this.movement.speed;
+  }
+
+  updateAnimation(gameState, isMoving) {
+    const { WALK_FRAMES, ANIMATION_SPEED } = Player.FRAME_SETTINGS;
+
+    if (!isMoving) {
+      this.sprite.frame = 0;
+      this.sprite.animationTimer = 0;
+      return;
+    }
+
+    this.sprite.animationTimer++;
+    if (this.sprite.animationTimer >= ANIMATION_SPEED) {
+      this.sprite.animationTimer = 0;
+      this.sprite.frame = (this.sprite.frame + 1) % WALK_FRAMES;
+    }
+
+    gameState.currentFrame = this.sprite.frame;
+  }
+
+  checkInteractions(keys, gameObjects, currentState) {
+    const { dog, mri } = gameObjects;
+
+    // Check MRI interaction
+    if (this.isCollidingWith(mri) && keys[" "]) {
+      return this.createStateUpdate(currentState, STATES.MED_SCAN_GAME);
+    }
+
+    // Check dog interaction
+    if (this.isCollidingWith(dog) && keys[" "]) {
+      this.interaction.isInteracting = true;
+      this.interaction.message = dog.interact();
+      return this.createStateUpdate(currentState, currentState, this.interaction.message);
+    }
+
+    return null;
+  }
+
+  isCollidingWith(gameObject) {
+    return this.position.x < gameObject.x + gameObject.width && this.position.x + this.dimensions.width > gameObject.x && this.position.y < gameObject.y + gameObject.height && this.position.y + this.dimensions.height > gameObject.y;
+  }
+
+  createStateUpdate(currentState, newState, interactionMessage = null) {
+    return {
+      savedPlayerPosition: { ...this.position },
+      previousState: currentState,
+      currentState: newState,
+      interactionMessage,
+    };
+  }
+
+  handleInventoryKey(keys, gameState) {
+    if (keys["i"] || keys["I"]) {
+      return this.createStateUpdate(gameState.currentState, STATES.INVENTORY);
     }
     return null;
   }
 
   handleEnterKey(keys) {
-    if (keys["Enter"] && this.isInteracting) {
-      this.isInteracting = false;
-      this.interactionMessage = null;
+    if (keys["Enter"] && this.interaction.isInteracting) {
+      this.interaction.isInteracting = false;
+      this.interaction.message = null;
       return true;
     }
     return false;
   }
 
-  handleAnimation(gameState, currentAction) {
-    const WALK_FRAMES = FRAME_SETTINGS.WALK_FRAMES;
-    const ANIMATION_SPEED = 8;
-
-    if (currentAction === ACTIONS.WALKING) {
-      this.animationTimer++;
-      if (this.animationTimer >= ANIMATION_SPEED) {
-        this.animationTimer = 0;
-        this.currentFrame = (this.currentFrame + 1) % WALK_FRAMES;
-      }
-    } else {
-      this.animationTimer = 0;
-      this.currentFrame = 0;
-    }
-    gameState.currentFrame = this.currentFrame;
-  }
-
-  handleCollision(keys, dog, mriMachine, currentState) {
-    // Check MRI machine collision first
-    if (this.checkCollisionWithGameObject(mriMachine) && keys[" "]) {
-      return {
-        savedPlayerPosition: { x: this.x, y: this.y },
-        previousState: currentState,
-        currentState: STATES.MED_SCAN_GAME,
-        interactionMessage: null,
-      };
-    }
-
-    // Then check dog collision
-    if (this.checkCollisionWithGameObject(dog) && keys[" "]) {
-      this.isInteracting = true;
-      this.interactionMessage = dog.interact();
-      return {
-        savedPlayerPosition: { x: this.x, y: this.y },
-        previousState: currentState,
-        currentState: currentState,
-        interactionMessage: this.interactionMessage,
-      };
-    }
-
-    return null;
-  }
-
-  checkCollisionWithGameObject(gameObject) {
-    return this.x < gameObject.x + gameObject.width && this.x + this.width > gameObject.x && this.y < gameObject.y + gameObject.height && this.y + this.height > gameObject.y;
-  }
-
-  handleEscapeKeyLogic(keys, currentState, previousState, savedPlayerPosition) {
+  handleEscapeKey(keys, currentState, previousState, savedPlayerPosition) {
     if (keys["Escape"]) {
-      return {
-        savedPlayerPosition: { x: this.x, y: this.y },
-        previousState: currentState,
-        currentState: STATES.MAIN_MENU,
-      };
+      return this.createStateUpdate(currentState, STATES.MAIN_MENU);
     }
+    return { currentState, previousState, savedPlayerPosition };
+  }
+
+  draw(canvas, ctx) {
+    const { FRAME_WIDTH, FRAME_HEIGHT } = Player.FRAME_SETTINGS;
+    const spriteRow = Player.DIRECTIONS[this.movement.direction];
+
+    const sourceX = this.sprite.frame * FRAME_WIDTH;
+    const sourceY = spriteRow * FRAME_HEIGHT;
+
+    const scale = this.calculateScale(canvas);
+    const drawPosition = this.calculateDrawPosition(scale);
+
+    ctx.drawImage(this.sprite.image, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, drawPosition.x, drawPosition.y, drawPosition.width, drawPosition.height);
+  }
+
+  calculateScale(canvas) {
     return {
-      savedPlayerPosition: savedPlayerPosition,
-      previousState: previousState,
-      currentState: currentState,
+      x: canvas.width / 640,
+      y: canvas.height / 360,
     };
   }
 
-  drawPlayer(canvas, ctx, currentFrame) {
-    const { FRAME_WIDTH, FRAME_HEIGHT } = FRAME_SETTINGS;
-    const spriteRow = DIRECTIONS[this.direction];
-    const sourceX = this.currentFrame * FRAME_WIDTH;
-    const sourceY = spriteRow * FRAME_HEIGHT;
-
-    const scaleX = canvas.width / 640;
-    const scaleY = canvas.height / 360;
-
-    const scaledX = this.x * scaleX;
-    const scaledY = this.y * scaleY;
-    const scaledWidth = this.width * scaleX;
-    const scaledHeight = this.height * scaleY;
-
-    ctx.drawImage(this.image, sourceX, sourceY, FRAME_WIDTH, FRAME_HEIGHT, scaledX, scaledY, scaledWidth, scaledHeight);
+  calculateDrawPosition(scale) {
+    return {
+      x: this.position.x * scale.x,
+      y: this.position.y * scale.y,
+      width: this.dimensions.width * scale.x,
+      height: this.dimensions.height * scale.y,
+    };
   }
 
   update({ keys, gameState, gameObjects }) {
-    if (keys["i"] || keys["I"]) {
-      return {
-        savedPlayerPosition: { x: this.x, y: this.y },
-        previousState: gameState.currentState,
-        currentState: STATES.INVENTORY,
-      };
-    }
+    // Check for inventory toggle first
+    const inventoryUpdate = this.handleInventoryKey(keys, gameState);
+    if (inventoryUpdate) return inventoryUpdate;
 
-    let { currentAction, currentState, previousState, savedPlayerPosition } = gameState;
-    const { dog, mriMachine } = gameObjects;
+    // Handle movement and animation
+    const isMoving = this.move(keys);
+    this.updateAnimation(gameState, isMoving);
 
-    const isMoving = this.handleMovement(keys);
-    currentAction = isMoving ? ACTIONS.WALKING : ACTIONS.IDLE;
-    this.handleAnimation(gameState, currentAction);
+    // Check for interactions with game objects
+    const interactionResult = this.checkInteractions(keys, gameObjects, gameState.currentState);
+    if (interactionResult) return interactionResult;
 
-    const collisionResult = this.handleCollision(keys, dog, mriMachine, currentState);
-    if (collisionResult) {
-      return collisionResult;
-    }
-
-    // Handle Enter key to clear interaction message
+    // Handle other key inputs
     if (this.handleEnterKey(keys)) {
-      return {
-        currentState,
-        previousState,
-        savedPlayerPosition,
-        interactionMessage: null,
-      };
+      return this.createStateUpdate(gameState.currentState, gameState.currentState, null);
     }
 
-    const escapeKeyResult = this.handleEscapeKeyLogic(keys, currentState, previousState, savedPlayerPosition);
-
-    if (escapeKeyResult) {
-      savedPlayerPosition = escapeKeyResult.savedPlayerPosition;
-      previousState = escapeKeyResult.previousState;
-      currentState = escapeKeyResult.currentState;
-    }
+    const escapeResult = this.handleEscapeKey(keys, gameState.currentState, gameState.previousState, gameState.savedPlayerPosition);
 
     return {
-      currentState,
-      previousState,
-      savedPlayerPosition,
-      interactionMessage: this.isInteracting ? this.interactionMessage : null,
+      ...escapeResult,
+      interactionMessage: this.interaction.isInteracting ? this.interaction.message : null,
     };
   }
 }
+
+export default Player;

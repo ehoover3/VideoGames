@@ -31,7 +31,7 @@ export default class Overworld {
   draw() {
     this.drawWorld();
     this.drawGameObjects();
-    this.gameObjects.player.drawPlayer(this.canvas, this.ctx, this.gameState.currentFrame);
+    this.gameObjects.player.draw(this.canvas, this.ctx, this.gameState.currentFrame);
   }
 
   drawWorld() {
@@ -40,10 +40,11 @@ export default class Overworld {
   }
 
   drawGameObjects() {
-    const { dog, mriMachine } = this.gameObjects;
+    const { dog, mri } = this.gameObjects;
     const scaleX = this.canvas.width / 640;
     const scaleY = this.canvas.height / 360;
-    mriMachine.draw(this.ctx, scaleX, scaleY);
+
     dog.draw(this.ctx, scaleX, scaleY);
+    mri.draw(this.ctx, scaleX, scaleY);
   }
 }

@@ -40,7 +40,7 @@ export default class Game {
   initGameObjects() {
     const player = new Player(this.loadedImages["player"], 100, 100, 32, 32, 4, DIRECTION.DOWN);
 
-    const mriMachine = new GameObject({
+    const mri = new GameObject({
       imgPath: this.loadedImages["mri"],
       imgSourceX: 0,
       imgSourceY: 0,
@@ -65,6 +65,6 @@ export default class Game {
       interactionText: "Woof woof!",
     });
 
-    return { dog, mriMachine, player };
+    return { dog, mri, player };
   }
 }
