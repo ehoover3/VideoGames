@@ -20,11 +20,11 @@ export default class Inventory {
   }
 
   load() {
-    this.update(); // Handles input and game state changes
-    this.draw(); // Renders the inventory screen
+    this.update();
+    this.draw();
     const game = window.gameInstance;
     if (game) {
-      game.hud.draw(this.gameState.currentState); // Render HUD if needed
+      game.hud.draw(this.gameState.currentState);
     }
   }
 

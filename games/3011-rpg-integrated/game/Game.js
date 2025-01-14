@@ -123,13 +123,7 @@ export default class Game {
       [STATES.MAIN_MENU]: () => this.menu.load(),
       [STATES.OVERWORLD]: () => this.overworld.load(),
       [STATES.MED_SCAN_GAME]: () => this.medScanGame.load(),
-      [STATES.INVENTORY]: () => this.inventory.load(), // Updated
-
-      // [STATES.INVENTORY]: () => {
-      //   this.inventory.update();
-      //   this.inventory.draw();
-      //   this.hud.draw(this.gameState.currentState);
-      // },
+      [STATES.INVENTORY]: () => this.inventory.load(),
     };
   }
 

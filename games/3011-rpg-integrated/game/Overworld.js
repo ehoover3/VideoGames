@@ -9,6 +9,7 @@ export default class Overworld {
     this.gameState = gameState;
     this.gameObjects = gameObjects;
     this.hud = new HUD(canvas, ctx);
+    this.isPlayerMoving = false;
   }
 
   load() {
@@ -23,9 +24,26 @@ export default class Overworld {
     this.gameState.savedPlayerPosition = update.savedPlayerPosition;
 
     this.draw(update.interactionMessage);
-    // Pass the interacting NPC if there's an interaction message
-    const interactingNPC = update.interactionMessage ? this.gameObjects.dog : null;
-    this.hud.draw(this.gameState.currentState, update.interactionMessage, interactingNPC);
+
+    // Update movement state
+    this.isPlayerMoving = Boolean(this.keys["ArrowUp"] || this.keys["ArrowDown"] || this.keys["ArrowLeft"] || this.keys["ArrowRight"]);
+
+    let displayObject = null;
+    let displayMessage = null;
+
+    if (!this.isPlayerMoving) {
+      if (update.showPickupNotification && update.lastPickedUpItem) {
+        // Show pickup notification and item
+        displayObject = update.lastPickedUpItem;
+        displayMessage = update.interactionMessage;
+      } else if (update.isInteracting) {
+        // Show dog during conversation
+        displayObject = this.gameObjects.dog;
+        displayMessage = update.interactionMessage;
+      }
+    }
+
+    this.hud.draw(this.gameState.currentState, displayMessage, displayObject);
   }
 
   draw() {
@@ -47,7 +65,6 @@ export default class Overworld {
     if (!ball.isPickedUp) {
       ball.draw(this.ctx, scaleX, scaleY);
     }
-    // ball.draw(this.ctx, scaleX, scaleY);
     dog.draw(this.ctx, scaleX, scaleY);
     mri.draw(this.ctx, scaleX, scaleY);
   }

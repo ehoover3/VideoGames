@@ -18,52 +18,46 @@ export default class HUD {
     this.scaleX = this.canvas.width / HUD.BASE_RESOLUTION.width;
     this.scaleY = this.canvas.height / HUD.BASE_RESOLUTION.height;
     this.scale = Math.min(this.scaleX, this.scaleY);
-
     this.hudHeight = Math.max(50 * this.scale, HUD.MIN_HUD_HEIGHT);
     this.fontSize = Math.max(HUD.MIN_FONT_SIZE * this.scale, HUD.MIN_FONT_SIZE);
-
-    // Portrait dimensions based on HUD height
     this.portraitSize = this.hudHeight - HUD.PORTRAIT_PADDING * 2;
   }
 
-  drawPortrait(npc) {
-    if (!npc || !npc.imgPath) return;
+  drawBackground() {
+    this.ctx.fillStyle = "rgba(211, 211, 211, 0.9)";
+    this.ctx.fillRect(0, this.canvas.height - this.hudHeight, this.canvas.width, this.hudHeight);
+  }
+
+  drawObject(gameObject) {
+    if (!gameObject || !gameObject.imgPath) return;
 
     const portraitX = HUD.PORTRAIT_PADDING;
     const portraitY = this.canvas.height - this.hudHeight + HUD.PORTRAIT_PADDING;
 
-    // Draw portrait background (optional - adds a nice frame effect)
     this.ctx.fillStyle = "white";
     this.ctx.fillRect(portraitX, portraitY, this.portraitSize, this.portraitSize);
 
-    // Draw the NPC portrait
-    this.ctx.drawImage(npc.imgPath, npc.imgSourceX, npc.imgSourceY, npc.imgSourceWidth, npc.imgSourceHeight, portraitX, portraitY, this.portraitSize, this.portraitSize);
+    this.ctx.drawImage(gameObject.imgPath, gameObject.imgSourceX, gameObject.imgSourceY, gameObject.imgSourceWidth, gameObject.imgSourceHeight, portraitX, portraitY, this.portraitSize, this.portraitSize);
   }
 
-  draw(currentState, interactionMessage, interactingNPC) {
+  draw(currentState, interactionMessage, displayObject) {
     this.calculateScaling();
-
-    // Draw HUD background
-    this.ctx.fillStyle = "rgba(211, 211, 211, 0.9)";
-    this.ctx.fillRect(0, this.canvas.height - this.hudHeight, this.canvas.width, this.hudHeight);
+    this.drawBackground();
 
     const font = `${Math.floor(this.fontSize)}px Arial`;
     const textY = this.canvas.height - this.hudHeight / 2 + this.fontSize / 3;
-
     let textX = this.canvas.width / 2;
     let textAlign = "center";
 
-    // If there's an interacting NPC, adjust text position and draw portrait
-    if (interactingNPC && interactionMessage) {
-      this.drawPortrait(interactingNPC);
+    // Draw the object if present
+    if (displayObject) {
+      this.drawObject(displayObject);
       textX = this.portraitSize + HUD.PORTRAIT_PADDING * 3;
       textAlign = "left";
     }
 
-    let hudText;
-    if (interactionMessage) {
-      hudText = interactionMessage;
-    } else {
+    let hudText = interactionMessage;
+    if (!hudText) {
       switch (currentState) {
         case STATES.OVERWORLD:
           hudText = "↑ ↓ → ← to Move | Space to Interact | I for Inventory | ESC for Main Menu";
