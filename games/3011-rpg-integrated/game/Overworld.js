@@ -36,9 +36,13 @@ export default class Overworld {
         // Show pickup notification and item
         displayObject = update.lastPickedUpItem;
         displayMessage = update.interactionMessage;
-      } else if (update.isInteracting) {
+      } else if (update.isInteracting && this.gameObjects.dog) {
         // Show dog during conversation
         displayObject = this.gameObjects.dog;
+        displayMessage = update.interactionMessage;
+      } else if (update.droppedItem) {
+        // Show dropped item notification and item
+        displayObject = update.droppedItem;
         displayMessage = update.interactionMessage;
       }
     }

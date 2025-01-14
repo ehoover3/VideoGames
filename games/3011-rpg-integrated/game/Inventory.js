@@ -51,17 +51,10 @@ export default class Inventory {
         item.x = player.x + player.width;
         item.y = player.y;
         item.isPickedUp = false;
+        this.items.splice(slotIndex, 1);
       }
-      this.items.splice(slotIndex, 1);
-      return {
-        success: true,
-        message: `Dropped ${item.name || "item"}`,
-      };
     }
-    return {
-      success: false,
-      message: "No item to drop",
-    };
+    return {};
   }
 
   update() {
@@ -83,11 +76,6 @@ export default class Inventory {
       const result = this.dropItem(this.selectedSlot);
       if (result.success) {
         this.selectedSlot = -1;
-      }
-      const game = window.gameInstance;
-      if (game && game.gameObjects.player) {
-        game.gameObjects.player.interaction.isInteracting = true;
-        game.gameObjects.player.interaction.message = result.message;
       }
       this.keys["d"] = false;
       this.keys["D"] = false;
@@ -116,7 +104,7 @@ export default class Inventory {
     drawText(this.ctx, "Inventory", startX + windowWidth / 2, startY + padding, `${fontSize}px Arial`, "black", "center");
 
     const smallerFontSize = Math.floor(14 * scale);
-    drawText(this.ctx, "Press 1-9 to select slot, D to drop selected item", startX + windowWidth / 2, startY + padding + fontSize + 5, `${smallerFontSize}px Arial`, "gray", "center");
+    drawText(this.ctx, "Press 1-9 to select, then D to drop", startX + windowWidth / 2, startY + padding + fontSize + 5, `${smallerFontSize}px Arial`, "gray", "center");
 
     for (let i = 0; i < Inventory.TOTAL_SLOTS; i++) {
       const row = Math.floor(i / Inventory.SLOTS_PER_ROW);

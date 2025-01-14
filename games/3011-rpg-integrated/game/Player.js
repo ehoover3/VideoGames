@@ -49,6 +49,7 @@ class Player extends GameObject {
       message: null,
       showPickupNotification: false,
       lastPickedUpItem: null,
+      droppedItem: null,
     };
   }
 
@@ -210,7 +211,6 @@ class Player extends GameObject {
     return { currentState, previousState, savedPlayerPosition };
   }
 
-  // Override parent's draw method
   draw(canvas, ctx) {
     const { FRAME_WIDTH, FRAME_HEIGHT } = Player.FRAME_SETTINGS;
     const spriteRow = Player.DIRECTIONS[this.movement.direction];
@@ -235,6 +235,7 @@ class Player extends GameObject {
 
     // If player is moving, clear all states
     if (isMoving) {
+      this.interaction.droppedItem = null;
       return {
         currentState: gameState.currentState,
         previousState: gameState.previousState,
@@ -243,6 +244,7 @@ class Player extends GameObject {
         showPickupNotification: false,
         lastPickedUpItem: null,
         isInteracting: false,
+        droppedItem: null,
       };
     }
 
@@ -261,6 +263,7 @@ class Player extends GameObject {
       showPickupNotification: this.interaction.showPickupNotification,
       lastPickedUpItem: this.interaction.lastPickedUpItem,
       isInteracting: this.interaction.isInteracting,
+      droppedItem: this.interaction.droppedItem,
     };
   }
 }
