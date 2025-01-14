@@ -1,23 +1,11 @@
 // game/Menu.js
 import { drawText } from "./utils/drawText.js";
-import { STATES } from "../config/constants.js";
+import { STATES, UI_CONFIG } from "../config/constants.js";
 
-const TITLE_HEIGHT_RATIO = 1 / 12;
-const MENU_START_Y_RATIO = 1 / 2.5;
-const MENU_SPACING_RATIO = 1 / 11;
-const MENU_FONT_SIZE_RATIO = 1 / 20;
-const BUTTON_PADDING_RATIO = 1 / 40;
-const BUTTON_WIDTH_RATIO = 0.25;
-const BUTTON_RADIUS_RATIO = 0.5;
 const SHADOW_BLUR = 0;
 const SHADOW_OFFSET_X = 2;
 const SHADOW_OFFSET_Y = 2;
 const SHADOW_COLOR = "rgba(0, 0, 0, 0.2)";
-const BUTTON_COLOR_SELECTED = "orange";
-const BUTTON_COLOR_DEFAULT = "white";
-const TEXT_COLOR_SELECTED = "white";
-const TEXT_COLOR_DEFAULT = "black";
-const STROKE_COLOR = "lightgrey";
 
 const MENU_OPTIONS = {
   START_NEW_GAME: "Start New Game",
@@ -137,26 +125,26 @@ export default class Menu {
 
     ctx.drawImage(menuBackground, 0, 0, menuBackground.width, menuBackground.height, 0, 0, canvas.width, canvas.height);
 
-    const titleFontSize = Math.round(canvas.height * TITLE_HEIGHT_RATIO);
+    const titleFontSize = Math.round(canvas.height * UI_CONFIG.MENU.TITLE_HEIGHT_RATIO);
     drawText(ctx, "Science Game", canvas.width / 2, canvas.height / 4, `${titleFontSize}px Arial`, "black");
 
     const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
 
-    const menuStartY = canvas.height * MENU_START_Y_RATIO;
-    const menuSpacing = canvas.height * MENU_SPACING_RATIO;
-    const menuFontSize = Math.round(canvas.height * MENU_FONT_SIZE_RATIO);
-    const buttonPadding = canvas.height * BUTTON_PADDING_RATIO;
+    const menuStartY = canvas.height * UI_CONFIG.MENU.MENU_START_Y_RATIO;
+    const menuSpacing = canvas.height * UI_CONFIG.MENU.SPACING_RATIO;
+    const menuFontSize = Math.round(canvas.height * UI_CONFIG.MENU.FONT_SIZE_RATIO);
+    const buttonPadding = canvas.height * UI_CONFIG.MENU.BUTTON.PADDING_RATIO;
 
     menu.forEach((option, index) => {
       const isSelected = index === selectedOption;
 
-      const buttonWidth = canvas.width * BUTTON_WIDTH_RATIO;
+      const buttonWidth = canvas.width * UI_CONFIG.MENU.BUTTON.WIDTH_RATIO;
       const buttonHeight = menuFontSize + buttonPadding;
-      const buttonX = (canvas.width - buttonWidth) * BUTTON_RADIUS_RATIO;
+      const buttonX = (canvas.width - buttonWidth) * UI_CONFIG.MENU.BUTTON.RADIUS_RATIO;
       const buttonY = menuStartY + index * menuSpacing - buttonHeight;
 
-      const buttonColor = isSelected ? BUTTON_COLOR_SELECTED : BUTTON_COLOR_DEFAULT;
-      const textColor = isSelected ? TEXT_COLOR_SELECTED : TEXT_COLOR_DEFAULT;
+      const buttonColor = isSelected ? UI_CONFIG.MENU.COLORS.SELECTED : UI_CONFIG.MENU.COLORS.TEXT_SELECTED;
+      const textColor = isSelected ? UI_CONFIG.MENU.COLORS.DEFAULT : UI_CONFIG.MENU.COLORS.TEXT_DEFAULT;
 
       ctx.beginPath();
       ctx.roundRect(buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
@@ -166,7 +154,7 @@ export default class Menu {
       ctx.shadowBlur = SHADOW_BLUR;
       ctx.shadowOffsetX = SHADOW_OFFSET_X;
       ctx.shadowOffsetY = SHADOW_OFFSET_Y;
-      ctx.strokeStyle = STROKE_COLOR;
+      ctx.strokeStyle = UI_CONFIG.MENU.COLORS.STROKE;
       ctx.stroke();
       ctx.shadowBlur = SHADOW_BLUR;
 

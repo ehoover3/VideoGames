@@ -1,13 +1,8 @@
 // game/HUD.js
 import { drawText } from "./utils/drawText.js";
-import { STATES } from "../config/constants.js";
+import { STATES, GAME_CONFIG, UI_CONFIG } from "../config/constants.js";
 
 export default class HUD {
-  static BASE_RESOLUTION = { width: 640, height: 360 };
-  static MIN_HUD_HEIGHT = 40;
-  static MIN_FONT_SIZE = 16;
-  static PORTRAIT_PADDING = 10;
-
   constructor(canvas, ctx) {
     this.canvas = canvas;
     this.ctx = ctx;
@@ -15,24 +10,24 @@ export default class HUD {
   }
 
   calculateScaling() {
-    this.scaleX = this.canvas.width / HUD.BASE_RESOLUTION.width;
-    this.scaleY = this.canvas.height / HUD.BASE_RESOLUTION.height;
+    this.scaleX = this.canvas.width / GAME_CONFIG.BASE_RESOLUTION.width;
+    this.scaleY = this.canvas.height / GAME_CONFIG.BASE_RESOLUTION.height;
     this.scale = Math.min(this.scaleX, this.scaleY);
-    this.hudHeight = Math.max(50 * this.scale, HUD.MIN_HUD_HEIGHT);
-    this.fontSize = Math.max(HUD.MIN_FONT_SIZE * this.scale, HUD.MIN_FONT_SIZE);
-    this.portraitSize = this.hudHeight - HUD.PORTRAIT_PADDING * 2;
+    this.hudHeight = Math.max(50 * this.scale, UI_CONFIG.HUD.MIN_HEIGHT);
+    this.fontSize = Math.max(UI_CONFIG.HUD.MIN_FONT_SIZE * this.scale, UI_CONFIG.HUD.MIN_FONT_SIZE);
+    this.portraitSize = this.hudHeight - UI_CONFIG.HUD.PADDING * 2;
   }
 
   drawBackground() {
-    this.ctx.fillStyle = "rgba(211, 211, 211, 0.9)";
+    this.ctx.fillStyle = UI_CONFIG.HUD.BACKGROUND;
     this.ctx.fillRect(0, this.canvas.height - this.hudHeight, this.canvas.width, this.hudHeight);
   }
 
   drawObject(gameObject) {
     if (!gameObject || !gameObject.imgPath) return;
 
-    const portraitX = HUD.PORTRAIT_PADDING;
-    const portraitY = this.canvas.height - this.hudHeight + HUD.PORTRAIT_PADDING;
+    const portraitX = UI_CONFIG.HUD.PADDING;
+    const portraitY = this.canvas.height - this.hudHeight + UI_CONFIG.HUD.PADDING;
 
     this.ctx.fillStyle = "white";
     this.ctx.fillRect(portraitX, portraitY, this.portraitSize, this.portraitSize);
@@ -51,7 +46,7 @@ export default class HUD {
 
     if (displayObject) {
       this.drawObject(displayObject);
-      textX = this.portraitSize + HUD.PORTRAIT_PADDING * 3;
+      textX = this.portraitSize + UI_CONFIG.HUD.PADDING * 3;
       textAlign = "left";
     }
 
