@@ -54,21 +54,6 @@ class Player extends GameObject {
   }
 
   move(keys) {
-    const movement = this.calculateMovement(keys);
-    if (!movement.isMoving) return false;
-
-    // Reset all interaction states when moving
-    this.interaction.isInteracting = false;
-    this.interaction.message = null;
-    this.interaction.showPickupNotification = false;
-    this.interaction.lastPickedUpItem = null;
-
-    this.updatePosition(movement);
-    this.movement.direction = movement.direction;
-    return true;
-  }
-
-  calculateMovement(keys) {
     const movement = {
       x: 0,
       y: 0,
@@ -97,20 +82,23 @@ class Player extends GameObject {
       movement.isMoving = true;
     }
 
-    return movement;
-  }
+    if (!movement.isMoving) return false;
 
-  updatePosition({ x, y, isMoving }) {
-    if (!isMoving) return;
+    // Reset all interaction states when moving
+    this.interaction.isInteracting = false;
+    this.interaction.message = null;
+    this.interaction.showPickupNotification = false;
+    this.interaction.lastPickedUpItem = null;
 
-    const speed = this.calculateSpeed(x, y);
-    this.x += x * speed;
-    this.y += y * speed;
-  }
+    // Update position
+    const isDiagonal = movement.x !== 0 && movement.y !== 0;
+    const speed = isDiagonal ? this.movement.speed / Math.SQRT2 : this.movement.speed;
 
-  calculateSpeed(x, y) {
-    const isDiagonal = x !== 0 && y !== 0;
-    return isDiagonal ? this.movement.speed / Math.SQRT2 : this.movement.speed;
+    this.x += movement.x * speed;
+    this.y += movement.y * speed;
+
+    this.movement.direction = movement.direction;
+    return true;
   }
 
   updateAnimation(gameState, isMoving) {
@@ -204,13 +192,6 @@ class Player extends GameObject {
     return false;
   }
 
-  handleEscapeKey(keys, currentState, previousState, savedPlayerPosition) {
-    if (keys["Escape"]) {
-      return this.createStateUpdate(currentState, STATES.MAIN_MENU);
-    }
-    return { currentState, previousState, savedPlayerPosition };
-  }
-
   draw(canvas, ctx) {
     const { FRAME_WIDTH, FRAME_HEIGHT } = Player.FRAME_SETTINGS;
     const spriteRow = Player.DIRECTIONS[this.movement.direction];
@@ -265,6 +246,13 @@ class Player extends GameObject {
       isInteracting: this.interaction.isInteracting,
       droppedItem: this.interaction.droppedItem,
     };
+  }
+
+  handleEscapeKey(keys, currentState, previousState, savedPlayerPosition) {
+    if (keys["Escape"]) {
+      return this.createStateUpdate(currentState, STATES.MAIN_MENU);
+    }
+    return { currentState, previousState, savedPlayerPosition };
   }
 }
 
