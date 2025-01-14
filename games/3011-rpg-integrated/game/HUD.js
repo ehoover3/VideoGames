@@ -49,7 +49,6 @@ export default class HUD {
     let textX = this.canvas.width / 2;
     let textAlign = "center";
 
-    // Draw the object if present
     if (displayObject) {
       this.drawObject(displayObject);
       textX = this.portraitSize + HUD.PORTRAIT_PADDING * 3;
@@ -60,7 +59,7 @@ export default class HUD {
     if (!hudText) {
       switch (currentState) {
         case STATES.OVERWORLD:
-          hudText = "↑ ↓ → ← to Move | Space to Interact | I for Inventory | ESC for Main Menu";
+          hudText = "(Space) Interact | (I) Inventory | (ESC) Main Menu";
           break;
         case STATES.MED_SCAN_GAME:
           hudText = "Hold SPACE to Scan | X to Exit | ESC for Main Menu";

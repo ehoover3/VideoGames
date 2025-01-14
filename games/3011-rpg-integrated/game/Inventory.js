@@ -7,7 +7,7 @@ export default class Inventory {
   static INVENTORY_PADDING = 20;
   static SLOT_SIZE = 40;
   static SLOTS_PER_ROW = 5;
-  static TOTAL_SLOTS = 15;
+  static TOTAL_SLOTS = 10;
   static INTERACTION_DISTANCE = 40;
 
   constructor(canvas, ctx, keys, gameState) {
