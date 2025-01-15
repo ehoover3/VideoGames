@@ -209,6 +209,15 @@ class Player extends GameObject {
     };
   }
 
+  changeGameState(currentState, newState, interactionMessage = null) {
+    return {
+      savedPlayerPosition: { x: this.x, y: this.y },
+      previousState: currentState,
+      currentState: newState,
+      interactionMessage,
+    };
+  }
+
   handleEnterKey(keys) {
     if (keys["Enter"]) {
       if (this.interaction.showPickupNotification) {
@@ -224,15 +233,6 @@ class Player extends GameObject {
       }
     }
     return false;
-  }
-
-  changeGameState(currentState, newState, interactionMessage = null) {
-    return {
-      savedPlayerPosition: { x: this.x, y: this.y },
-      previousState: currentState,
-      currentState: newState,
-      interactionMessage,
-    };
   }
 
   handleInventoryKey(keys, gameState) {
