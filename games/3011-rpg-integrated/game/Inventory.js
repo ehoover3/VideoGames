@@ -87,30 +87,35 @@ export default class Inventory {
     const scaleY = this.canvas.height / Inventory.BASE_RESOLUTION.height;
     const scale = Math.min(scaleX, scaleY);
 
+    // black background
     this.ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     const padding = Inventory.INVENTORY_PADDING * scale;
     const slotSize = Inventory.SLOT_SIZE * scale;
+    const fontSize = Math.floor(20 * scale);
+    const smallerFontSize = Math.floor(14 * scale);
+    const headerHeight = fontSize + smallerFontSize + 15; // Title + instructions + spacing
+
     const windowWidth = slotSize * Inventory.SLOTS_PER_ROW + padding * 2;
-    const windowHeight = slotSize * Math.ceil(Inventory.TOTAL_SLOTS / Inventory.SLOTS_PER_ROW) + padding * 2;
+    const numRows = Math.ceil(Inventory.TOTAL_SLOTS / Inventory.SLOTS_PER_ROW);
+    const windowHeight = slotSize * numRows + padding * 2 + headerHeight;
+
     const startX = (this.canvas.width - windowWidth) / 2;
     const startY = (this.canvas.height - windowHeight) / 2;
 
+    // grey background
     this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
     this.ctx.fillRect(startX, startY, windowWidth, windowHeight);
 
-    const fontSize = Math.floor(20 * scale);
     drawText(this.ctx, "Inventory", startX + windowWidth / 2, startY + padding, `${fontSize}px Arial`, "black", "center");
-
-    const smallerFontSize = Math.floor(14 * scale);
     drawText(this.ctx, "Press 1-9 to select, then D to drop", startX + windowWidth / 2, startY + padding + fontSize + 5, `${smallerFontSize}px Arial`, "gray", "center");
 
     for (let i = 0; i < Inventory.TOTAL_SLOTS; i++) {
       const row = Math.floor(i / Inventory.SLOTS_PER_ROW);
       const col = i % Inventory.SLOTS_PER_ROW;
       const x = startX + padding + col * slotSize;
-      const y = startY + padding * 2 + fontSize + 10 + row * slotSize;
+      const y = startY + padding + headerHeight + row * slotSize;
 
       this.ctx.fillStyle = i === this.selectedSlot ? "rgba(255, 165, 0, 0.3)" : "white";
       this.ctx.fillRect(x, y, slotSize, slotSize);
