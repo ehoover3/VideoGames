@@ -8,6 +8,7 @@ import HUD from "./HUD.js";
 import Item from "./Item.js";
 import NPC from "./NPC.js";
 import Player from "./Player.js";
+import DogBallQuest from "./quests/DogBallQuest.js";
 
 export default class Game {
   constructor(canvasId) {
@@ -18,6 +19,7 @@ export default class Game {
     this.loadImages();
     this.inventory = new Inventory(this.canvas, this.ctx, this.keys, this.gameState);
     this.gameObjects = this.getGameObjects();
+    this.initializeQuests();
     this.startGameComponents();
     this.bindEvents();
     window.gameInstance = this;
@@ -172,5 +174,17 @@ export default class Game {
 
   getInventory() {
     return this.inventory;
+  }
+
+  initializeQuests() {
+    // Create the dog quest instance
+    const dogQuest = new DogBallQuest();
+
+    // Assign the quest to the dog NPC
+    if (this.gameObjects.dog) {
+      this.gameObjects.dog.quest = dogQuest;
+    } else {
+      console.error("Dog NPC not found when initializing quests");
+    }
   }
 }
