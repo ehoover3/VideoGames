@@ -18,38 +18,36 @@ export default class HUD {
     this.portraitSize = this.hudHeight - UI_CONFIG.HUD.PADDING * 2;
   }
 
-  drawBackground() {
+  draw(currentState, interactionMessage, displayObject) {
+    // Calculate scaling and draw background
+    this.calculateScaling();
     this.ctx.fillStyle = UI_CONFIG.HUD.BACKGROUND;
     this.ctx.fillRect(0, this.canvas.height - this.hudHeight, this.canvas.width, this.hudHeight);
-  }
 
-  drawObject(gameObject) {
-    if (!gameObject || !gameObject.imgPath) return;
-
-    const portraitX = UI_CONFIG.HUD.PADDING;
-    const portraitY = this.canvas.height - this.hudHeight + UI_CONFIG.HUD.PADDING;
-
-    this.ctx.fillStyle = "white";
-    this.ctx.fillRect(portraitX, portraitY, this.portraitSize, this.portraitSize);
-
-    this.ctx.drawImage(gameObject.imgPath, gameObject.imgSourceX, gameObject.imgSourceY, gameObject.imgSourceWidth, gameObject.imgSourceHeight, portraitX, portraitY, this.portraitSize, this.portraitSize);
-  }
-
-  draw(currentState, interactionMessage, displayObject) {
-    this.calculateScaling();
-    this.drawBackground();
-
+    // Set up text properties
     const font = `${Math.floor(this.fontSize)}px Arial`;
     const textY = this.canvas.height - this.hudHeight / 2 + this.fontSize / 3;
     let textX = this.canvas.width / 2;
     let textAlign = "center";
 
-    if (displayObject) {
-      this.drawObject(displayObject);
+    // Draw object if present
+    if (displayObject && displayObject.imgPath) {
+      const portraitX = UI_CONFIG.HUD.PADDING;
+      const portraitY = this.canvas.height - this.hudHeight + UI_CONFIG.HUD.PADDING;
+
+      // Draw white background for portrait
+      this.ctx.fillStyle = "white";
+      this.ctx.fillRect(portraitX, portraitY, this.portraitSize, this.portraitSize);
+
+      // Draw the object image
+      this.ctx.drawImage(displayObject.imgPath, displayObject.imgSourceX, displayObject.imgSourceY, displayObject.imgSourceWidth, displayObject.imgSourceHeight, portraitX, portraitY, this.portraitSize, this.portraitSize);
+
+      // Adjust text position when object is displayed
       textX = this.portraitSize + UI_CONFIG.HUD.PADDING * 3;
       textAlign = "left";
     }
 
+    // Determine HUD text based on state or interaction message
     let hudText = interactionMessage;
     if (!hudText) {
       switch (currentState) {
@@ -67,6 +65,7 @@ export default class HUD {
       }
     }
 
+    // Draw the text
     drawText(this.ctx, hudText, textX, textY, font, "black", textAlign);
   }
 }

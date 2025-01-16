@@ -108,9 +108,11 @@ export default class Inventory {
     this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
     this.ctx.fillRect(startX, startY, windowWidth, windowHeight);
 
+    // inventory header text
     drawText(this.ctx, "Inventory", startX + windowWidth / 2, startY + padding, `${fontSize}px Arial`, "black", "center");
     drawText(this.ctx, "Press 1-9 to select, then D to drop", startX + windowWidth / 2, startY + padding + fontSize + 5, `${smallerFontSize}px Arial`, "gray", "center");
 
+    // inventory slots
     for (let i = 0; i < Inventory.TOTAL_SLOTS; i++) {
       const row = Math.floor(i / Inventory.SLOTS_PER_ROW);
       const col = i % Inventory.SLOTS_PER_ROW;
