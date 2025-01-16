@@ -1,6 +1,5 @@
 // game/GameObject.js
-
-export class GameObject {
+export default class GameObject {
   constructor({ imgPath, imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight, x, y, width = 32, height = 32 }) {
     this.imgPath = imgPath;
     this.imgSourceX = imgSourceX;
@@ -13,6 +12,12 @@ export class GameObject {
     this.height = height;
   }
 
+  draw(ctx, scaleX, scaleY) {
+    const { imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight } = this;
+    const { scaledX, scaledY, scaledWidth, scaledHeight } = this.getScaledDimensions(scaleX, scaleY);
+    ctx.drawImage(this.imgPath, imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight, scaledX, scaledY, scaledWidth, scaledHeight);
+  }
+
   getScaledDimensions(scaleX, scaleY) {
     return {
       scaledX: this.x * scaleX,
@@ -22,9 +27,19 @@ export class GameObject {
     };
   }
 
-  draw(ctx, scaleX, scaleY) {
-    const { imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight } = this;
-    const { scaledX, scaledY, scaledWidth, scaledHeight } = this.getScaledDimensions(scaleX, scaleY);
-    ctx.drawImage(this.imgPath, imgSourceX, imgSourceY, imgSourceWidth, imgSourceHeight, scaledX, scaledY, scaledWidth, scaledHeight);
+  getBoundingBox() {
+    return {
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+    };
+  }
+
+  isColliding(otherObject) {
+    const box1 = this.getBoundingBox();
+    const box2 = otherObject.getBoundingBox();
+
+    return box1.x < box2.x + box2.width && box1.x + box1.width > box2.x && box1.y < box2.y + box2.height && box1.y + box1.height > box2.y;
   }
 }

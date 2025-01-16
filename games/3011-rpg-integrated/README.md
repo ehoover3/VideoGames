@@ -21,32 +21,17 @@ Main Monitor Sizes
 ├── config/
 │ ├── constants.js
 ├── game/
-│ ├── draw/
-│ │ ├── menu.js
-│ │ ├── overworld.js
-│ │ ├── utils.js
-│ ├── gameLoop/
-│ │ ├── index.js
-│ │ ├── menu.js
-│ │ ├── overworld.js
-│ │ ├── scanGame.js
-│ ├── gameStart/
-│ │ ├── canvasSetup.js
-│ │ ├── gameObjects.js
-│ │ ├── gameState.js
-│ │ ├── keyboard.js
-│ ├── menu/
-│ │ ├── exit.js
-│ │ ├── index.js
-│ │ ├── loadGame.js
-│ │ ├── returnToGame.js
-│ │ ├── settings.js
-│ │ ├── startNewGame.js
-│ ├── minigames/
-│ │ ├── medScan.js
-│ │ ├── draw.js
-│ │ ├── logic.js
-│ ├── player.js
+│ ├── utils
+│ │ ├── drawText.js
+│ ├── game/
+│ │ ├── Game.js
+│ │ ├── GameEngine.js
+│ │ ├── GameObject.js
+│ │ ├── HUD.js
+│ │ ├── MedScanGame.js
+│ │ ├── Menu.js
+│ │ ├── Overworld.js
+│ │ ├── Player.js
 ├── index.html
 ├── index.js
 ├── styles.css
