@@ -118,7 +118,7 @@ class Player extends GameObject {
 
   update({ keys, gameState, gameObjects }) {
     const { WALK_FRAMES, ANIMATION_SPEED } = Player.FRAME_SETTINGS;
-    const { dog, mri, ball } = gameObjects;
+    const { ball, coin, dog, mri } = gameObjects;
 
     // Handle inventory first
     const inventoryUpdate = this.handleInventoryKey(keys, gameState);
@@ -184,6 +184,22 @@ class Player extends GameObject {
           this.interaction.isInteracting = false;
           this.interaction.showPickupNotification = true;
           this.interaction.lastPickedUpItem = ball;
+          this.interaction.message = result.message;
+          return this.changeGameState(gameState.currentState, gameState.currentState, result.message);
+        }
+      }
+    }
+
+    // Handle coin pickup
+    if (!coin.isPickedUp && keys[" "] && isWithinInteractionDistance(coin)) {
+      const game = window.gameInstance;
+      if (game?.getInventory()) {
+        const result = game.getInventory().addItem(coin);
+        if (result.success) {
+          coin.isPickedUp = true;
+          this.interaction.isInteracting = false;
+          this.interaction.showPickupNotification = true;
+          this.interaction.lastPickedUpItem = coin;
           this.interaction.message = result.message;
           return this.changeGameState(gameState.currentState, gameState.currentState, result.message);
         }

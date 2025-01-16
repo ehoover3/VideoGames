@@ -61,6 +61,7 @@ export default class Game {
     };
     this.images = {
       ball: loadImage("assets/images/overworld/tennisBall.png"),
+      coin: loadImage("assets/images/overworld/coin.png"),
       dog: loadImage("assets/images/overworld/dog.png"),
       mri: loadImage("assets/images/overworld/mri.png"),
       player: loadImage("assets/images/overworld/player.png"),
@@ -69,6 +70,34 @@ export default class Game {
 
   getGameObjects() {
     const player = new Player(this.images["player"], 100, 100, 32, 32, 4, DIRECTION.DOWN);
+
+    const ball = new Item({
+      imgPath: this.images["ball"],
+      imgSourceX: 0,
+      imgSourceY: 0,
+      imgSourceWidth: 155,
+      imgSourceHeight: 155,
+      x: 76,
+      y: 130,
+      width: 16,
+      height: 16,
+      name: "Tennis Ball",
+      isPickedUp: false,
+    });
+
+    const coin = new Item({
+      imgPath: this.images["coin"],
+      imgSourceX: 90,
+      imgSourceY: 80,
+      imgSourceWidth: 100,
+      imgSourceHeight: 130,
+      x: 130,
+      y: 70,
+      width: 16,
+      height: 16,
+      name: "Coin",
+      isPickedUp: false,
+    });
 
     const dog = new NPC({
       imgPath: this.images["dog"],
@@ -96,21 +125,7 @@ export default class Game {
       name: "MRI Machine",
     });
 
-    const ball = new Item({
-      imgPath: this.images["ball"],
-      imgSourceX: 0,
-      imgSourceY: 0,
-      imgSourceWidth: 155,
-      imgSourceHeight: 155,
-      x: 76,
-      y: 130,
-      width: 16,
-      height: 16,
-      name: "Tennis Ball",
-      isPickedUp: false,
-    });
-
-    return { ball, dog, mri, player };
+    return { ball, coin, dog, mri, player };
   }
 
   startGameComponents() {
