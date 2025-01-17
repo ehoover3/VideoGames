@@ -53,18 +53,20 @@ export default class Inventory {
   }
 
   dropItem(slotIndex) {
-    if (slotIndex >= 0 && slotIndex < this.items.length) {
-      const item = this.items[slotIndex];
+    const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedCategory);
+    if (slotIndex >= 0 && slotIndex < filteredItems.length) {
+      const item = filteredItems[slotIndex];
       const game = window.gameInstance;
       if (game && game.gameObjects.player) {
         const player = game.gameObjects.player;
         item.x = player.x + player.width;
         item.y = player.y;
         item.isPickedUp = false;
-        this.items.splice(slotIndex, 1);
+        this.items = this.items.filter((i) => i !== item); // Remove the item from the main inventory
       }
+      return { success: true };
     }
-    return {};
+    return { success: false, message: "No valid item to drop in the selected slot." };
   }
 
   handleArrowNavigation() {
@@ -149,9 +151,12 @@ export default class Inventory {
     this.handleArrowNavigation();
 
     if ((this.keys["d"] || this.keys["D"]) && this.selectedSlot !== -1) {
-      const result = this.dropItem(this.selectedSlot);
-      if (result.success) {
-        this.selectedSlot = -1;
+      const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedCategory);
+      if (this.selectedSlot < filteredItems.length) {
+        const result = this.dropItem(this.selectedSlot);
+        if (result.success) {
+          this.selectedSlot = -1; // Reset slot selection after dropping
+        }
       }
       this.keys["d"] = false;
       this.keys["D"] = false;
