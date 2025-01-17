@@ -88,6 +88,7 @@ export default class Game {
       name: "Tennis Ball",
       isPickedUp: false,
       itemCategory: "Key Items",
+      description: "A bouncy tennis ball.",
     });
 
     const coin = new Item({
@@ -103,6 +104,7 @@ export default class Game {
       name: "Coin",
       isPickedUp: false,
       itemCategory: "Key Items",
+      description: "A shiny metal coin.",
     });
 
     const dog = new NPC({

@@ -195,27 +195,26 @@ export default class Inventory {
     const headerHeight = fontSize + smallerFontSize + 15;
     const categoryHeight = 40 * scale;
 
-    const windowWidth = slotSize * Inventory.SLOTS_PER_ROW + padding * 2;
-    const numRows = Math.ceil(Inventory.TOTAL_SLOTS / Inventory.SLOTS_PER_ROW);
-    const windowHeight = slotSize * numRows + padding * 2 + headerHeight + categoryHeight;
+    // Left section dimensions
+    const leftSectionWidth = this.canvas.width * 0.5;
+    const leftStartX = padding;
+    const leftStartY = padding;
+    const leftSectionHeight = this.canvas.height - padding * 2;
 
-    const startX = (this.canvas.width - windowWidth) / 2;
-    const startY = (this.canvas.height - windowHeight) / 2;
-
-    // grey background
+    // Draw left section background
     this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
-    this.ctx.fillRect(startX, startY, windowWidth, windowHeight);
+    this.ctx.fillRect(leftStartX, leftStartY, leftSectionWidth, leftSectionHeight);
 
-    // inventory header text
-    drawText(this.ctx, "Inventory", startX + windowWidth / 2, startY + padding, `${fontSize}px Arial`, "black", "center");
-    drawText(this.ctx, "D drop item, L Adventure Log", startX + windowWidth / 2, startY + padding + fontSize + 5, `${smallerFontSize}px Arial`, "gray", "center");
+    // Header text (centered within left section)
+    drawText(this.ctx, "Inventory", leftStartX + leftSectionWidth / 2, leftStartY + padding, `${fontSize}px Arial`, "black", "center");
+    drawText(this.ctx, "D drop item, L Adventure Log", leftStartX + leftSectionWidth / 2, leftStartY + padding + fontSize + 5, `${smallerFontSize}px Arial`, "gray", "center");
 
-    // draw category tabs
-    const tabWidth = windowWidth / Inventory.CATEGORIES.length;
-    const categoryY = startY + padding + headerHeight;
+    // Category tabs
+    const tabWidth = leftSectionWidth / Inventory.CATEGORIES.length;
+    const categoryY = leftStartY + padding + headerHeight;
 
     Inventory.CATEGORIES.forEach((category, index) => {
-      const categoryX = startX + tabWidth * index;
+      const categoryX = leftStartX + tabWidth * index;
       const isSelectedCategory = category === this.selectedCategory;
       const isNavigatingCategories = this.selectedSlot === -1;
 
@@ -254,12 +253,13 @@ export default class Inventory {
     // Filter items by selected category
     const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedCategory);
 
-    // inventory slots
+    // Inventory slots
+    const slotsStartY = categoryY + categoryHeight + padding;
     for (let i = 0; i < Inventory.TOTAL_SLOTS; i++) {
       const row = Math.floor(i / Inventory.SLOTS_PER_ROW);
       const col = i % Inventory.SLOTS_PER_ROW;
-      const x = startX + padding + col * slotSize;
-      const y = startY + padding + headerHeight + categoryHeight + row * slotSize;
+      const x = leftStartX + padding + col * slotSize;
+      const y = slotsStartY + row * slotSize;
 
       this.ctx.fillStyle = i === this.selectedSlot ? "rgba(255, 165, 0, 0.3)" : "white";
       this.ctx.fillRect(x, y, slotSize, slotSize);
