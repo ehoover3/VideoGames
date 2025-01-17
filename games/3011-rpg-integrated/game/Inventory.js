@@ -1,4 +1,3 @@
-// game/Inventory.js
 import { STATES } from "../config/constants.js";
 import { drawText } from "./utils/drawText.js";
 
@@ -6,9 +5,10 @@ export default class Inventory {
   static BASE_RESOLUTION = { width: 640, height: 360 };
   static INVENTORY_PADDING = 20;
   static SLOT_SIZE = 40;
-  static SLOTS_PER_ROW = 5;
-  static TOTAL_SLOTS = 10;
+  static SLOTS_PER_ROW = 4;
+  static TOTAL_SLOTS = 16;
   static INTERACTION_DISTANCE = 40;
+  static CATEGORIES = ["Weapons", "Bows and Arrows", "Shields", "Armor", "Materials", "Food", "Key Items"];
 
   constructor(canvas, ctx, keys, gameState) {
     this.canvas = canvas;
@@ -17,6 +17,7 @@ export default class Inventory {
     this.gameState = gameState;
     this.items = [];
     this.selectedSlot = -1;
+    this.selectedCategory = "All";
   }
 
   load() {
@@ -65,7 +66,6 @@ export default class Inventory {
       this.keys["X"] = false;
     }
 
-    // Adventure log navigation
     if (this.keys["l"] || this.keys["L"]) {
       this.gameState.currentState = STATES.ADVENTURE_LOG;
       this.keys["l"] = false;
@@ -89,6 +89,21 @@ export default class Inventory {
     }
   }
 
+  isMouseInCategory(mouseX, mouseY, categoryX, categoryY, categoryWidth, categoryHeight) {
+    return mouseX >= categoryX && mouseX <= categoryX + categoryWidth && mouseY >= categoryY && mouseY <= categoryY + categoryHeight;
+  }
+
+  handleCategoryClick(mouseX, mouseY, startX, startY, tabWidth, tabHeight) {
+    const scale = Math.min(this.canvas.width / Inventory.BASE_RESOLUTION.width, this.canvas.height / Inventory.BASE_RESOLUTION.height);
+
+    Inventory.CATEGORIES.forEach((category, index) => {
+      const categoryX = startX + tabWidth * index;
+      if (this.isMouseInCategory(mouseX, mouseY, categoryX, startY, tabWidth, tabHeight)) {
+        this.selectedCategory = category;
+      }
+    });
+  }
+
   draw() {
     const scaleX = this.canvas.width / Inventory.BASE_RESOLUTION.width;
     const scaleY = this.canvas.height / Inventory.BASE_RESOLUTION.height;
@@ -102,11 +117,12 @@ export default class Inventory {
     const slotSize = Inventory.SLOT_SIZE * scale;
     const fontSize = Math.floor(20 * scale);
     const smallerFontSize = Math.floor(14 * scale);
-    const headerHeight = fontSize + smallerFontSize + 15; // Title + instructions + spacing
+    const headerHeight = fontSize + smallerFontSize + 15;
+    const categoryHeight = 40 * scale;
 
     const windowWidth = slotSize * Inventory.SLOTS_PER_ROW + padding * 2;
     const numRows = Math.ceil(Inventory.TOTAL_SLOTS / Inventory.SLOTS_PER_ROW);
-    const windowHeight = slotSize * numRows + padding * 2 + headerHeight;
+    const windowHeight = slotSize * numRows + padding * 2 + headerHeight + categoryHeight;
 
     const startX = (this.canvas.width - windowWidth) / 2;
     const startY = (this.canvas.height - windowHeight) / 2;
@@ -119,12 +135,43 @@ export default class Inventory {
     drawText(this.ctx, "Inventory", startX + windowWidth / 2, startY + padding, `${fontSize}px Arial`, "black", "center");
     drawText(this.ctx, "Press 1-9 to select, D to drop, L for Adventure Log", startX + windowWidth / 2, startY + padding + fontSize + 5, `${smallerFontSize}px Arial`, "gray", "center");
 
+    // draw category tabs
+    const tabWidth = windowWidth / Inventory.CATEGORIES.length;
+    const categoryY = startY + padding + headerHeight;
+
+    Inventory.CATEGORIES.forEach((category, index) => {
+      const categoryX = startX + tabWidth * index;
+
+      // Tab background
+      this.ctx.fillStyle = category === this.selectedCategory ? "rgba(255, 165, 0, 0.3)" : "white";
+      this.ctx.fillRect(categoryX, categoryY, tabWidth, categoryHeight);
+
+      // Tab border
+      this.ctx.strokeStyle = category === this.selectedCategory ? "orange" : "gray";
+      this.ctx.strokeRect(categoryX, categoryY, tabWidth, categoryHeight);
+
+      // Category text
+      this.ctx.font = `${Math.floor(12 * scale)}px Arial`;
+      this.ctx.fillStyle = "black";
+      this.ctx.textAlign = "center";
+      let categoryEmoji = "";
+      if (category === "Weapons") categoryEmoji = "⚔️";
+      else if (category === "Bows and Arrows") categoryEmoji = "🏹";
+      else if (category === "Shields") categoryEmoji = "🛡️";
+      else if (category === "Armor") categoryEmoji = "🥋";
+      else if (category === "Materials") categoryEmoji = "🪵";
+      else if (category === "Food") categoryEmoji = "🍎";
+      else if (category === "Key Items") categoryEmoji = "🔑";
+
+      this.ctx.fillText(categoryEmoji, categoryX + tabWidth / 2, categoryY + categoryHeight / 2 + 5);
+    });
+
     // inventory slots
     for (let i = 0; i < Inventory.TOTAL_SLOTS; i++) {
       const row = Math.floor(i / Inventory.SLOTS_PER_ROW);
       const col = i % Inventory.SLOTS_PER_ROW;
       const x = startX + padding + col * slotSize;
-      const y = startY + padding + headerHeight + row * slotSize;
+      const y = startY + padding + headerHeight + categoryHeight + row * slotSize;
 
       this.ctx.fillStyle = i === this.selectedSlot ? "rgba(255, 165, 0, 0.3)" : "white";
       this.ctx.fillRect(x, y, slotSize, slotSize);
