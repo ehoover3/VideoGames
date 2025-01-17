@@ -6,5 +6,6 @@ export default class Item extends GameObject {
     super(config);
     this.name = config.name || "Unknown Item";
     this.isPickedUp = config.isPickedUp || false;
+    this.itemCategory = config.itemCategory || "";
   }
 }

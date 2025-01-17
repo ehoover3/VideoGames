@@ -87,6 +87,7 @@ export default class Game {
       height: 16,
       name: "Tennis Ball",
       isPickedUp: false,
+      itemCategory: "Key Items",
     });
 
     const coin = new Item({
@@ -101,6 +102,7 @@ export default class Game {
       height: 16,
       name: "Coin",
       isPickedUp: false,
+      itemCategory: "Key Items",
     });
 
     const dog = new NPC({

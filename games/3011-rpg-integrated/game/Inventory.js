@@ -1,3 +1,4 @@
+// game/Inventory.js
 import { STATES } from "../config/constants.js";
 import { drawText } from "./utils/drawText.js";
 
@@ -245,6 +246,9 @@ export default class Inventory {
       this.ctx.fillText(categoryEmoji, categoryX + tabWidth / 2, categoryY + categoryHeight / 2 + 5);
     });
 
+    // Filter items by selected category
+    const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedCategory);
+
     // inventory slots
     for (let i = 0; i < Inventory.TOTAL_SLOTS; i++) {
       const row = Math.floor(i / Inventory.SLOTS_PER_ROW);
@@ -258,8 +262,8 @@ export default class Inventory {
       this.ctx.strokeStyle = i === this.selectedSlot ? "orange" : "gray";
       this.ctx.strokeRect(x, y, slotSize, slotSize);
 
-      if (this.items[i]) {
-        const item = this.items[i];
+      const item = filteredItems[i];
+      if (item) {
         const itemPadding = slotSize * 0.1;
         this.ctx.drawImage(item.imgPath, item.imgSourceX, item.imgSourceY, item.imgSourceWidth, item.imgSourceHeight, x + itemPadding, y + itemPadding, slotSize - itemPadding * 2, slotSize - itemPadding * 2);
       }
