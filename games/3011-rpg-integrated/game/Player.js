@@ -120,7 +120,11 @@ class Player extends GameObject {
     const { WALK_FRAMES, ANIMATION_SPEED } = Player.FRAME_SETTINGS;
     const { ball, coin, dog, mri } = gameObjects;
 
-    // Handle inventory first
+    // Handle adventure log screen
+    const adventureLogUpdate = this.handleAdventureLogKey(keys, gameState);
+    if (adventureLogUpdate) return adventureLogUpdate;
+
+    // Handle inventory screen
     const inventoryUpdate = this.handleInventoryKey(keys, gameState);
     if (inventoryUpdate) return inventoryUpdate;
 
@@ -249,6 +253,13 @@ class Player extends GameObject {
       }
     }
     return false;
+  }
+
+  handleAdventureLogKey(keys, gameState) {
+    if (keys["l"] || keys["L"]) {
+      return this.changeGameState(gameState.currentState, STATES.ADVENTURE_LOG);
+    }
+    return null;
   }
 
   handleInventoryKey(keys, gameState) {

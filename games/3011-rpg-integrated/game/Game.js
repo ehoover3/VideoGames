@@ -9,6 +9,7 @@ import Item from "./Item.js";
 import NPC from "./NPC.js";
 import Player from "./Player.js";
 import DogBallQuest from "./quests/DogBallQuest.js";
+import AdventureLog from "./AdventureLog.js";
 
 export default class Game {
   constructor(canvasId) {
@@ -20,6 +21,7 @@ export default class Game {
     this.inventory = new Inventory(this.canvas, this.ctx, this.keys, this.gameState);
     this.gameObjects = this.getGameObjects();
     this.initializeQuests();
+    this.adventureLog = new AdventureLog(this.canvas, this.ctx, this.keys, this.gameState);
     this.startGameComponents();
     this.bindEvents();
     window.gameInstance = this;
@@ -141,6 +143,7 @@ export default class Game {
       [STATES.OVERWORLD]: () => this.overworld.load(),
       [STATES.MED_SCAN_GAME]: () => this.medScanGame.load(),
       [STATES.INVENTORY]: () => this.inventory.load(),
+      [STATES.ADVENTURE_LOG]: () => this.adventureLog.load(),
     };
   }
 

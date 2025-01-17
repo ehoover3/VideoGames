@@ -8,6 +8,7 @@ import HUD from "./HUD.js";
 import Item from "./Item.js";
 import NPC from "./NPC.js";
 import Player from "./Player.js";
+import DogBallQuest from "./quests/DogBallQuest.js";
 
 export default class Game {
   constructor(canvasId) {
@@ -18,6 +19,7 @@ export default class Game {
     this.loadImages();
     this.inventory = new Inventory(this.canvas, this.ctx, this.keys, this.gameState);
     this.gameObjects = this.getGameObjects();
+    this.initializeQuests();
     this.startGameComponents();
     this.bindEvents();
     window.gameInstance = this;
@@ -175,13 +177,17 @@ export default class Game {
   }
 
   initializeQuests() {
+    // Create the dog quest instance
     const dogQuest = new DogBallQuest();
+
+    // Assign the quest to the dog NPC
     if (this.gameObjects.dog) {
       this.gameObjects.dog.quest = dogQuest;
+    } else {
+      console.error("Dog NPC not found when initializing quests");
     }
   }
 }
-
 
 // game/GameObject.js
 export default class GameObject {
@@ -228,7 +234,7 @@ export default class GameObject {
       return box1.x < box2.x + box2.width && box1.x + box1.width > box2.x && box1.y < box2.y + box2.height && box1.y + box1.height > box2.y;
     }
   }
-
+  
   // game/GameState.js
   import { STATES, ACTIONS, DIRECTION } from "../config/constants.js";
   
@@ -365,7 +371,7 @@ export default class GameObject {
       this.notifyListeners();
     }
   }
-
+  
   // game/HUD.js
   import { drawText } from "./utils/drawText.js";
   import { STATES, GAME_CONFIG, UI_CONFIG } from "../config/constants.js";
@@ -577,7 +583,7 @@ export default class GameObject {
       }
     }
   }
-  
+
   // game/Item.js
   import GameObject from "./GameObject.js";
   
@@ -589,697 +595,511 @@ export default class GameObject {
     }
   }
   
-// game/Menu.js
-import { drawText } from "./utils/drawText.js";
-import { STATES, UI_CONFIG } from "../config/constants.js";
-
-const SHADOW_BLUR = 0;
-const SHADOW_OFFSET_X = 2;
-const SHADOW_OFFSET_Y = 2;
-const SHADOW_COLOR = "rgba(0, 0, 0, 0.2)";
-
-const MENU_OPTIONS = {
-  START_NEW_GAME: "Start New Game",
-  RETURN_TO_GAME: "Return to Game",
-  LOAD_GAME: "Load Game",
-  SETTINGS: "Settings",
-  EXIT: "Exit",
-};
-
-const menuBackground = new Image();
-menuBackground.src = "assets/images/menu/menu.jpeg";
-
-const BASE_MENU = [MENU_OPTIONS.START_NEW_GAME, MENU_OPTIONS.LOAD_GAME, MENU_OPTIONS.SETTINGS, MENU_OPTIONS.EXIT];
-
-export default class Menu {
-  constructor(canvas, ctx, keys, gameState) {
-    this.canvas = canvas;
-    this.ctx = ctx;
-    this.keys = keys;
-    this.gameState = gameState;
-  }
-
-  load() {
-    this.updateMenu();
-    this.drawMenu();
-  }
-
-  updateMenu() {
-    const { keys, gameState } = this;
-    let { selectedMenuOption } = gameState;
-
-    const setCurrentState = (newState) => {
-      gameState.currentState = newState;
-    };
-
-    const setIsGameStarted = (newGameStarted) => {
-      gameState.isGameStarted = newGameStarted;
-    };
-
-    const setSelectedMenuOption = (newSelected) => {
-      gameState.selectedMenuOption = newSelected;
-    };
-
-    const handleLoadGame = () => {
-      alert("Load Game functionality is not implemented yet.");
-    };
-
-    const handleMenuSelection = () => {
-      const menu = gameState.isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
-      const selected = menu[selectedMenuOption];
-
-      switch (selected) {
-        case MENU_OPTIONS.START_NEW_GAME:
-          this.handleStartNewGame(setCurrentState, setIsGameStarted);
-          break;
-        case MENU_OPTIONS.RETURN_TO_GAME:
-          this.handleReturnToGame(gameState.previousState, setCurrentState);
-          break;
-        case MENU_OPTIONS.LOAD_GAME:
-          handleLoadGame();
-          break;
-        case MENU_OPTIONS.SETTINGS:
-          this.handleSettings();
-          break;
-        case MENU_OPTIONS.EXIT:
-          this.handleExit();
-          break;
-        default:
-          console.warn("Invalid menu option selected");
-      }
-    };
-
-    const menuLength = BASE_MENU.length;
-
-    if (keys["ArrowUp"]) {
-      setSelectedMenuOption((selectedMenuOption - 1 + menuLength) % menuLength);
-      keys["ArrowUp"] = false;
-    }
-    if (keys["ArrowDown"]) {
-      setSelectedMenuOption((selectedMenuOption + 1) % menuLength);
-      keys["ArrowDown"] = false;
-    }
-
-    if (keys["Enter"]) {
-      handleMenuSelection();
-      keys["Enter"] = false;
-    }
-  }
-
-  handleReturnToGame(previousState, setCurrentState) {
-    const stateMap = {
-      [STATES.MED_SCAN_GAME]: STATES.MED_SCAN_GAME,
-    };
-    const state = stateMap[previousState] || previousState;
-    setCurrentState(state);
-  }
-
-  handleSettings() {
-    alert("Settings functionality is not implemented yet.");
-  }
-
-  handleStartNewGame(setCurrentState, setIsGameStarted) {
-    setCurrentState(STATES.OVERWORLD);
-    setIsGameStarted(true);
-  }
-
-  handleExit() {
-    alert("Exiting the game...");
-  }
-
-  drawMenu() {
-    const { canvas, ctx, gameState } = this;
-    const isGameStarted = gameState.isGameStarted;
-    const selectedOption = gameState.selectedMenuOption;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    ctx.drawImage(menuBackground, 0, 0, menuBackground.width, menuBackground.height, 0, 0, canvas.width, canvas.height);
-
-    const titleFontSize = Math.round(canvas.height * UI_CONFIG.MENU.TITLE_HEIGHT_RATIO);
-    drawText(ctx, "Science Game", canvas.width / 2, canvas.height / 4, `${titleFontSize}px Arial`, "black");
-
-    const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
-
-    const menuStartY = canvas.height * UI_CONFIG.MENU.MENU_START_Y_RATIO;
-    const menuSpacing = canvas.height * UI_CONFIG.MENU.SPACING_RATIO;
-    const menuFontSize = Math.round(canvas.height * UI_CONFIG.MENU.FONT_SIZE_RATIO);
-    const buttonPadding = canvas.height * UI_CONFIG.MENU.BUTTON.PADDING_RATIO;
-
-    menu.forEach((option, index) => {
-      const isSelected = index === selectedOption;
-
-      const buttonWidth = canvas.width * UI_CONFIG.MENU.BUTTON.WIDTH_RATIO;
-      const buttonHeight = menuFontSize + buttonPadding;
-      const buttonX = (canvas.width - buttonWidth) * UI_CONFIG.MENU.BUTTON.RADIUS_RATIO;
-      const buttonY = menuStartY + index * menuSpacing - buttonHeight;
-
-      const buttonColor = isSelected ? UI_CONFIG.MENU.COLORS.SELECTED : UI_CONFIG.MENU.COLORS.TEXT_SELECTED;
-      const textColor = isSelected ? UI_CONFIG.MENU.COLORS.DEFAULT : UI_CONFIG.MENU.COLORS.TEXT_DEFAULT;
-
-      ctx.beginPath();
-      ctx.roundRect(buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
-      ctx.fillStyle = buttonColor;
-      ctx.fill();
-      ctx.shadowColor = SHADOW_COLOR;
-      ctx.shadowBlur = SHADOW_BLUR;
-      ctx.shadowOffsetX = SHADOW_OFFSET_X;
-      ctx.shadowOffsetY = SHADOW_OFFSET_Y;
-      ctx.strokeStyle = UI_CONFIG.MENU.COLORS.STROKE;
-      ctx.stroke();
-      ctx.shadowBlur = SHADOW_BLUR;
-
-      drawText(ctx, option, canvas.width / 2, buttonY + buttonHeight / 2 + menuFontSize / 3, `${menuFontSize}px Arial`, textColor);
-    });
-  }
-}
-
-// game/NPC.js
-export default class NPC extends GameObject {
-    constructor(config) {
-      super(config);
-      this.interactionText = config.interactionText;
-      this.quest = null; // Add this line
+  // game/Menu.js
+  import { drawText } from "./utils/drawText.js";
+  import { STATES, UI_CONFIG } from "../config/constants.js";
+  
+  const SHADOW_BLUR = 0;
+  const SHADOW_OFFSET_X = 2;
+  const SHADOW_OFFSET_Y = 2;
+  const SHADOW_COLOR = "rgba(0, 0, 0, 0.2)";
+  
+  const MENU_OPTIONS = {
+    START_NEW_GAME: "Start New Game",
+    RETURN_TO_GAME: "Return to Game",
+    LOAD_GAME: "Load Game",
+    SETTINGS: "Settings",
+    EXIT: "Exit",
+  };
+  
+  const menuBackground = new Image();
+  menuBackground.src = "assets/images/menu/menu.jpeg";
+  
+  const BASE_MENU = [MENU_OPTIONS.START_NEW_GAME, MENU_OPTIONS.LOAD_GAME, MENU_OPTIONS.SETTINGS, MENU_OPTIONS.EXIT];
+  
+  export default class Menu {
+    constructor(canvas, ctx, keys, gameState) {
+      this.canvas = canvas;
+      this.ctx = ctx;
+      this.keys = keys;
+      this.gameState = gameState;
     }
   
-    interact(gameState) {
-      if (this.quest) {
-        return this.quest.handleInteraction(window.gameInstance.gameObjects.player, this, gameState);
-      }
+    load() {
+      this.updateMenu();
+      this.drawMenu();
     }
-  }
   
-
-// game/Overworld.js
-import HUD from "./HUD.js";
-
-export default class Overworld {
-  constructor(canvas, ctx, keys, gameState, gameObjects) {
-    this.canvas = canvas;
-    this.ctx = ctx;
-    this.keys = keys;
-    this.gameState = gameState;
-    this.gameObjects = gameObjects;
-    this.hud = new HUD(canvas, ctx);
-    this.isPlayerMoving = false;
-  }
-
-  load() {
-    const update = this.gameObjects.player.update({
-      keys: this.keys,
-      gameState: this.gameState,
-      gameObjects: this.gameObjects,
-    });
-
-    this.gameState.currentState = update.currentState;
-    this.gameState.previousState = update.previousState;
-    this.gameState.savedPlayerPosition = update.savedPlayerPosition;
-
-    this.draw(update.interactionMessage);
-
-    // Update movement state
-    this.isPlayerMoving = Boolean(this.keys["ArrowUp"] || this.keys["ArrowDown"] || this.keys["ArrowLeft"] || this.keys["ArrowRight"]);
-
-    let displayObject = null;
-    let displayMessage = null;
-
-    if (!this.isPlayerMoving) {
-      if (update.isInteracting && this.gameObjects.dog) {
-        // Show dog during conversation
-        displayObject = this.gameObjects.dog;
-        displayMessage = update.interactionMessage;
+    updateMenu() {
+      const { keys, gameState } = this;
+      let { selectedMenuOption } = gameState;
+  
+      const setCurrentState = (newState) => {
+        gameState.currentState = newState;
+      };
+  
+      const setIsGameStarted = (newGameStarted) => {
+        gameState.isGameStarted = newGameStarted;
+      };
+  
+      const setSelectedMenuOption = (newSelected) => {
+        gameState.selectedMenuOption = newSelected;
+      };
+  
+      const handleLoadGame = () => {
+        alert("Load Game functionality is not implemented yet.");
+      };
+  
+      const handleMenuSelection = () => {
+        const menu = gameState.isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
+        const selected = menu[selectedMenuOption];
+  
+        switch (selected) {
+          case MENU_OPTIONS.START_NEW_GAME:
+            this.handleStartNewGame(setCurrentState, setIsGameStarted);
+            break;
+          case MENU_OPTIONS.RETURN_TO_GAME:
+            this.handleReturnToGame(gameState.previousState, setCurrentState);
+            break;
+          case MENU_OPTIONS.LOAD_GAME:
+            handleLoadGame();
+            break;
+          case MENU_OPTIONS.SETTINGS:
+            this.handleSettings();
+            break;
+          case MENU_OPTIONS.EXIT:
+            this.handleExit();
+            break;
+          default:
+            console.warn("Invalid menu option selected");
+        }
+      };
+  
+      const menuLength = BASE_MENU.length;
+  
+      if (keys["ArrowUp"]) {
+        setSelectedMenuOption((selectedMenuOption - 1 + menuLength) % menuLength);
+        keys["ArrowUp"] = false;
+      }
+      if (keys["ArrowDown"]) {
+        setSelectedMenuOption((selectedMenuOption + 1) % menuLength);
+        keys["ArrowDown"] = false;
+      }
+  
+      if (keys["Enter"]) {
+        handleMenuSelection();
+        keys["Enter"] = false;
       }
     }
-
-    this.hud.draw(this.gameState.currentState, displayMessage, displayObject);
-  }
-
-  draw() {
-    this.drawWorld();
-    this.drawGameObjects();
-    this.gameObjects.player.draw(this.canvas, this.ctx, this.gameState.currentFrame);
-  }
-
-  drawWorld() {
-    this.ctx.fillStyle = "darkseagreen";
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-  }
-
-  drawGameObjects() {
-    const { ball, coin, dog, mri } = this.gameObjects;
-    const scaleX = this.canvas.width / 640;
-    const scaleY = this.canvas.height / 360;
-
-    if (!ball.isPickedUp) {
-      ball.draw(this.ctx, scaleX, scaleY);
+  
+    handleReturnToGame(previousState, setCurrentState) {
+      const stateMap = {
+        [STATES.MED_SCAN_GAME]: STATES.MED_SCAN_GAME,
+      };
+      const state = stateMap[previousState] || previousState;
+      setCurrentState(state);
     }
-
-    if (!coin.isPickedUp) {
-      coin.draw(this.ctx, scaleX, scaleY);
+  
+    handleSettings() {
+      alert("Settings functionality is not implemented yet.");
     }
-
-    dog.draw(this.ctx, scaleX, scaleY);
-    mri.draw(this.ctx, scaleX, scaleY);
+  
+    handleStartNewGame(setCurrentState, setIsGameStarted) {
+      setCurrentState(STATES.OVERWORLD);
+      setIsGameStarted(true);
+    }
+  
+    handleExit() {
+      alert("Exiting the game...");
+    }
+  
+    drawMenu() {
+      const { canvas, ctx, gameState } = this;
+      const isGameStarted = gameState.isGameStarted;
+      const selectedOption = gameState.selectedMenuOption;
+  
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+      ctx.drawImage(menuBackground, 0, 0, menuBackground.width, menuBackground.height, 0, 0, canvas.width, canvas.height);
+  
+      const titleFontSize = Math.round(canvas.height * UI_CONFIG.MENU.TITLE_HEIGHT_RATIO);
+      drawText(ctx, "Science Game", canvas.width / 2, canvas.height / 4, `${titleFontSize}px Arial`, "black");
+  
+      const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
+  
+      const menuStartY = canvas.height * UI_CONFIG.MENU.MENU_START_Y_RATIO;
+      const menuSpacing = canvas.height * UI_CONFIG.MENU.SPACING_RATIO;
+      const menuFontSize = Math.round(canvas.height * UI_CONFIG.MENU.FONT_SIZE_RATIO);
+      const buttonPadding = canvas.height * UI_CONFIG.MENU.BUTTON.PADDING_RATIO;
+  
+      menu.forEach((option, index) => {
+        const isSelected = index === selectedOption;
+  
+        const buttonWidth = canvas.width * UI_CONFIG.MENU.BUTTON.WIDTH_RATIO;
+        const buttonHeight = menuFontSize + buttonPadding;
+        const buttonX = (canvas.width - buttonWidth) * UI_CONFIG.MENU.BUTTON.RADIUS_RATIO;
+        const buttonY = menuStartY + index * menuSpacing - buttonHeight;
+  
+        const buttonColor = isSelected ? UI_CONFIG.MENU.COLORS.SELECTED : UI_CONFIG.MENU.COLORS.TEXT_SELECTED;
+        const textColor = isSelected ? UI_CONFIG.MENU.COLORS.DEFAULT : UI_CONFIG.MENU.COLORS.TEXT_DEFAULT;
+  
+        ctx.beginPath();
+        ctx.roundRect(buttonX, buttonY, buttonWidth, buttonHeight, buttonHeight / 2);
+        ctx.fillStyle = buttonColor;
+        ctx.fill();
+        ctx.shadowColor = SHADOW_COLOR;
+        ctx.shadowBlur = SHADOW_BLUR;
+        ctx.shadowOffsetX = SHADOW_OFFSET_X;
+        ctx.shadowOffsetY = SHADOW_OFFSET_Y;
+        ctx.strokeStyle = UI_CONFIG.MENU.COLORS.STROKE;
+        ctx.stroke();
+        ctx.shadowBlur = SHADOW_BLUR;
+  
+        drawText(ctx, option, canvas.width / 2, buttonY + buttonHeight / 2 + menuFontSize / 3, `${menuFontSize}px Arial`, textColor);
+      });
+    }
   }
-}
-
-// game/Player.js
-import { DIRECTION, STATES } from "../config/constants.js";
-import GameObject from "./GameObject.js";
-import Inventory from "./Inventory.js";
-
-class Player extends GameObject {
-  static FRAME_SETTINGS = {
-    FRAME_WIDTH: 102,
-    FRAME_HEIGHT: 152.75,
-    WALK_FRAMES: 4,
-    ATTACK_FRAMES: 1,
-    ANIMATION_SPEED: 8,
-  };
-
-  static DIRECTIONS = {
-    [DIRECTION.DOWN]: 0,
-    [DIRECTION.UP]: 1,
-    [DIRECTION.LEFT]: 2,
-    [DIRECTION.RIGHT]: 3,
-  };
-
-  constructor(image, x, y, width, height, speed, direction) {
-    super({
-      imgPath: image,
-      imgSourceX: 0,
-      imgSourceY: 0,
-      imgSourceWidth: Player.FRAME_SETTINGS.FRAME_WIDTH,
-      imgSourceHeight: Player.FRAME_SETTINGS.FRAME_HEIGHT,
-      x,
-      y,
-      width,
-      height,
-    });
-
-    this.sprite = {
-      image,
-      frame: 0,
-      animationTimer: 0,
-    };
-
-    this.movement = {
-      speed,
-      direction,
-      isMoving: false,
-    };
-
-    this.interaction = {
-      isInteracting: false,
-      message: null,
-      showPickupNotification: false,
-      lastPickedUpItem: null,
-      droppedItem: null,
-    };
-  }
-
-  move(keys) {
-    const movement = {
-      x: 0,
-      y: 0,
-      direction: this.movement.direction,
-      isMoving: false,
-    };
-
-    if (keys["ArrowUp"]) {
-      movement.y -= 1;
-      movement.direction = DIRECTION.UP;
-      movement.isMoving = true;
+  // game/Overworld.js
+  import HUD from "./HUD.js";
+  
+  export default class Overworld {
+    constructor(canvas, ctx, keys, gameState, gameObjects) {
+      this.canvas = canvas;
+      this.ctx = ctx;
+      this.keys = keys;
+      this.gameState = gameState;
+      this.gameObjects = gameObjects;
+      this.hud = new HUD(canvas, ctx);
+      this.isPlayerMoving = false;
     }
-    if (keys["ArrowDown"]) {
-      movement.y += 1;
-      movement.direction = DIRECTION.DOWN;
-      movement.isMoving = true;
-    }
-    if (keys["ArrowLeft"]) {
-      movement.x -= 1;
-      movement.direction = DIRECTION.LEFT;
-      movement.isMoving = true;
-    }
-    if (keys["ArrowRight"]) {
-      movement.x += 1;
-      movement.direction = DIRECTION.RIGHT;
-      movement.isMoving = true;
-    }
-
-    if (!movement.isMoving) return false;
-
-    // Reset all interaction states when moving
-    this.interaction.isInteracting = false;
-    this.interaction.message = null;
-    this.interaction.showPickupNotification = false;
-    this.interaction.lastPickedUpItem = null;
-
-    // Update position
-    const isDiagonal = movement.x !== 0 && movement.y !== 0;
-    const speed = isDiagonal ? this.movement.speed / Math.SQRT2 : this.movement.speed;
-
-    this.x += movement.x * speed;
-    this.y += movement.y * speed;
-
-    this.movement.direction = movement.direction;
-    return true;
-  }
-
-  draw(canvas, ctx) {
-    const { FRAME_WIDTH, FRAME_HEIGHT } = Player.FRAME_SETTINGS;
-    const spriteRow = Player.DIRECTIONS[this.movement.direction];
-
-    this.imgSourceX = this.sprite.frame * FRAME_WIDTH;
-    this.imgSourceY = spriteRow * FRAME_HEIGHT;
-
-    const scale = {
-      x: canvas.width / 640,
-      y: canvas.height / 360,
-    };
-
-    super.draw(ctx, scale.x, scale.y);
-  }
-
-  update({ keys, gameState, gameObjects }) {
-    const { WALK_FRAMES, ANIMATION_SPEED } = Player.FRAME_SETTINGS;
-    const { ball, coin, dog, mri } = gameObjects;
-
-    // Handle inventory first
-    const inventoryUpdate = this.handleInventoryKey(keys, gameState);
-    if (inventoryUpdate) return inventoryUpdate;
-
-    // Handle movement and animation
-    const isMoving = this.move(keys);
-
-    // Update animation state
-    if (!isMoving) {
-      this.sprite.frame = 0;
-      this.sprite.animationTimer = 0;
-    } else {
-      this.sprite.animationTimer++;
-      if (this.sprite.animationTimer >= ANIMATION_SPEED) {
-        this.sprite.animationTimer = 0;
-        this.sprite.frame = (this.sprite.frame + 1) % WALK_FRAMES;
+  
+    load() {
+      const update = this.gameObjects.player.update({
+        keys: this.keys,
+        gameState: this.gameState,
+        gameObjects: this.gameObjects,
+      });
+  
+      this.gameState.currentState = update.currentState;
+      this.gameState.previousState = update.previousState;
+      this.gameState.savedPlayerPosition = update.savedPlayerPosition;
+  
+      this.draw(update.interactionMessage);
+  
+      // Update movement state
+      this.isPlayerMoving = Boolean(this.keys["ArrowUp"] || this.keys["ArrowDown"] || this.keys["ArrowLeft"] || this.keys["ArrowRight"]);
+  
+      let displayObject = null;
+      let displayMessage = null;
+  
+      if (!this.isPlayerMoving) {
+        if (update.isInteracting && this.gameObjects.dog) {
+          // Show dog during conversation
+          displayObject = this.gameObjects.dog;
+          displayMessage = update.interactionMessage;
+        }
       }
+  
+      this.hud.draw(this.gameState.currentState, displayMessage, displayObject);
     }
+  
+    draw() {
+      this.drawWorld();
+      this.drawGameObjects();
+      this.gameObjects.player.draw(this.canvas, this.ctx, this.gameState.currentFrame);
+    }
+  
+    drawWorld() {
+      this.ctx.fillStyle = "darkseagreen";
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+  
+    drawGameObjects() {
+      const { ball, coin, dog, mri } = this.gameObjects;
+      const scaleX = this.canvas.width / 640;
+      const scaleY = this.canvas.height / 360;
+  
+      if (!ball.isPickedUp) {
+        ball.draw(this.ctx, scaleX, scaleY);
+      }
+  
+      if (!coin.isPickedUp) {
+        coin.draw(this.ctx, scaleX, scaleY);
+      }
+  
+      dog.draw(this.ctx, scaleX, scaleY);
+      mri.draw(this.ctx, scaleX, scaleY);
+    }
+  }
 
-    gameState.currentFrame = this.sprite.frame;
-
-    // If moving, reset interaction state
-    if (isMoving) {
-      return {
-        currentState: gameState.currentState,
-        previousState: gameState.previousState,
-        savedPlayerPosition: gameState.savedPlayerPosition,
-        interactionMessage: null,
+  // game/Player.js
+  import { DIRECTION, STATES } from "../config/constants.js";
+  import GameObject from "./GameObject.js";
+  import Inventory from "./Inventory.js";
+  
+  class Player extends GameObject {
+    static FRAME_SETTINGS = {
+      FRAME_WIDTH: 102,
+      FRAME_HEIGHT: 152.75,
+      WALK_FRAMES: 4,
+      ATTACK_FRAMES: 1,
+      ANIMATION_SPEED: 8,
+    };
+  
+    static DIRECTIONS = {
+      [DIRECTION.DOWN]: 0,
+      [DIRECTION.UP]: 1,
+      [DIRECTION.LEFT]: 2,
+      [DIRECTION.RIGHT]: 3,
+    };
+  
+    constructor(image, x, y, width, height, speed, direction) {
+      super({
+        imgPath: image,
+        imgSourceX: 0,
+        imgSourceY: 0,
+        imgSourceWidth: Player.FRAME_SETTINGS.FRAME_WIDTH,
+        imgSourceHeight: Player.FRAME_SETTINGS.FRAME_HEIGHT,
+        x,
+        y,
+        width,
+        height,
+      });
+  
+      this.sprite = {
+        image,
+        frame: 0,
+        animationTimer: 0,
+      };
+  
+      this.movement = {
+        speed,
+        direction,
+        isMoving: false,
+      };
+  
+      this.interaction = {
+        isInteracting: false,
+        message: null,
         showPickupNotification: false,
         lastPickedUpItem: null,
-        isInteracting: false,
         droppedItem: null,
       };
     }
-
-    // Handle interactions
-    const isWithinInteractionDistance = (object) => {
-      const dx = this.x - object.x;
-      const dy = this.y - object.y;
-      return Math.sqrt(dx * dx + dy * dy) <= Inventory.INTERACTION_DISTANCE;
-    };
-
-    // Check for MRI interaction
-    if (this.isColliding(mri) && keys[" "]) {
-      return this.changeGameState(gameState.currentState, STATES.MED_SCAN_GAME);
+  
+    move(keys) {
+      const movement = {
+        x: 0,
+        y: 0,
+        direction: this.movement.direction,
+        isMoving: false,
+      };
+  
+      if (keys["ArrowUp"]) {
+        movement.y -= 1;
+        movement.direction = DIRECTION.UP;
+        movement.isMoving = true;
+      }
+      if (keys["ArrowDown"]) {
+        movement.y += 1;
+        movement.direction = DIRECTION.DOWN;
+        movement.isMoving = true;
+      }
+      if (keys["ArrowLeft"]) {
+        movement.x -= 1;
+        movement.direction = DIRECTION.LEFT;
+        movement.isMoving = true;
+      }
+      if (keys["ArrowRight"]) {
+        movement.x += 1;
+        movement.direction = DIRECTION.RIGHT;
+        movement.isMoving = true;
+      }
+  
+      if (!movement.isMoving) return false;
+  
+      // Reset all interaction states when moving
+      this.interaction.isInteracting = false;
+      this.interaction.message = null;
+      this.interaction.showPickupNotification = false;
+      this.interaction.lastPickedUpItem = null;
+  
+      // Update position
+      const isDiagonal = movement.x !== 0 && movement.y !== 0;
+      const speed = isDiagonal ? this.movement.speed / Math.SQRT2 : this.movement.speed;
+  
+      this.x += movement.x * speed;
+      this.y += movement.y * speed;
+  
+      this.movement.direction = movement.direction;
+      return true;
     }
-
-    // Check for dog interaction if not showing pickup notification
-    if (!this.interaction.showPickupNotification && this.isColliding(dog) && keys[" "]) {
-      this.interaction.isInteracting = true;
-      this.interaction.message = dog.interact();
-      return this.changeGameState(gameState.currentState, gameState.currentState, this.interaction.message);
+  
+    draw(canvas, ctx) {
+      const { FRAME_WIDTH, FRAME_HEIGHT } = Player.FRAME_SETTINGS;
+      const spriteRow = Player.DIRECTIONS[this.movement.direction];
+  
+      this.imgSourceX = this.sprite.frame * FRAME_WIDTH;
+      this.imgSourceY = spriteRow * FRAME_HEIGHT;
+  
+      const scale = {
+        x: canvas.width / 640,
+        y: canvas.height / 360,
+      };
+  
+      super.draw(ctx, scale.x, scale.y);
     }
-
-    // Handle ball pickup
-    if (!ball.isPickedUp && keys[" "] && isWithinInteractionDistance(ball)) {
-      const game = window.gameInstance;
-      if (game?.getInventory()) {
-        const result = game.getInventory().addItem(ball);
-        if (result.success) {
-          ball.isPickedUp = true;
-          this.interaction.isInteracting = false;
-          this.interaction.showPickupNotification = true;
-          this.interaction.lastPickedUpItem = ball;
-          this.interaction.message = result.message;
-          return this.changeGameState(gameState.currentState, gameState.currentState, result.message);
+  
+    update({ keys, gameState, gameObjects }) {
+      const { WALK_FRAMES, ANIMATION_SPEED } = Player.FRAME_SETTINGS;
+      const { ball, coin, dog, mri } = gameObjects;
+  
+      // Handle inventory first
+      const inventoryUpdate = this.handleInventoryKey(keys, gameState);
+      if (inventoryUpdate) return inventoryUpdate;
+  
+      // Handle movement and animation
+      const isMoving = this.move(keys);
+  
+      // Update animation state
+      if (!isMoving) {
+        this.sprite.frame = 0;
+        this.sprite.animationTimer = 0;
+      } else {
+        this.sprite.animationTimer++;
+        if (this.sprite.animationTimer >= ANIMATION_SPEED) {
+          this.sprite.animationTimer = 0;
+          this.sprite.frame = (this.sprite.frame + 1) % WALK_FRAMES;
         }
       }
-    }
-
-    // Handle coin pickup
-    if (!coin.isPickedUp && keys[" "] && isWithinInteractionDistance(coin)) {
-      const game = window.gameInstance;
-      if (game?.getInventory()) {
-        const result = game.getInventory().addItem(coin);
-        if (result.success) {
-          coin.isPickedUp = true;
-          this.interaction.isInteracting = false;
-          this.interaction.showPickupNotification = true;
-          this.interaction.lastPickedUpItem = coin;
-          this.interaction.message = result.message;
-          return this.changeGameState(gameState.currentState, gameState.currentState, result.message);
+  
+      gameState.currentFrame = this.sprite.frame;
+  
+      // If moving, reset interaction state
+      if (isMoving) {
+        return {
+          currentState: gameState.currentState,
+          previousState: gameState.previousState,
+          savedPlayerPosition: gameState.savedPlayerPosition,
+          interactionMessage: null,
+          showPickupNotification: false,
+          lastPickedUpItem: null,
+          isInteracting: false,
+          droppedItem: null,
+        };
+      }
+  
+      // Handle interactions
+      const isWithinInteractionDistance = (object) => {
+        const dx = this.x - object.x;
+        const dy = this.y - object.y;
+        return Math.sqrt(dx * dx + dy * dy) <= Inventory.INTERACTION_DISTANCE;
+      };
+  
+      // Check for MRI interaction
+      if (this.isColliding(mri) && keys[" "]) {
+        return this.changeGameState(gameState.currentState, STATES.MED_SCAN_GAME);
+      }
+  
+      // Check for dog interaction if not showing pickup notification
+      if (!this.interaction.showPickupNotification && this.isColliding(dog) && keys[" "]) {
+        this.interaction.isInteracting = true;
+        this.interaction.message = dog.interact();
+        return this.changeGameState(gameState.currentState, gameState.currentState, this.interaction.message);
+      }
+  
+      // Handle ball pickup
+      if (!ball.isPickedUp && keys[" "] && isWithinInteractionDistance(ball)) {
+        const game = window.gameInstance;
+        if (game?.getInventory()) {
+          const result = game.getInventory().addItem(ball);
+          if (result.success) {
+            ball.isPickedUp = true;
+            this.interaction.isInteracting = false;
+            this.interaction.showPickupNotification = true;
+            this.interaction.lastPickedUpItem = ball;
+            this.interaction.message = result.message;
+            return this.changeGameState(gameState.currentState, gameState.currentState, result.message);
+          }
         }
       }
-    }
-
-    // Handle enter key
-    if (this.handleEnterKey(keys)) {
-      return this.changeGameState(gameState.currentState, gameState.currentState, null);
-    }
-
-    // Handle escape key
-    const escapeResult = this.handleEscapeKey(keys, gameState.currentState, gameState.previousState, gameState.savedPlayerPosition);
-
-    // Return final state with current interaction status
-    return {
-      ...escapeResult,
-      interactionMessage: this.interaction.message,
-      showPickupNotification: this.interaction.showPickupNotification,
-      lastPickedUpItem: this.interaction.lastPickedUpItem,
-      isInteracting: this.interaction.isInteracting,
-      droppedItem: this.interaction.droppedItem,
-    };
-  }
-
-  changeGameState(currentState, newState, interactionMessage = null) {
-    return {
-      savedPlayerPosition: { x: this.x, y: this.y },
-      previousState: currentState,
-      currentState: newState,
-      interactionMessage,
-    };
-  }
-
-  handleEnterKey(keys) {
-    if (keys["Enter"]) {
-      if (this.interaction.showPickupNotification) {
-        this.interaction.showPickupNotification = false;
-        this.interaction.lastPickedUpItem = null;
-        this.interaction.message = null;
-        return true;
-      }
-      if (this.interaction.isInteracting) {
-        this.interaction.isInteracting = false;
-        this.interaction.message = null;
-        return true;
-      }
-    }
-    return false;
-  }
-
-  handleInventoryKey(keys, gameState) {
-    if (keys["i"] || keys["I"]) {
-      return this.changeGameState(gameState.currentState, STATES.INVENTORY);
-    }
-    return null;
-  }
-
-  handleEscapeKey(keys, currentState, previousState, savedPlayerPosition) {
-    if (keys["Escape"]) {
-      return this.changeGameState(currentState, STATES.MAIN_MENU);
-    }
-    return { currentState, previousState, savedPlayerPosition };
-  }
-}
-
-export default Player;
-
-// game/Quest.js
-export default class Quest {
-    constructor(config) {
-      this.id = config.id;
-      this.title = config.title;
-      this.description = config.description;
-      this.objectives = config.objectives.map((obj) => ({
-        ...obj,
-        completed: false,
-      }));
-      this.reward = config.reward;
-      this.isCompleted = false;
-    }
   
-    updateObjective(objectiveId, progress) {
-      const objective = this.objectives.find((obj) => obj.id === objectiveId);
-      if (objective) {
-        objective.progress = progress;
-        objective.completed = progress >= objective.required;
-        this.checkCompletion();
-      }
-    }
-  
-    checkCompletion() {
-      this.isCompleted = this.objectives.every((obj) => obj.completed);
-    }
-  }
-  
-  // Example usage:
-  const sampleQuest = {
-    id: "dog_training",
-    title: "Dog Training",
-    description: "Help train the hospital's therapy dog",
-    objectives: [
-      {
-        id: "fetch",
-        description: "Play fetch with the dog 3 times",
-        required: 3,
-        progress: 0,
-      },
-      {
-        id: "treats",
-        description: "Give treats to the dog",
-        required: 1,
-        progress: 0,
-      },
-    ],
-    reward: {
-      items: ["dog_treat_bag"],
-      experience: 100,
-    },
-  };
-  
-
-  // game/quests/DogBallQuest.js
-  import Quest from "../Quest.js";
-  import { STATES } from "../../config/constants.js";
-  
-  export default class DogBallQuest extends Quest {
-    constructor() {
-      super({
-        id: "give_dog_ball",
-        title: "A Dog's Best Friend",
-        description: "Find a tennis ball and give it to the therapy dog.",
-        objectives: [
-          {
-            id: "find_ball",
-            description: "Find and pick up the tennis ball",
-            required: 1,
-            progress: 0,
-          },
-          {
-            id: "give_ball",
-            description: "Give the ball to the dog",
-            required: 1,
-            progress: 0,
-          },
-        ],
-        reward: {
-          items: ["dog_treat"],
-          experience: 50,
-        },
-      });
-  
-      this.questStates = {
-        NOT_STARTED: "NOT_STARTED",
-        BALL_FOUND: "BALL_FOUND",
-        COMPLETED: "COMPLETED",
-      };
-  
-      this.currentState = this.questStates.NOT_STARTED;
-      this.dialogueOptions = this.setupDialogue();
-    }
-  
-    setupDialogue() {
-      return {
-        [this.questStates.NOT_STARTED]: "Woof! *The dog looks longingly at the tennis ball in the distance*",
-        [this.questStates.BALL_FOUND]: "Woof woof! *The dog's tail wags excitedly at the sight of the ball*",
-        [this.questStates.COMPLETED]: "Woof! *The dog happily plays with the ball*",
-      };
-    }
-  
-    handleInteraction(player, dog, gameState) {
-      const inventory = window.gameInstance?.getInventory();
-      if (!inventory) return null;
-  
-      const hasBall = inventory.items.some((item) => item.name === "Tennis Ball");
-  
-      switch (this.currentState) {
-        case this.questStates.NOT_STARTED:
-          if (!hasBall) {
-            this.updateObjective("find_ball", 0);
-            return this.dialogueOptions[this.questStates.NOT_STARTED];
-          } else {
-            this.currentState = this.questStates.BALL_FOUND;
-            this.updateObjective("find_ball", 1);
-            return this.dialogueOptions[this.questStates.BALL_FOUND];
+      // Handle coin pickup
+      if (!coin.isPickedUp && keys[" "] && isWithinInteractionDistance(coin)) {
+        const game = window.gameInstance;
+        if (game?.getInventory()) {
+          const result = game.getInventory().addItem(coin);
+          if (result.success) {
+            coin.isPickedUp = true;
+            this.interaction.isInteracting = false;
+            this.interaction.showPickupNotification = true;
+            this.interaction.lastPickedUpItem = coin;
+            this.interaction.message = result.message;
+            return this.changeGameState(gameState.currentState, gameState.currentState, result.message);
           }
-  
-        case this.questStates.BALL_FOUND:
-          if (hasBall) {
-            // Find and remove the ball from inventory
-            const ballIndex = inventory.items.findIndex((item) => item.name === "Tennis Ball");
-            if (ballIndex !== -1) {
-              inventory.items.splice(ballIndex, 1);
-  
-              // Complete the quest
-              this.currentState = this.questStates.COMPLETED;
-              this.updateObjective("give_ball", 1);
-              this.completeQuest(player);
-  
-              return "You gave the ball to the dog. The dog seems overjoyed!";
-            }
-          }
-          return this.dialogueOptions[this.questStates.BALL_FOUND];
-  
-        case this.questStates.COMPLETED:
-          return this.dialogueOptions[this.questStates.COMPLETED];
-  
-        default:
-          return "Woof?";
+        }
       }
-    }
   
-    getProgress() {
+      // Handle enter key
+      if (this.handleEnterKey(keys)) {
+        return this.changeGameState(gameState.currentState, gameState.currentState, null);
+      }
+  
+      // Handle escape key
+      const escapeResult = this.handleEscapeKey(keys, gameState.currentState, gameState.previousState, gameState.savedPlayerPosition);
+  
+      // Return final state with current interaction status
       return {
-        title: this.title,
-        description: this.description,
-        objectives: this.objectives.map((obj) => ({
-          description: obj.description,
-          progress: obj.progress,
-          required: obj.required,
-          completed: obj.completed,
-        })),
-        completed: this.isCompleted,
+        ...escapeResult,
+        interactionMessage: this.interaction.message,
+        showPickupNotification: this.interaction.showPickupNotification,
+        lastPickedUpItem: this.interaction.lastPickedUpItem,
+        isInteracting: this.interaction.isInteracting,
+        droppedItem: this.interaction.droppedItem,
       };
     }
   
-    completeQuest(player) {
-      this.isCompleted = true;
+    changeGameState(currentState, newState, interactionMessage = null) {
+      return {
+        savedPlayerPosition: { x: this.x, y: this.y },
+        previousState: currentState,
+        currentState: newState,
+        interactionMessage,
+      };
+    }
   
-      // Add reward to inventory
-      const inventory = window.gameInstance?.getInventory();
-      if (inventory) {
-        // You could create a new dog treat item here
-        // inventory.addItem(new Item({ ...dogTreatConfig }));
+    handleEnterKey(keys) {
+      if (keys["Enter"]) {
+        if (this.interaction.showPickupNotification) {
+          this.interaction.showPickupNotification = false;
+          this.interaction.lastPickedUpItem = null;
+          this.interaction.message = null;
+          return true;
+        }
+        if (this.interaction.isInteracting) {
+          this.interaction.isInteracting = false;
+          this.interaction.message = null;
+          return true;
+        }
       }
+      return false;
+    }
+  
+    handleInventoryKey(keys, gameState) {
+      if (keys["i"] || keys["I"]) {
+        return this.changeGameState(gameState.currentState, STATES.INVENTORY);
+      }
+      return null;
+    }
+  
+    handleEscapeKey(keys, currentState, previousState, savedPlayerPosition) {
+      if (keys["Escape"]) {
+        return this.changeGameState(currentState, STATES.MAIN_MENU);
+      }
+      return { currentState, previousState, savedPlayerPosition };
     }
   }
+  
+  export default Player;
+  
   

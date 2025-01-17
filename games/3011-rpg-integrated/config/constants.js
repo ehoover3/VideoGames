@@ -5,6 +5,7 @@ export const STATES = {
   OVERWORLD: "overworld",
   MED_SCAN_GAME: "medScanGame",
   INVENTORY: "INVENTORY",
+  ADVENTURE_LOG: "ADVENTURE_LOG",
 };
 
 export const ACTIONS = {

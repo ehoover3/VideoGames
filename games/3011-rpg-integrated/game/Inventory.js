@@ -65,6 +65,13 @@ export default class Inventory {
       this.keys["X"] = false;
     }
 
+    // Adventure log navigation
+    if (this.keys["l"] || this.keys["L"]) {
+      this.gameState.currentState = STATES.ADVENTURE_LOG;
+      this.keys["l"] = false;
+      this.keys["L"] = false;
+    }
+
     for (let i = 1; i <= 9; i++) {
       if (this.keys[i.toString()]) {
         this.selectedSlot = i - 1;
@@ -110,7 +117,7 @@ export default class Inventory {
 
     // inventory header text
     drawText(this.ctx, "Inventory", startX + windowWidth / 2, startY + padding, `${fontSize}px Arial`, "black", "center");
-    drawText(this.ctx, "Press 1-9 to select, then D to drop", startX + windowWidth / 2, startY + padding + fontSize + 5, `${smallerFontSize}px Arial`, "gray", "center");
+    drawText(this.ctx, "Press 1-9 to select, D to drop, L for Adventure Log", startX + windowWidth / 2, startY + padding + fontSize + 5, `${smallerFontSize}px Arial`, "gray", "center");
 
     // inventory slots
     for (let i = 0; i < Inventory.TOTAL_SLOTS; i++) {
