@@ -207,6 +207,11 @@ export default class Inventory {
     const rightStartY = padding;
     const rightSectionHeight = this.canvas.height - padding * 2;
 
+    // Item Name and Description (if an item is selected)
+    const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedCategory);
+    const selectedItem = filteredItems[this.selectedSlot];
+
+    // DRAW LEFT SECTION
     // Left Section Background
     this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
     this.ctx.fillRect(leftStartX, leftStartY, leftSectionWidth, leftSectionHeight);
@@ -214,18 +219,6 @@ export default class Inventory {
     // Header text (centered within left section)
     drawText(this.ctx, "Inventory", leftStartX + leftSectionWidth / 2, leftStartY + padding, `${fontSize}px Arial`, "black", "center");
     drawText(this.ctx, "D drop item, L Adventure Log", leftStartX + leftSectionWidth / 2, leftStartY + padding + fontSize + 5, `${smallerFontSize}px Arial`, "gray", "center");
-
-    // Right Section Background
-    this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
-    this.ctx.fillRect(rightStartX, rightStartY, rightSectionWidth, rightSectionHeight);
-
-    // Item Description (if an item is selected)
-    const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedCategory);
-    const selectedItem = filteredItems[this.selectedSlot];
-    if (selectedItem) {
-      drawText(this.ctx, selectedItem.name, rightStartX + rightSectionWidth / 2, rightStartY + padding, `${fontSize}px Arial`, "black", "center");
-      drawText(this.ctx, selectedItem.description || "No description available.", rightStartX + padding, rightStartY + padding + fontSize + 10, `${smallerFontSize}px Arial`, "black", "left");
-    }
 
     // Category tabs
     const tabWidth = leftSectionWidth / Inventory.CATEGORIES.length;
@@ -290,6 +283,32 @@ export default class Inventory {
         const itemPadding = slotSize * 0.1;
         this.ctx.drawImage(item.imgPath, item.imgSourceX, item.imgSourceY, item.imgSourceWidth, item.imgSourceHeight, x + itemPadding, y + itemPadding, slotSize - itemPadding * 2, slotSize - itemPadding * 2);
       }
+    }
+
+    // DRAW RIGHT SECTION
+    // Right Section Background
+    this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
+    this.ctx.fillRect(rightStartX, rightStartY, rightSectionWidth, rightSectionHeight);
+
+    if (selectedItem) {
+      // Determine the maximum Y position above the inventory grid
+      const descriptionAreaHeight = fontSize + smallerFontSize + 10; // Space needed for name and description
+      const gridTopY = slotsStartY; // Top Y position of the inventory grid
+      const textStartY = gridTopY - descriptionAreaHeight - padding; // Place text above grid
+
+      // Draw item name
+      drawText(
+        this.ctx,
+        selectedItem.name,
+        rightStartX + rightSectionWidth / 2,
+        textStartY, // Position for item name
+        `${fontSize}px Arial`,
+        "black",
+        "center"
+      );
+
+      // Draw item description
+      drawText(this.ctx, selectedItem.description || "No description available.", rightStartX + padding, textStartY + fontSize + 5, `${smallerFontSize}px Arial`, "black", "left");
     }
   }
 }
