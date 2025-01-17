@@ -63,7 +63,7 @@ export default class AdventureLog {
     drawText(this.ctx, "Adventure Log", startX + windowWidth / 2, startY + padding, `${fontSize}px Arial`, "black", "center");
 
     // Draw navigation instructions
-    drawText(this.ctx, "Press I for Inventory, X to return to game", startX + windowWidth / 2, startY + padding + fontSize + 5, `${smallerFontSize}px Arial`, "gray", "center");
+    drawText(this.ctx, "I for Inventory, X returns to game", startX + windowWidth / 2, startY + padding + fontSize + 5, `${smallerFontSize}px Arial`, "gray", "center");
 
     // Draw quest sections
     const questStartY = startY + headerHeight + padding;

@@ -71,23 +71,54 @@ export default class Inventory {
     const currentRow = Math.floor(this.selectedSlot / Inventory.SLOTS_PER_ROW);
     const currentCol = this.selectedSlot % Inventory.SLOTS_PER_ROW;
 
+    // Track if we're currently navigating categories
+    const isInCategoryNav = this.selectedSlot === -1;
+
+    // Find current category index
+    const currentCategoryIndex = Inventory.CATEGORIES.indexOf(this.selectedCategory);
+
     // Only process a key if it wasn't already pressed (prevent holding)
     if (this.keys.ArrowLeft && !this.keyStates.ArrowLeft) {
-      this.selectedSlot = Math.max(0, this.selectedSlot - 1);
+      if (isInCategoryNav) {
+        // Navigate categories to the left
+        const newIndex = Math.max(0, currentCategoryIndex - 1);
+        this.selectedCategory = Inventory.CATEGORIES[newIndex];
+      } else {
+        // Navigate inventory slots to the left
+        this.selectedSlot = Math.max(0, this.selectedSlot - 1);
+      }
       this.keyStates.ArrowLeft = true;
     }
+
     if (this.keys.ArrowRight && !this.keyStates.ArrowRight) {
-      this.selectedSlot = Math.min(Inventory.TOTAL_SLOTS - 1, this.selectedSlot + 1);
+      if (isInCategoryNav) {
+        // Navigate categories to the right
+        const newIndex = Math.min(Inventory.CATEGORIES.length - 1, currentCategoryIndex + 1);
+        this.selectedCategory = Inventory.CATEGORIES[newIndex];
+      } else {
+        // Navigate inventory slots to the right
+        this.selectedSlot = Math.min(Inventory.TOTAL_SLOTS - 1, this.selectedSlot + 1);
+      }
       this.keyStates.ArrowRight = true;
     }
+
     if (this.keys.ArrowUp && !this.keyStates.ArrowUp) {
-      if (currentRow > 0) {
+      if (currentRow === 0 && !isInCategoryNav) {
+        // Move from top row to category navigation
+        this.selectedSlot = -1;
+      } else if (!isInCategoryNav && currentRow > 0) {
+        // Navigate up within inventory
         this.selectedSlot -= Inventory.SLOTS_PER_ROW;
       }
       this.keyStates.ArrowUp = true;
     }
+
     if (this.keys.ArrowDown && !this.keyStates.ArrowDown) {
-      if (currentRow < rows - 1 && this.selectedSlot + Inventory.SLOTS_PER_ROW < Inventory.TOTAL_SLOTS) {
+      if (isInCategoryNav) {
+        // Move from category navigation to first row of inventory
+        this.selectedSlot = 0; // Start at the first slot of the inventory
+      } else if (currentRow < rows - 1 && this.selectedSlot + Inventory.SLOTS_PER_ROW < Inventory.TOTAL_SLOTS) {
+        // Navigate down within inventory
         this.selectedSlot += Inventory.SLOTS_PER_ROW;
       }
       this.keyStates.ArrowDown = true;
@@ -137,6 +168,7 @@ export default class Inventory {
       const categoryX = startX + tabWidth * index;
       if (this.isMouseInCategory(mouseX, mouseY, categoryX, startY, tabWidth, tabHeight)) {
         this.selectedCategory = category;
+        this.selectedSlot = 0; // Reset slot selection when changing category
       }
     });
   }
@@ -178,13 +210,23 @@ export default class Inventory {
 
     Inventory.CATEGORIES.forEach((category, index) => {
       const categoryX = startX + tabWidth * index;
+      const isSelectedCategory = category === this.selectedCategory;
+      const isNavigatingCategories = this.selectedSlot === -1;
 
       // Tab background
-      this.ctx.fillStyle = category === this.selectedCategory ? "rgba(255, 165, 0, 0.3)" : "white";
+      this.ctx.fillStyle = isSelectedCategory
+        ? isNavigatingCategories
+          ? "rgba(255, 165, 0, 0.6)" // Brighter orange when actively navigating
+          : "rgba(255, 165, 0, 0.3)" // Normal selected state
+        : "white";
       this.ctx.fillRect(categoryX, categoryY, tabWidth, categoryHeight);
 
       // Tab border
-      this.ctx.strokeStyle = category === this.selectedCategory ? "orange" : "gray";
+      this.ctx.strokeStyle = isSelectedCategory
+        ? isNavigatingCategories
+          ? "rgb(255, 140, 0)" // Darker orange when actively navigating
+          : "orange"
+        : "gray";
       this.ctx.strokeRect(categoryX, categoryY, tabWidth, categoryHeight);
 
       // Category text
