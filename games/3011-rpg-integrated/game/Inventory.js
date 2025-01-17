@@ -16,8 +16,8 @@ export default class Inventory {
     this.keys = keys;
     this.gameState = gameState;
     this.items = [];
-    this.selectedSlot = 0; // Start with first slot selected instead of -1
-    this.selectedCategory = "All";
+    this.selectedSlot = 0;
+    this.selectedCategory = "Weapons";
 
     // Add key state tracking to prevent continuous movement while holding keys
     this.keyStates = {
@@ -170,7 +170,7 @@ export default class Inventory {
 
     // inventory header text
     drawText(this.ctx, "Inventory", startX + windowWidth / 2, startY + padding, `${fontSize}px Arial`, "black", "center");
-    drawText(this.ctx, "Use arrow keys to navigate, D to drop, L for Adventure Log", startX + windowWidth / 2, startY + padding + fontSize + 5, `${smallerFontSize}px Arial`, "gray", "center");
+    drawText(this.ctx, "D drop item, L Adventure Log", startX + windowWidth / 2, startY + padding + fontSize + 5, `${smallerFontSize}px Arial`, "gray", "center");
 
     // draw category tabs
     const tabWidth = windowWidth / Inventory.CATEGORIES.length;
@@ -215,8 +215,6 @@ export default class Inventory {
 
       this.ctx.strokeStyle = i === this.selectedSlot ? "orange" : "gray";
       this.ctx.strokeRect(x, y, slotSize, slotSize);
-
-      // Remove the slot number display since we're not using number keys anymore
 
       if (this.items[i]) {
         const item = this.items[i];
