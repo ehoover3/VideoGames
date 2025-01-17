@@ -16,8 +16,16 @@ export default class Inventory {
     this.keys = keys;
     this.gameState = gameState;
     this.items = [];
-    this.selectedSlot = -1;
+    this.selectedSlot = 0; // Start with first slot selected instead of -1
     this.selectedCategory = "All";
+
+    // Add key state tracking to prevent continuous movement while holding keys
+    this.keyStates = {
+      ArrowLeft: false,
+      ArrowRight: false,
+      ArrowUp: false,
+      ArrowDown: false,
+    };
   }
 
   load() {
@@ -58,6 +66,40 @@ export default class Inventory {
     return {};
   }
 
+  handleArrowNavigation() {
+    const rows = Math.ceil(Inventory.TOTAL_SLOTS / Inventory.SLOTS_PER_ROW);
+    const currentRow = Math.floor(this.selectedSlot / Inventory.SLOTS_PER_ROW);
+    const currentCol = this.selectedSlot % Inventory.SLOTS_PER_ROW;
+
+    // Only process a key if it wasn't already pressed (prevent holding)
+    if (this.keys.ArrowLeft && !this.keyStates.ArrowLeft) {
+      this.selectedSlot = Math.max(0, this.selectedSlot - 1);
+      this.keyStates.ArrowLeft = true;
+    }
+    if (this.keys.ArrowRight && !this.keyStates.ArrowRight) {
+      this.selectedSlot = Math.min(Inventory.TOTAL_SLOTS - 1, this.selectedSlot + 1);
+      this.keyStates.ArrowRight = true;
+    }
+    if (this.keys.ArrowUp && !this.keyStates.ArrowUp) {
+      if (currentRow > 0) {
+        this.selectedSlot -= Inventory.SLOTS_PER_ROW;
+      }
+      this.keyStates.ArrowUp = true;
+    }
+    if (this.keys.ArrowDown && !this.keyStates.ArrowDown) {
+      if (currentRow < rows - 1 && this.selectedSlot + Inventory.SLOTS_PER_ROW < Inventory.TOTAL_SLOTS) {
+        this.selectedSlot += Inventory.SLOTS_PER_ROW;
+      }
+      this.keyStates.ArrowDown = true;
+    }
+
+    // Reset key states when keys are released
+    if (!this.keys.ArrowLeft) this.keyStates.ArrowLeft = false;
+    if (!this.keys.ArrowRight) this.keyStates.ArrowRight = false;
+    if (!this.keys.ArrowUp) this.keyStates.ArrowUp = false;
+    if (!this.keys.ArrowDown) this.keyStates.ArrowDown = false;
+  }
+
   update() {
     if (this.keys["x"] || this.keys["X"]) {
       this.gameState.previousState = this.gameState.currentState;
@@ -72,12 +114,7 @@ export default class Inventory {
       this.keys["L"] = false;
     }
 
-    for (let i = 1; i <= 9; i++) {
-      if (this.keys[i.toString()]) {
-        this.selectedSlot = i - 1;
-        this.keys[i.toString()] = false;
-      }
-    }
+    this.handleArrowNavigation();
 
     if ((this.keys["d"] || this.keys["D"]) && this.selectedSlot !== -1) {
       const result = this.dropItem(this.selectedSlot);
@@ -133,7 +170,7 @@ export default class Inventory {
 
     // inventory header text
     drawText(this.ctx, "Inventory", startX + windowWidth / 2, startY + padding, `${fontSize}px Arial`, "black", "center");
-    drawText(this.ctx, "Press 1-9 to select, D to drop, L for Adventure Log", startX + windowWidth / 2, startY + padding + fontSize + 5, `${smallerFontSize}px Arial`, "gray", "center");
+    drawText(this.ctx, "Use arrow keys to navigate, D to drop, L for Adventure Log", startX + windowWidth / 2, startY + padding + fontSize + 5, `${smallerFontSize}px Arial`, "gray", "center");
 
     // draw category tabs
     const tabWidth = windowWidth / Inventory.CATEGORIES.length;
@@ -179,9 +216,7 @@ export default class Inventory {
       this.ctx.strokeStyle = i === this.selectedSlot ? "orange" : "gray";
       this.ctx.strokeRect(x, y, slotSize, slotSize);
 
-      this.ctx.fillStyle = "gray";
-      this.ctx.font = `${Math.floor(12 * scale)}px Arial`;
-      this.ctx.fillText((i + 1).toString(), x + 4, y + 14);
+      // Remove the slot number display since we're not using number keys anymore
 
       if (this.items[i]) {
         const item = this.items[i];
