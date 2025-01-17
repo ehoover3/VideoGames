@@ -184,7 +184,7 @@ export default class Inventory {
     const scaleY = this.canvas.height / Inventory.BASE_RESOLUTION.height;
     const scale = Math.min(scaleX, scaleY);
 
-    // black background
+    // Background
     this.ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -201,13 +201,31 @@ export default class Inventory {
     const leftStartY = padding;
     const leftSectionHeight = this.canvas.height - padding * 2;
 
-    // Draw left section background
+    // Right section dimensions
+    const rightSectionWidth = this.canvas.width * 0.5;
+    const rightStartX = leftSectionWidth + padding;
+    const rightStartY = padding;
+    const rightSectionHeight = this.canvas.height - padding * 2;
+
+    // Left Section Background
     this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
     this.ctx.fillRect(leftStartX, leftStartY, leftSectionWidth, leftSectionHeight);
 
     // Header text (centered within left section)
     drawText(this.ctx, "Inventory", leftStartX + leftSectionWidth / 2, leftStartY + padding, `${fontSize}px Arial`, "black", "center");
     drawText(this.ctx, "D drop item, L Adventure Log", leftStartX + leftSectionWidth / 2, leftStartY + padding + fontSize + 5, `${smallerFontSize}px Arial`, "gray", "center");
+
+    // Right Section Background
+    this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
+    this.ctx.fillRect(rightStartX, rightStartY, rightSectionWidth, rightSectionHeight);
+
+    // Item Description (if an item is selected)
+    const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedCategory);
+    const selectedItem = filteredItems[this.selectedSlot];
+    if (selectedItem) {
+      drawText(this.ctx, "Item Description", rightStartX + rightSectionWidth / 2, rightStartY + padding, `${fontSize}px Arial`, "black", "center");
+      drawText(this.ctx, selectedItem.description || "No description available.", rightStartX + padding, rightStartY + padding + fontSize + 10, `${smallerFontSize}px Arial`, "black", "left");
+    }
 
     // Category tabs
     const tabWidth = leftSectionWidth / Inventory.CATEGORIES.length;
@@ -249,9 +267,6 @@ export default class Inventory {
 
       this.ctx.fillText(categoryEmoji, categoryX + tabWidth / 2, categoryY + categoryHeight / 2 + 5);
     });
-
-    // Filter items by selected category
-    const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedCategory);
 
     // Inventory slots
     const slotsStartY = categoryY + categoryHeight + padding;
