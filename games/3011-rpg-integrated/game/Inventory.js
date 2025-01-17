@@ -270,10 +270,13 @@ export default class Inventory {
 
     // Inventory slots
     const slotsStartY = categoryY + categoryHeight + padding;
+    const totalGridWidth = Inventory.SLOTS_PER_ROW * slotSize;
+    const slotsStartX = leftStartX + (leftSectionWidth - totalGridWidth) / 2; // Centering the grid
+
     for (let i = 0; i < Inventory.TOTAL_SLOTS; i++) {
       const row = Math.floor(i / Inventory.SLOTS_PER_ROW);
       const col = i % Inventory.SLOTS_PER_ROW;
-      const x = leftStartX + padding + col * slotSize;
+      const x = slotsStartX + col * slotSize;
       const y = slotsStartY + row * slotSize;
 
       this.ctx.fillStyle = i === this.selectedSlot ? "rgba(255, 165, 0, 0.3)" : "white";
