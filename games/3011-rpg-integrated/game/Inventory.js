@@ -223,7 +223,7 @@ export default class Inventory {
     const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedCategory);
     const selectedItem = filteredItems[this.selectedSlot];
     if (selectedItem) {
-      drawText(this.ctx, "Item Description", rightStartX + rightSectionWidth / 2, rightStartY + padding, `${fontSize}px Arial`, "black", "center");
+      drawText(this.ctx, selectedItem.name, rightStartX + rightSectionWidth / 2, rightStartY + padding, `${fontSize}px Arial`, "black", "center");
       drawText(this.ctx, selectedItem.description || "No description available.", rightStartX + padding, rightStartY + padding + fontSize + 10, `${smallerFontSize}px Arial`, "black", "left");
     }
 
