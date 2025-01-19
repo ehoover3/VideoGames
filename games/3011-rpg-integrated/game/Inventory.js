@@ -200,15 +200,15 @@ export default class Inventory {
 
   calculateDrawSectionDimensions(padding, fontSize) {
     const leftSection = {
-      x: padding,
+      x: 0, // Start flush with the left edge
       y: padding + fontSize * 2,
-      width: this.canvas.width * 0.5,
+      width: this.canvas.width * 0.5, // 50% of the screen
       height: this.canvas.height - (padding * 2 + fontSize * 2),
     };
     const rightSection = {
-      x: leftSection.width + padding,
+      x: leftSection.width, // Start where the left section ends
       y: leftSection.y,
-      width: this.canvas.width * 0.5,
+      width: this.canvas.width * 0.5, // Remaining 50% of the screen
       height: leftSection.height,
     };
     return { left: leftSection, right: rightSection };
@@ -304,80 +304,23 @@ export default class Inventory {
     }
   }
 
-  // drawRightSection(sectionDimension, scale, filteredItems, padding, slotSize) {
-  //   let { x, y, width, height } = sectionDimension;
-
-  //   // Draw main background
-  //   this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
-  //   this.ctx.fillRect(x, y, width, height);
-
-  //   // Get selected item if any
-  //   const selectedItem = this.selectedSlot >= 0 && this.selectedSlot < filteredItems.length ? filteredItems[this.selectedSlot] : null;
-
-  //   if (selectedItem) {
-  //     const fontSize = Math.floor(20 * scale);
-  //     const smallerFontSize = Math.floor(14 * scale);
-
-  //     // Calculate positions for item display
-  //     const imageSize = slotSize * 2;
-  //     const imageX = x + (width - imageSize) / 2;
-  //     const imageY = y + padding * 2;
-
-  //     // Draw large item image
-  //     this.ctx.fillStyle = "white";
-  //     this.ctx.fillRect(imageX, imageY, imageSize, imageSize);
-  //     this.ctx.strokeStyle = "gray";
-  //     this.ctx.strokeRect(imageX, imageY, imageSize, imageSize);
-
-  //     // Draw item sprite scaled up
-  //     const itemPadding = imageSize * 0.1;
-  //     this.ctx.drawImage(selectedItem.imgPath, selectedItem.imgSourceX, selectedItem.imgSourceY, selectedItem.imgSourceWidth, selectedItem.imgSourceHeight, imageX + itemPadding, imageY + itemPadding, imageSize - itemPadding * 2, imageSize - itemPadding * 2);
-
-  //     // Draw item name
-  //     const nameY = imageY + imageSize + padding * 2;
-  //     drawText(this.ctx, selectedItem.name, x + width / 2, nameY, `${fontSize}px Arial`, "black", "center");
-
-  //     // Draw item description
-  //     const descriptionY = nameY + fontSize + padding;
-  //     const descriptionWidth = width - padding * 2;
-  //     const description = selectedItem.description || "No description available.";
-
-  //     this.ctx.font = `${smallerFontSize}px Arial`;
-  //     const words = description.split(" ");
-  //     let line = "";
-  //     let currentY = descriptionY; // Changed from 'y' to 'currentY' to avoid scope issues
-
-  //     // Word wrap the description
-  //     words.forEach((word) => {
-  //       const testLine = line + word + " ";
-  //       const metrics = this.ctx.measureText(testLine);
-  //       if (metrics.width > descriptionWidth) {
-  //         drawText(this.ctx, line, x + padding, currentY, `${smallerFontSize}px Arial`, "black", "left");
-  //         line = word + " ";
-  //         currentY += smallerFontSize * 1.2;
-  //       } else {
-  //         line = testLine;
-  //       }
-  //     });
-  //     drawText(this.ctx, line, x + padding, currentY, `${smallerFontSize}px Arial`, "black", "left");
-
-  //     // Draw controls hint at the bottom
-  //     const controlsY = sectionDimension.y + height - padding * 2; // Fixed to use sectionDimension.y
-  //     drawText(this.ctx, "Press 'D' to drop item", x + width / 2, controlsY, `${smallerFontSize}px Arial`, "black", "center");
-  //   } else {
-  //     // Draw "No item selected" message when no item is selected
-  //     const fontSize = Math.floor(16 * scale);
-  //     drawText(this.ctx, "No item selected", x + width / 2, y + height / 2, `${fontSize}px Arial`, "gray", "center");
-  //   }
-  // }
   drawRightSection(sectionDimension, scale, filteredItems, padding, slotSize) {
-    let { x, y, width, height } = sectionDimension;
+    const { x, y, width, height } = sectionDimension;
 
-    // Draw main background
     this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
     this.ctx.fillRect(x, y, width, height);
 
-    // Draw player character first
+    this.drawRightSection_Player(x, y, width, padding, slotSize);
+
+    const selectedItem = this.selectedSlot >= 0 && this.selectedSlot < filteredItems.length ? filteredItems[this.selectedSlot] : null;
+
+    if (selectedItem) {
+      this.drawRightSection_ItemName(x, y, width, scale, padding, slotSize, selectedItem);
+      this.drawRightSection_ItemDescription(x, y, width, scale, padding, slotSize, selectedItem);
+    }
+  }
+
+  drawRightSection_Player(x, y, width, padding, slotSize) {
     const game = window.gameInstance;
     if (game?.gameObjects?.player) {
       const player = game.gameObjects.player;
@@ -385,7 +328,6 @@ export default class Inventory {
       const playerX = x + (width - playerSize) / 2;
       const playerY = y + padding;
 
-      // Draw player sprite
       this.ctx.drawImage(
         player.imgPath,
         0, // Source X (first frame for idle)
@@ -398,65 +340,21 @@ export default class Inventory {
         playerSize
       );
     }
+  }
 
-    // Get selected item if any
-    const selectedItem = this.selectedSlot >= 0 && this.selectedSlot < filteredItems.length ? filteredItems[this.selectedSlot] : null;
+  drawRightSection_ItemName(x, y, width, scale, padding, slotSize, selectedItem) {
+    const fontSize = Math.floor(20 * scale);
+    const playerSpace = slotSize * 3 + padding * 2;
+    const nameY = y + playerSpace + padding;
+    this.ctx.textAlign = "left";
+    drawText(this.ctx, selectedItem.name, x + padding, nameY, `${fontSize}px Arial`, "black", "left");
+  }
 
-    if (selectedItem) {
-      const fontSize = Math.floor(20 * scale);
-      const smallerFontSize = Math.floor(14 * scale);
-
-      // Calculate positions for item display - now below the player sprite
-      const playerSpace = slotSize * 3 + padding * 2;
-      const imageSize = slotSize * 2;
-      const imageX = x + (width - imageSize) / 2;
-      const imageY = y + playerSpace;
-
-      // Draw large item image
-      this.ctx.fillStyle = "white";
-      this.ctx.fillRect(imageX, imageY, imageSize, imageSize);
-      this.ctx.strokeStyle = "gray";
-      this.ctx.strokeRect(imageX, imageY, imageSize, imageSize);
-
-      // Draw item sprite scaled up
-      const itemPadding = imageSize * 0.1;
-      this.ctx.drawImage(selectedItem.imgPath, selectedItem.imgSourceX, selectedItem.imgSourceY, selectedItem.imgSourceWidth, selectedItem.imgSourceHeight, imageX + itemPadding, imageY + itemPadding, imageSize - itemPadding * 2, imageSize - itemPadding * 2);
-
-      // Draw item name
-      const nameY = imageY + imageSize + padding;
-      drawText(this.ctx, selectedItem.name, x + width / 2, nameY, `${fontSize}px Arial`, "black", "center");
-
-      // Draw item description
-      const descriptionY = nameY + fontSize + padding;
-      const descriptionWidth = width - padding * 2;
-      const description = selectedItem.description || "No description available.";
-
-      this.ctx.font = `${smallerFontSize}px Arial`;
-      const words = description.split(" ");
-      let line = "";
-      let currentY = descriptionY;
-
-      // Word wrap the description
-      words.forEach((word) => {
-        const testLine = line + word + " ";
-        const metrics = this.ctx.measureText(testLine);
-        if (metrics.width > descriptionWidth) {
-          drawText(this.ctx, line, x + padding, currentY, `${smallerFontSize}px Arial`, "black", "left");
-          line = word + " ";
-          currentY += smallerFontSize * 1.2;
-        } else {
-          line = testLine;
-        }
-      });
-      drawText(this.ctx, line, x + padding, currentY, `${smallerFontSize}px Arial`, "black", "left");
-
-      // Draw controls hint at the bottom
-      const controlsY = sectionDimension.y + height - padding * 2;
-      drawText(this.ctx, "Press 'D' to drop item", x + width / 2, controlsY, `${smallerFontSize}px Arial`, "black", "center");
-    } else {
-      // Draw "No item selected" message when no item is selected
-      const fontSize = Math.floor(16 * scale);
-      drawText(this.ctx, "No item selected", x + width / 2, y + height / 2, `${fontSize}px Arial`, "gray", "center");
-    }
+  drawRightSection_ItemDescription(x, y, width, scale, padding, slotSize, selectedItem) {
+    const fontSize = Math.floor(14 * scale);
+    const playerSpace = slotSize * 3 + padding * 2;
+    const descY = y + playerSpace + 2 * padding;
+    this.ctx.textAlign = "left";
+    drawText(this.ctx, selectedItem.description, x + padding, descY, `${fontSize}px Arial`, "black", "left");
   }
 }
