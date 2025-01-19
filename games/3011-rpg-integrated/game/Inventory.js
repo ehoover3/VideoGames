@@ -222,10 +222,6 @@ export default class Inventory {
     const scaleY = this.canvas.height / Inventory.BASE_RESOLUTION.height;
     const scale = Math.min(scaleX, scaleY);
 
-    // Background
-    this.ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
     const padding = Inventory.INVENTORY_PADDING * scale;
     const slotSize = Inventory.SLOT_SIZE * scale;
     const fontSize = Math.floor(20 * scale);
@@ -246,9 +242,15 @@ export default class Inventory {
 
     const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedItemCategory);
 
+    this.drawBackground();
     this.drawTopSection();
     this.drawLeftSection(leftStartX, leftStartY, leftSectionWidth, leftSectionHeight, scale, filteredItems, padding, headerHeight, slotSize, itemCategoryHeight);
     this.drawRightSection(rightStartX, rightStartY, rightSectionWidth, rightSectionHeight, scale, filteredItems, padding, slotSize);
+  }
+
+  drawBackground() {
+    this.ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
   drawTopSection() {
