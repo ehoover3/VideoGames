@@ -11,8 +11,8 @@ export default class Inventory {
   static TOTAL_SLOTS = 16;
   static INTERACTION_DISTANCE = 40;
   static ITEM_CATEGORIES = ["Weapons", "Bows and Arrows", "Shields", "Armor", "Materials", "Food", "Key Items"];
-  static NAVIGATION_ITEMS = ["Adventure Log", "Inventory", "System"];
-  static NAVIGATION_LABELS = ["L", null, "R"];
+  static NAVBAR_ITEMS = ["Adventure Log", "Inventory", "System"];
+  static NAVBAR_LABELS = ["L", null, "R"];
 
   constructor(canvas, ctx, keys, gameState) {
     this.canvas = canvas;
@@ -22,7 +22,7 @@ export default class Inventory {
     this.items = [];
     this.selectedSlot = 0;
     this.selectedItemCategory = "Weapons";
-    this.selectedNavigationItem = 1; // Start with Inventory selected
+    this.selectedNavbarItem = 1; // Start with Inventory selected
 
     // Add key state tracking to prevent continuous movement while holding keys
     this.keyStates = {
@@ -53,11 +53,108 @@ export default class Inventory {
     };
   }
 
+  update() {
+    if (this.keys["x"] || this.keys["X"]) {
+      this.gameState.previousState = this.gameState.currentState;
+      this.gameState.currentState = STATES.OVERWORLD;
+      this.keys["x"] = false;
+      this.keys["X"] = false;
+    }
+
+    // Handle L and R key shortcuts
+    if (this.keys["l"] || this.keys["L"]) {
+      this.handleNavbar("Adventure Log");
+      this.keys["l"] = false;
+      this.keys["L"] = false;
+    }
+    if (this.keys["r"] || this.keys["R"]) {
+      this.handleNavbar("System");
+      this.keys["r"] = false;
+      this.keys["R"] = false;
+    }
+    this.handleInventorySelection();
+
+    // handle drop item
+    if ((this.keys["d"] || this.keys["D"]) && this.selectedSlot !== -1) {
+      this.dropItem(this.selectedSlot);
+      this.keys["d"] = false;
+      this.keys["D"] = false;
+    }
+
+    // Reset key states
+    if (!this.keys.ArrowLeft) this.keyStates.ArrowLeft = false;
+    if (!this.keys.ArrowRight) this.keyStates.ArrowRight = false;
+    if (!this.keys.ArrowUp) this.keyStates.ArrowUp = false;
+    if (!this.keys.ArrowDown) this.keyStates.ArrowDown = false;
+    if (!this.keys.Enter) this.keyStates.Enter = false;
+  }
+
+  handleNavbar(selectedNavbarItem) {
+    switch (selectedNavbarItem) {
+      case "Adventure Log":
+        this.gameState.currentState = STATES.ADVENTURE_LOG;
+        break;
+      case "System":
+        this.gameState.currentState = STATES.SYSTEM;
+        break;
+    }
+  }
+
+  handleInventorySelection() {
+    const rows = Math.ceil(Inventory.TOTAL_SLOTS / Inventory.SLOTS_PER_ROW);
+    const currentRow = Math.floor(this.selectedSlot / Inventory.SLOTS_PER_ROW);
+    const currentCol = this.selectedSlot % Inventory.SLOTS_PER_ROW;
+    const isInItemCategoryNav = this.selectedSlot === -1;
+    const currentItemCategoryIndex = Inventory.ITEM_CATEGORIES.indexOf(this.selectedItemCategory);
+    if (this.keys.ArrowLeft && !this.keyStates.ArrowLeft) {
+      if (isInItemCategoryNav) {
+        const newIndex = Math.max(0, currentItemCategoryIndex - 1);
+        this.selectedItemCategory = Inventory.ITEM_CATEGORIES[newIndex];
+      } else {
+        this.selectedSlot = Math.max(0, this.selectedSlot - 1);
+      }
+      this.keyStates.ArrowLeft = true;
+    }
+    if (this.keys.ArrowRight && !this.keyStates.ArrowRight) {
+      if (isInItemCategoryNav) {
+        const newIndex = Math.min(Inventory.ITEM_CATEGORIES.length - 1, currentItemCategoryIndex + 1);
+        this.selectedItemCategory = Inventory.ITEM_CATEGORIES[newIndex];
+      } else {
+        this.selectedSlot = Math.min(Inventory.TOTAL_SLOTS - 1, this.selectedSlot + 1);
+      }
+      this.keyStates.ArrowRight = true;
+    }
+    if (this.keys.ArrowUp && !this.keyStates.ArrowUp) {
+      if (!isInItemCategoryNav && currentRow === 0) {
+        // Move from top row to itemCategory
+        this.selectedSlot = -1;
+      } else if (!isInItemCategoryNav) {
+        // Navigate up within inventory
+        this.selectedSlot -= Inventory.SLOTS_PER_ROW;
+      }
+      this.keyStates.ArrowUp = true;
+    }
+    if (this.keys.ArrowDown && !this.keyStates.ArrowDown) {
+      if (isInItemCategoryNav) {
+        // Move from itemCategory to first row of inventory
+        this.selectedSlot = 0;
+      } else if (currentRow < rows - 1 && this.selectedSlot + Inventory.SLOTS_PER_ROW < Inventory.TOTAL_SLOTS) {
+        // Navigate down within inventory
+        this.selectedSlot += Inventory.SLOTS_PER_ROW;
+      }
+      this.keyStates.ArrowDown = true;
+    }
+    // Reset key states
+    if (!this.keys.ArrowLeft) this.keyStates.ArrowLeft = false;
+    if (!this.keys.ArrowRight) this.keyStates.ArrowRight = false;
+    if (!this.keys.ArrowUp) this.keyStates.ArrowUp = false;
+    if (!this.keys.ArrowDown) this.keyStates.ArrowDown = false;
+  }
+
   dropItem(slotIndex) {
     if (slotIndex === -1) {
       return { success: false, message: "No slot selected." };
     }
-
     const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedItemCategory);
     if (slotIndex >= 0 && slotIndex < filteredItems.length) {
       const item = filteredItems[slotIndex];
@@ -73,140 +170,6 @@ export default class Inventory {
       return { success: true };
     }
     return { success: false, message: "No valid item to drop in the selected slot." };
-  }
-
-  // dropItem(slotIndex) {
-  //   const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedItemCategory);
-  //   if (slotIndex >= 0 && slotIndex < filteredItems.length) {
-  //     const item = filteredItems[slotIndex];
-  //     const game = window.gameInstance;
-  //     if (game && game.gameObjects.player) {
-  //       const player = game.gameObjects.player;
-  //       item.x = player.x + player.width;
-  //       item.y = player.y;
-  //       item.isPickedUp = false;
-  //       this.items = this.items.filter((i) => i !== item); // Remove the item from the main inventory
-  //     }
-  //     return { success: true };
-  //   }
-  //   return { success: false, message: "No valid item to drop in the selected slot." };
-  // }
-
-  update() {
-    if (this.keys["x"] || this.keys["X"]) {
-      this.gameState.previousState = this.gameState.currentState;
-      this.gameState.currentState = STATES.OVERWORLD;
-      this.keys["x"] = false;
-      this.keys["X"] = false;
-    }
-
-    // Handle L and R key shortcuts
-    if (this.keys["l"] || this.keys["L"]) {
-      this.handleNavigation("Adventure Log");
-      this.keys["l"] = false;
-      this.keys["L"] = false;
-    }
-    if (this.keys["r"] || this.keys["R"]) {
-      this.handleNavigation("System");
-      this.keys["r"] = false;
-      this.keys["R"] = false;
-    }
-
-    this.handleInventorySelection();
-
-    // handle drop item
-    if ((this.keys["d"] || this.keys["D"]) && this.selectedSlot !== -1) {
-      this.dropItem(this.selectedSlot);
-      this.keys["d"] = false;
-      this.keys["D"] = false;
-    }
-
-    // if ((this.keys["d"] || this.keys["D"]) && this.selectedSlot !== -1) {
-    //   const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedItemCategory);
-    //   if (this.selectedSlot < filteredItems.length) {
-    //     const result = this.dropItem(this.selectedSlot);
-    //     if (result.success) {
-    //       this.selectedSlot = -1;
-    //     }
-    //   }
-    //   this.keys["d"] = false;
-    //   this.keys["D"] = false;
-    // }
-
-    // Reset key states
-    if (!this.keys.ArrowLeft) this.keyStates.ArrowLeft = false;
-    if (!this.keys.ArrowRight) this.keyStates.ArrowRight = false;
-    if (!this.keys.ArrowUp) this.keyStates.ArrowUp = false;
-    if (!this.keys.ArrowDown) this.keyStates.ArrowDown = false;
-    if (!this.keys.Enter) this.keyStates.Enter = false;
-  }
-
-  handleNavigation(selectedNavigationItem) {
-    switch (selectedNavigationItem) {
-      case "Adventure Log":
-        this.gameState.currentState = STATES.ADVENTURE_LOG;
-        break;
-      case "System":
-        this.gameState.currentState = STATES.SYSTEM;
-        break;
-    }
-  }
-
-  handleInventorySelection() {
-    // Handle inventory grid navigation only
-    const rows = Math.ceil(Inventory.TOTAL_SLOTS / Inventory.SLOTS_PER_ROW);
-    const currentRow = Math.floor(this.selectedSlot / Inventory.SLOTS_PER_ROW);
-    const currentCol = this.selectedSlot % Inventory.SLOTS_PER_ROW;
-    const isInItemCategoryNav = this.selectedSlot === -1;
-    const currentItemCategoryIndex = Inventory.ITEM_CATEGORIES.indexOf(this.selectedItemCategory);
-
-    if (this.keys.ArrowLeft && !this.keyStates.ArrowLeft) {
-      if (isInItemCategoryNav) {
-        const newIndex = Math.max(0, currentItemCategoryIndex - 1);
-        this.selectedItemCategory = Inventory.ITEM_CATEGORIES[newIndex];
-      } else {
-        this.selectedSlot = Math.max(0, this.selectedSlot - 1);
-      }
-      this.keyStates.ArrowLeft = true;
-    }
-
-    if (this.keys.ArrowRight && !this.keyStates.ArrowRight) {
-      if (isInItemCategoryNav) {
-        const newIndex = Math.min(Inventory.ITEM_CATEGORIES.length - 1, currentItemCategoryIndex + 1);
-        this.selectedItemCategory = Inventory.ITEM_CATEGORIES[newIndex];
-      } else {
-        this.selectedSlot = Math.min(Inventory.TOTAL_SLOTS - 1, this.selectedSlot + 1);
-      }
-      this.keyStates.ArrowRight = true;
-    }
-
-    if (this.keys.ArrowUp && !this.keyStates.ArrowUp) {
-      if (!isInItemCategoryNav && currentRow === 0) {
-        // Move from top row to itemCategory navigation
-        this.selectedSlot = -1;
-      } else if (!isInItemCategoryNav) {
-        // Navigate up within inventory
-        this.selectedSlot -= Inventory.SLOTS_PER_ROW;
-      }
-      this.keyStates.ArrowUp = true;
-    }
-
-    if (this.keys.ArrowDown && !this.keyStates.ArrowDown) {
-      if (isInItemCategoryNav) {
-        // Move from itemCategory navigation to first row of inventory
-        this.selectedSlot = 0;
-      } else if (currentRow < rows - 1 && this.selectedSlot + Inventory.SLOTS_PER_ROW < Inventory.TOTAL_SLOTS) {
-        // Navigate down within inventory
-        this.selectedSlot += Inventory.SLOTS_PER_ROW;
-      }
-      this.keyStates.ArrowDown = true;
-    }
-
-    // Reset key states for inventory navigation
-    if (!this.keys.ArrowLeft) this.keyStates.ArrowLeft = false;
-    if (!this.keys.ArrowRight) this.keyStates.ArrowRight = false;
-    if (!this.keys.ArrowUp) this.keyStates.ArrowUp = false;
-    if (!this.keys.ArrowDown) this.keyStates.ArrowDown = false;
   }
 
   draw() {
@@ -262,16 +225,15 @@ export default class Inventory {
     const fontSize = Math.floor(20 * scale);
     const smallerFontSize = Math.floor(14 * scale);
 
-    const navigationWidth = this.canvas.width / Inventory.NAVIGATION_ITEMS.length;
+    const navbarWidth = this.canvas.width / Inventory.NAVBAR_ITEMS.length;
 
-    Inventory.NAVIGATION_ITEMS.forEach((item, index) => {
-      const x = navigationWidth * index + navigationWidth / 2;
+    Inventory.NAVBAR_ITEMS.forEach((item, index) => {
+      const x = navbarWidth * index + navbarWidth / 2;
       const y = padding + fontSize;
       const isInventory = item === "Inventory";
 
-      // Remove highlight for navigation since it's no longer selectable with arrow keys
-      if (Inventory.NAVIGATION_LABELS[index]) {
-        drawText(this.ctx, Inventory.NAVIGATION_LABELS[index], x, padding + fontSize * 0.5, `${smallerFontSize}px Arial`, "white", "center");
+      if (Inventory.NAVBAR_LABELS[index]) {
+        drawText(this.ctx, Inventory.NAVBAR_LABELS[index], x, padding + fontSize * 0.5, `${smallerFontSize}px Arial`, "white", "center");
       }
 
       const itemFontSize = isInventory ? fontSize : smallerFontSize;
