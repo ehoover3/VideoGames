@@ -4,6 +4,7 @@ import MedScanGame from "./MedScanGame.js";
 import Menu from "./Menu.js";
 import Overworld from "./Overworld.js";
 import Inventory from "./Inventory.js";
+import System from "./System.js";
 import HUD from "./HUD.js";
 import Item from "./Item.js";
 import NPC from "./NPC.js";
@@ -18,10 +19,11 @@ export default class Game {
     this.keys = this.setupKeyboard();
     this.startGameState();
     this.loadImages();
-    this.inventory = new Inventory(this.canvas, this.ctx, this.keys, this.gameState);
     this.gameObjects = this.getGameObjects();
     this.initializeQuests();
     this.adventureLog = new AdventureLog(this.canvas, this.ctx, this.keys, this.gameState);
+    this.inventory = new Inventory(this.canvas, this.ctx, this.keys, this.gameState);
+    this.system = new System(this.canvas, this.ctx, this.keys, this.gameState);
     this.startGameComponents();
     this.bindEvents();
     window.gameInstance = this;
@@ -146,8 +148,9 @@ export default class Game {
       [STATES.MAIN_MENU]: () => this.menu.load(),
       [STATES.OVERWORLD]: () => this.overworld.load(),
       [STATES.MED_SCAN_GAME]: () => this.medScanGame.load(),
-      [STATES.INVENTORY]: () => this.inventory.load(),
       [STATES.ADVENTURE_LOG]: () => this.adventureLog.load(),
+      [STATES.INVENTORY]: () => this.inventory.load(),
+      [STATES.SYSTEM]: () => this.system.load(),
     };
   }
 

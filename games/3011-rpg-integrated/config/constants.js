@@ -1,11 +1,12 @@
 // constants.js
 
 export const STATES = {
-  MAIN_MENU: "mainMenu",
-  OVERWORLD: "overworld",
-  MED_SCAN_GAME: "medScanGame",
+  MAIN_MENU: "MAIN_MENU",
+  OVERWORLD: "OVERWORLD",
+  MED_SCAN_GAME: "MED_SCAN_GAME",
   INVENTORY: "INVENTORY",
   ADVENTURE_LOG: "ADVENTURE_LOG",
+  SYSTEM: "SYSTEM",
 };
 
 export const ACTIONS = {
