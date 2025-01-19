@@ -10,7 +10,7 @@ export default class Inventory {
   static SLOTS_PER_ROW = 4;
   static TOTAL_SLOTS = 16;
   static INTERACTION_DISTANCE = 40;
-  static CATEGORIES = ["Weapons", "Bows and Arrows", "Shields", "Armor", "Materials", "Food", "Key Items"];
+  static ITEM_CATEGORIES = ["Weapons", "Bows and Arrows", "Shields", "Armor", "Materials", "Food", "Key Items"];
   static TOP_MENU_ITEMS = ["Adventure Log", "Inventory", "System"];
   static TOP_MENU_LABELS = ["L", null, "R"];
 
@@ -21,7 +21,7 @@ export default class Inventory {
     this.gameState = gameState;
     this.items = [];
     this.selectedSlot = 0;
-    this.selectedCategory = "Weapons";
+    this.selectedItemCategory = "Weapons";
     this.isInTopMenu = false;
     this.selectedTopMenuItem = 1; // Start with Inventory selected
 
@@ -56,7 +56,7 @@ export default class Inventory {
   }
 
   dropItem(slotIndex) {
-    const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedCategory);
+    const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedItemCategory);
     if (slotIndex >= 0 && slotIndex < filteredItems.length) {
       const item = filteredItems[slotIndex];
       const game = window.gameInstance;
@@ -85,7 +85,7 @@ export default class Inventory {
       }
       if (this.keys.ArrowDown && !this.keyStates.ArrowDown) {
         this.isInTopMenu = false;
-        this.selectedSlot = -1; // Move to category selection
+        this.selectedSlot = -1; // Move to itemCategory selection
         this.keyStates.ArrowDown = true;
       }
       // Handle Enter key for menu selection
@@ -100,13 +100,13 @@ export default class Inventory {
     const rows = Math.ceil(Inventory.TOTAL_SLOTS / Inventory.SLOTS_PER_ROW);
     const currentRow = Math.floor(this.selectedSlot / Inventory.SLOTS_PER_ROW);
     const currentCol = this.selectedSlot % Inventory.SLOTS_PER_ROW;
-    const isInCategoryNav = this.selectedSlot === -1;
-    const currentCategoryIndex = Inventory.CATEGORIES.indexOf(this.selectedCategory);
+    const isInItemCategoryNav = this.selectedSlot === -1;
+    const currentItemCategoryIndex = Inventory.ITEM_CATEGORIES.indexOf(this.selectedItemCategory);
 
     if (this.keys.ArrowLeft && !this.keyStates.ArrowLeft) {
-      if (isInCategoryNav) {
-        const newIndex = Math.max(0, currentCategoryIndex - 1);
-        this.selectedCategory = Inventory.CATEGORIES[newIndex];
+      if (isInItemCategoryNav) {
+        const newIndex = Math.max(0, currentItemCategoryIndex - 1);
+        this.selectedItemCategory = Inventory.ITEM_CATEGORIES[newIndex];
       } else {
         this.selectedSlot = Math.max(0, this.selectedSlot - 1);
       }
@@ -114,9 +114,9 @@ export default class Inventory {
     }
 
     if (this.keys.ArrowRight && !this.keyStates.ArrowRight) {
-      if (isInCategoryNav) {
-        const newIndex = Math.min(Inventory.CATEGORIES.length - 1, currentCategoryIndex + 1);
-        this.selectedCategory = Inventory.CATEGORIES[newIndex];
+      if (isInItemCategoryNav) {
+        const newIndex = Math.min(Inventory.ITEM_CATEGORIES.length - 1, currentItemCategoryIndex + 1);
+        this.selectedItemCategory = Inventory.ITEM_CATEGORIES[newIndex];
       } else {
         this.selectedSlot = Math.min(Inventory.TOTAL_SLOTS - 1, this.selectedSlot + 1);
       }
@@ -124,12 +124,12 @@ export default class Inventory {
     }
 
     if (this.keys.ArrowUp && !this.keyStates.ArrowUp) {
-      if (isInCategoryNav) {
-        // Move from category nav to top menu
+      if (isInItemCategoryNav) {
+        // Move from itemCategory nav to top menu
         this.isInTopMenu = true;
         this.selectedSlot = 0;
       } else if (currentRow === 0) {
-        // Move from top row to category navigation
+        // Move from top row to itemCategory navigation
         this.selectedSlot = -1;
       } else {
         // Navigate up within inventory
@@ -139,8 +139,8 @@ export default class Inventory {
     }
 
     if (this.keys.ArrowDown && !this.keyStates.ArrowDown) {
-      if (isInCategoryNav) {
-        // Move from category navigation to first row of inventory
+      if (isInItemCategoryNav) {
+        // Move from itemCategory navigation to first row of inventory
         this.selectedSlot = 0;
       } else if (currentRow < rows - 1 && this.selectedSlot + Inventory.SLOTS_PER_ROW < Inventory.TOTAL_SLOTS) {
         // Navigate down within inventory
@@ -184,7 +184,7 @@ export default class Inventory {
     this.handleArrowNavigation();
 
     if ((this.keys["d"] || this.keys["D"]) && this.selectedSlot !== -1) {
-      const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedCategory);
+      const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedItemCategory);
       if (this.selectedSlot < filteredItems.length) {
         const result = this.dropItem(this.selectedSlot);
         if (result.success) {
@@ -203,18 +203,16 @@ export default class Inventory {
     if (!this.keys.Enter) this.keyStates.Enter = false;
   }
 
-  isMouseInCategory(mouseX, mouseY, categoryX, categoryY, categoryWidth, categoryHeight) {
-    return mouseX >= categoryX && mouseX <= categoryX + categoryWidth && mouseY >= categoryY && mouseY <= categoryY + categoryHeight;
+  isMouseInItemCategory(mouseX, mouseY, itemCategoryX, itemCategoryY, itemCategoryWidth, itemCategoryHeight) {
+    return mouseX >= itemCategoryX && mouseX <= itemCategoryX + itemCategoryWidth && mouseY >= itemCategoryY && mouseY <= itemCategoryY + itemCategoryHeight;
   }
 
-  handleCategoryClick(mouseX, mouseY, startX, startY, tabWidth, tabHeight) {
-    const scale = Math.min(this.canvas.width / Inventory.BASE_RESOLUTION.width, this.canvas.height / Inventory.BASE_RESOLUTION.height);
-
-    Inventory.CATEGORIES.forEach((category, index) => {
-      const categoryX = startX + tabWidth * index;
-      if (this.isMouseInCategory(mouseX, mouseY, categoryX, startY, tabWidth, tabHeight)) {
-        this.selectedCategory = category;
-        this.selectedSlot = 0; // Reset slot selection when changing category
+  handleItemCategoryClick(mouseX, mouseY, startX, startY, tabWidth, tabHeight) {
+    Inventory.ITEM_CATEGORIES.forEach((itemCategory, index) => {
+      const itemCategoryX = startX + tabWidth * index;
+      if (this.isMouseInItemCategory(mouseX, mouseY, itemCategoryX, startY, tabWidth, tabHeight)) {
+        this.selectedItemCategory = itemCategory;
+        this.selectedSlot = 0; // Reset slot selection when changing itemCategory
       }
     });
   }
@@ -233,7 +231,7 @@ export default class Inventory {
     const fontSize = Math.floor(20 * scale);
     const smallerFontSize = Math.floor(14 * scale);
     const headerHeight = fontSize + smallerFontSize + 15;
-    const categoryHeight = 40 * scale;
+    const itemCategoryHeight = 40 * scale;
 
     // Setup sections
     const leftSectionWidth = this.canvas.width * 0.5;
@@ -246,10 +244,10 @@ export default class Inventory {
     const rightStartY = padding + fontSize * 2;
     const rightSectionHeight = this.canvas.height - (padding * 2 + fontSize * 2);
 
-    const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedCategory);
+    const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedItemCategory);
 
     this.drawTopSection();
-    this.drawLeftSection(leftStartX, leftStartY, leftSectionWidth, leftSectionHeight, scale, filteredItems, padding, headerHeight, slotSize, categoryHeight);
+    this.drawLeftSection(leftStartX, leftStartY, leftSectionWidth, leftSectionHeight, scale, filteredItems, padding, headerHeight, slotSize, itemCategoryHeight);
     this.drawRightSection(rightStartX, rightStartY, rightSectionWidth, rightSectionHeight, scale, filteredItems, padding, slotSize);
   }
 
@@ -283,31 +281,31 @@ export default class Inventory {
     });
   }
 
-  drawLeftSection(startX, startY, sectionWidth, sectionHeight, scale, filteredItems, padding, headerHeight, slotSize, categoryHeight) {
+  drawLeftSection(startX, startY, sectionWidth, sectionHeight, scale, filteredItems, padding, headerHeight, slotSize, itemCategoryHeight) {
     // Draw main background
     this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
     this.ctx.fillRect(startX, startY, sectionWidth, sectionHeight);
 
-    // Draw category tabs
-    const tabWidth = sectionWidth / Inventory.CATEGORIES.length;
-    const categoryY = startY + padding + headerHeight;
+    // Draw itemCategory tabs
+    const tabWidth = sectionWidth / Inventory.ITEM_CATEGORIES.length;
+    const itemCategoryY = startY + padding + headerHeight;
 
-    Inventory.CATEGORIES.forEach((category, index) => {
-      const categoryX = startX + tabWidth * index;
-      const isSelectedCategory = category === this.selectedCategory;
+    Inventory.ITEM_CATEGORIES.forEach((itemCategory, index) => {
+      const itemCategoryX = startX + tabWidth * index;
+      const isSelectedCategory = itemCategory === this.selectedItemCategory;
       const isNavigatingCategories = this.selectedSlot === -1;
 
       this.ctx.fillStyle = isSelectedCategory ? (isNavigatingCategories ? "rgba(255, 165, 0, 0.6)" : "rgba(255, 165, 0, 0.3)") : "white";
-      this.ctx.fillRect(categoryX, categoryY, tabWidth, categoryHeight);
+      this.ctx.fillRect(itemCategoryX, itemCategoryY, tabWidth, itemCategoryHeight);
 
       this.ctx.strokeStyle = isSelectedCategory ? (isNavigatingCategories ? "rgb(255, 140, 0)" : "orange") : "gray";
-      this.ctx.strokeRect(categoryX, categoryY, tabWidth, categoryHeight);
+      this.ctx.strokeRect(itemCategoryX, itemCategoryY, tabWidth, itemCategoryHeight);
 
       this.ctx.font = `${Math.floor(12 * scale)}px Arial`;
       this.ctx.fillStyle = "black";
       this.ctx.textAlign = "center";
 
-      const categoryEmojis = {
+      const itemCategoryEmojis = {
         Weapons: "⚔️",
         "Bows and Arrows": "🏹",
         Shields: "🛡️",
@@ -317,11 +315,11 @@ export default class Inventory {
         "Key Items": "🔑",
       };
 
-      this.ctx.fillText(categoryEmojis[category], categoryX + tabWidth / 2, categoryY + categoryHeight / 2 + 5);
+      this.ctx.fillText(itemCategoryEmojis[itemCategory], itemCategoryX + tabWidth / 2, itemCategoryY + itemCategoryHeight / 2 + 5);
     });
 
     // Draw inventory slots
-    const slotsStartY = categoryY + categoryHeight + padding;
+    const slotsStartY = itemCategoryY + itemCategoryHeight + padding;
     const totalGridWidth = Inventory.SLOTS_PER_ROW * slotSize;
     const slotsStartX = startX + (sectionWidth - totalGridWidth) / 2;
 
