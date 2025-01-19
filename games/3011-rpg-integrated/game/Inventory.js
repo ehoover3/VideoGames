@@ -1,3 +1,5 @@
+// game/Inventory.js
+
 import { STATES } from "../config/constants.js";
 import { drawText } from "./utils/drawText.js";
 
