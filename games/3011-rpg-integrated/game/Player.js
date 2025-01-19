@@ -19,6 +19,16 @@ class Player extends GameObject {
     [DIRECTION.RIGHT]: 3,
   };
 
+  static MENU_KEYS = {
+    l: STATES.ADVENTURE_LOG,
+    L: STATES.ADVENTURE_LOG,
+    i: STATES.INVENTORY,
+    I: STATES.INVENTORY,
+    s: STATES.SYSTEM,
+    S: STATES.SYSTEM,
+    Escape: STATES.SYSTEM,
+  };
+
   constructor(image, x, y, width, height, speed, direction) {
     super({
       imgPath: image,
@@ -57,17 +67,9 @@ class Player extends GameObject {
     const { WALK_FRAMES, ANIMATION_SPEED } = Player.FRAME_SETTINGS;
     const { ball, coin, dog, mri } = gameObjects;
 
-    // Handle adventure log screen
-    const adventureLogUpdate = this.handleAdventureLogKey(keys, gameState);
-    if (adventureLogUpdate) return adventureLogUpdate;
-
-    // Handle inventory screen
-    const inventoryUpdate = this.handleInventoryKey(keys, gameState);
-    if (inventoryUpdate) return inventoryUpdate;
-
-    // Handle system screen
-    const systemUpdate = this.handleSystemKey(keys, gameState);
-    if (systemUpdate) return systemUpdate;
+    // Handle menu key presses
+    const menuUpdate = this.handleMenuKeys(keys, gameState);
+    if (menuUpdate) return menuUpdate;
 
     // Handle movement and animation
     const isMoving = this.move(keys);
@@ -130,17 +132,26 @@ class Player extends GameObject {
       return this.changeGameState(gameState.currentState, gameState.currentState, null);
     }
 
-    const escapeKeyPress = this.handleEscapeKey(keys, gameState.currentState, gameState.previousState, gameState.savedPlayerPosition);
-
     // Return final state with current interaction status
     return {
-      ...escapeKeyPress,
+      currentState: gameState.currentState,
+      previousState: gameState.previousState,
+      savedPlayerPosition: gameState.savedPlayerPosition,
       interactionMessage: this.interaction.message,
       showPickupNotification: this.interaction.showPickupNotification,
       lastPickedUpItem: this.interaction.lastPickedUpItem,
       isInteracting: this.interaction.isInteracting,
       droppedItem: this.interaction.droppedItem,
     };
+  }
+
+  handleMenuKeys(keys, gameState) {
+    for (const [key, state] of Object.entries(Player.MENU_KEYS)) {
+      if (keys[key]) {
+        return this.changeGameState(gameState.currentState, state);
+      }
+    }
+    return null;
   }
 
   move(keys) {
@@ -233,34 +244,6 @@ class Player extends GameObject {
       }
     }
     return false;
-  }
-
-  handleAdventureLogKey(keys, gameState) {
-    if (keys["l"] || keys["L"]) {
-      return this.changeGameState(gameState.currentState, STATES.ADVENTURE_LOG);
-    }
-    return null;
-  }
-
-  handleInventoryKey(keys, gameState) {
-    if (keys["i"] || keys["I"]) {
-      return this.changeGameState(gameState.currentState, STATES.INVENTORY);
-    }
-    return null;
-  }
-
-  handleSystemKey(keys, gameState) {
-    if (keys["s"] || keys["S"]) {
-      return this.changeGameState(gameState.currentState, STATES.SYSTEM);
-    }
-    return null;
-  }
-
-  handleEscapeKey(keys, currentState, previousState, savedPlayerPosition) {
-    if (keys["Escape"]) {
-      return this.changeGameState(currentState, STATES.MAIN_MENU);
-    }
-    return { currentState, previousState, savedPlayerPosition };
   }
 
   draw(canvas, ctx) {

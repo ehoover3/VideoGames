@@ -54,7 +54,7 @@ export default class MedScanGame {
 
     if (this.keys["Escape"]) {
       previousState = currentState;
-      currentState = STATES.MAIN_MENU;
+      currentState = STATES.SYSTEM;
     }
 
     Object.assign(this.gameState, { currentState, previousState, scanProgress, scanning });
