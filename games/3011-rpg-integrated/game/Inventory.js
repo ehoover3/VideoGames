@@ -10,6 +10,7 @@ export default class Inventory {
   static INTERACTION_DISTANCE = 40;
   static CATEGORIES = ["Weapons", "Bows and Arrows", "Shields", "Armor", "Materials", "Food", "Key Items"];
   static TOP_MENU_ITEMS = ["Adventure Log", "Inventory", "System"];
+  static TOP_MENU_LABELS = ["L", null, "R"];
 
   constructor(canvas, ctx, keys, gameState) {
     this.canvas = canvas;
@@ -87,15 +88,7 @@ export default class Inventory {
       }
       // Handle Enter key for menu selection
       if (this.keys.Enter && !this.keyStates.Enter) {
-        const selectedMenu = Inventory.TOP_MENU_ITEMS[this.selectedTopMenuItem];
-        switch (selectedMenu) {
-          case "Adventure Log":
-            this.gameState.currentState = STATES.ADVENTURE_LOG;
-            break;
-          case "System":
-            this.gameState.currentState = STATES.SYSTEM;
-            break;
-        }
+        this.handleMenuSelection(Inventory.TOP_MENU_ITEMS[this.selectedTopMenuItem]);
         this.keyStates.Enter = true;
       }
       return;
@@ -155,12 +148,35 @@ export default class Inventory {
     }
   }
 
+  handleMenuSelection(selectedMenu) {
+    switch (selectedMenu) {
+      case "Adventure Log":
+        this.gameState.currentState = STATES.ADVENTURE_LOG;
+        break;
+      case "System":
+        this.gameState.currentState = STATES.SYSTEM;
+        break;
+    }
+  }
+
   update() {
     if (this.keys["x"] || this.keys["X"]) {
       this.gameState.previousState = this.gameState.currentState;
       this.gameState.currentState = STATES.OVERWORLD;
       this.keys["x"] = false;
       this.keys["X"] = false;
+    }
+
+    // Handle L and R key shortcuts
+    if (this.keys["l"] || this.keys["L"]) {
+      this.handleMenuSelection("Adventure Log");
+      this.keys["l"] = false;
+      this.keys["L"] = false;
+    }
+    if (this.keys["r"] || this.keys["R"]) {
+      this.handleMenuSelection("System");
+      this.keys["r"] = false;
+      this.keys["R"] = false;
     }
 
     this.handleArrowNavigation();
@@ -222,6 +238,7 @@ export default class Inventory {
     Inventory.TOP_MENU_ITEMS.forEach((item, index) => {
       const x = menuWidth * index + menuWidth / 2;
       const y = padding + fontSize;
+      const isInventory = item === "Inventory";
 
       // Highlight selected menu item
       if (this.isInTopMenu && index === this.selectedTopMenuItem) {
@@ -229,27 +246,31 @@ export default class Inventory {
         this.ctx.fillRect(menuWidth * index, padding, menuWidth, fontSize * 1.5);
       }
 
-      drawText(this.ctx, item, x, y, `${fontSize}px Arial`, "white", "center");
+      // Draw shortcut key label if it exists
+      if (Inventory.TOP_MENU_LABELS[index]) {
+        drawText(this.ctx, Inventory.TOP_MENU_LABELS[index], x, padding + fontSize * 0.5, `${smallerFontSize}px Arial`, "white", "center");
+      }
+
+      // Draw menu item text with different sizes for Inventory vs other items
+      const itemFontSize = isInventory ? fontSize : smallerFontSize;
+      drawText(this.ctx, item, x, y + (isInventory ? 0 : fontSize * 0.2), `${itemFontSize}px Arial`, "white", "center");
     });
 
-    // Left section dimensions
+    // Rest of the draw method remains unchanged
     const leftSectionWidth = this.canvas.width * 0.5;
     const leftStartX = padding;
-    const leftStartY = padding + fontSize * 2; // Adjusted to account for top section
+    const leftStartY = padding + fontSize * 2;
     const leftSectionHeight = this.canvas.height - (padding * 2 + fontSize * 2);
 
-    // Right section dimensions
     const rightSectionWidth = this.canvas.width * 0.5;
     const rightStartX = leftSectionWidth + padding;
-    const rightStartY = padding + fontSize * 2; // Adjusted to account for top section
+    const rightStartY = padding + fontSize * 2;
     const rightSectionHeight = this.canvas.height - (padding * 2 + fontSize * 2);
 
-    // Item Name and Description (if an item is selected)
     const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedCategory);
     const selectedItem = filteredItems[this.selectedSlot];
 
     // DRAW LEFT SECTION
-    // Left Section Background
     this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
     this.ctx.fillRect(leftStartX, leftStartY, leftSectionWidth, leftSectionHeight);
 
@@ -262,23 +283,12 @@ export default class Inventory {
       const isSelectedCategory = category === this.selectedCategory;
       const isNavigatingCategories = this.selectedSlot === -1;
 
-      // Tab background
-      this.ctx.fillStyle = isSelectedCategory
-        ? isNavigatingCategories
-          ? "rgba(255, 165, 0, 0.6)" // Brighter orange when actively navigating
-          : "rgba(255, 165, 0, 0.3)" // Normal selected state
-        : "white";
+      this.ctx.fillStyle = isSelectedCategory ? (isNavigatingCategories ? "rgba(255, 165, 0, 0.6)" : "rgba(255, 165, 0, 0.3)") : "white";
       this.ctx.fillRect(categoryX, categoryY, tabWidth, categoryHeight);
 
-      // Tab border
-      this.ctx.strokeStyle = isSelectedCategory
-        ? isNavigatingCategories
-          ? "rgb(255, 140, 0)" // Darker orange when actively navigating
-          : "orange"
-        : "gray";
+      this.ctx.strokeStyle = isSelectedCategory ? (isNavigatingCategories ? "rgb(255, 140, 0)" : "orange") : "gray";
       this.ctx.strokeRect(categoryX, categoryY, tabWidth, categoryHeight);
 
-      // Category text
       this.ctx.font = `${Math.floor(12 * scale)}px Arial`;
       this.ctx.fillStyle = "black";
       this.ctx.textAlign = "center";
