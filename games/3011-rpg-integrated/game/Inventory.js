@@ -235,30 +235,7 @@ export default class Inventory {
     const headerHeight = fontSize + smallerFontSize + 15;
     const categoryHeight = 40 * scale;
 
-    // Draw top menu items
-    const menuWidth = this.canvas.width / Inventory.TOP_MENU_ITEMS.length;
-    Inventory.TOP_MENU_ITEMS.forEach((item, index) => {
-      const x = menuWidth * index + menuWidth / 2;
-      const y = padding + fontSize;
-      const isInventory = item === "Inventory";
-
-      // Highlight selected menu item
-      if (this.isInTopMenu && index === this.selectedTopMenuItem) {
-        this.ctx.fillStyle = "rgba(255, 165, 0, 0.3)";
-        this.ctx.fillRect(menuWidth * index, padding, menuWidth, fontSize * 1.5);
-      }
-
-      // Draw shortcut key label if it exists
-      if (Inventory.TOP_MENU_LABELS[index]) {
-        drawText(this.ctx, Inventory.TOP_MENU_LABELS[index], x, padding + fontSize * 0.5, `${smallerFontSize}px Arial`, "white", "center");
-      }
-
-      // Draw menu item text with different sizes for Inventory vs other items
-      const itemFontSize = isInventory ? fontSize : smallerFontSize;
-      drawText(this.ctx, item, x, y + (isInventory ? 0 : fontSize * 0.2), `${itemFontSize}px Arial`, "white", "center");
-    });
-
-    // Rest of the draw method remains unchanged
+    // Setup sections
     const leftSectionWidth = this.canvas.width * 0.5;
     const leftStartX = padding;
     const leftStartY = padding + fontSize * 2;
@@ -270,18 +247,53 @@ export default class Inventory {
     const rightSectionHeight = this.canvas.height - (padding * 2 + fontSize * 2);
 
     const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedCategory);
-    const selectedItem = filteredItems[this.selectedSlot];
 
-    // DRAW LEFT SECTION
+    this.drawTopSection();
+    this.drawLeftSection(leftStartX, leftStartY, leftSectionWidth, leftSectionHeight, scale, filteredItems, padding, headerHeight, slotSize, categoryHeight);
+    this.drawRightSection(rightStartX, rightStartY, rightSectionWidth, rightSectionHeight, scale, filteredItems, padding, slotSize);
+  }
+
+  drawTopSection() {
+    const scaleX = this.canvas.width / Inventory.BASE_RESOLUTION.width;
+    const scaleY = this.canvas.height / Inventory.BASE_RESOLUTION.height;
+    const scale = Math.min(scaleX, scaleY);
+
+    const padding = Inventory.INVENTORY_PADDING * scale;
+    const fontSize = Math.floor(20 * scale);
+    const smallerFontSize = Math.floor(14 * scale);
+
+    const menuWidth = this.canvas.width / Inventory.TOP_MENU_ITEMS.length;
+
+    Inventory.TOP_MENU_ITEMS.forEach((item, index) => {
+      const x = menuWidth * index + menuWidth / 2;
+      const y = padding + fontSize;
+      const isInventory = item === "Inventory";
+
+      if (this.isInTopMenu && index === this.selectedTopMenuItem) {
+        this.ctx.fillStyle = "rgba(255, 165, 0, 0.3)";
+        this.ctx.fillRect(menuWidth * index, padding, menuWidth, fontSize * 1.5);
+      }
+
+      if (Inventory.TOP_MENU_LABELS[index]) {
+        drawText(this.ctx, Inventory.TOP_MENU_LABELS[index], x, padding + fontSize * 0.5, `${smallerFontSize}px Arial`, "white", "center");
+      }
+
+      const itemFontSize = isInventory ? fontSize : smallerFontSize;
+      drawText(this.ctx, item, x, y + (isInventory ? 0 : fontSize * 0.2), `${itemFontSize}px Arial`, "white", "center");
+    });
+  }
+
+  drawLeftSection(startX, startY, sectionWidth, sectionHeight, scale, filteredItems, padding, headerHeight, slotSize, categoryHeight) {
+    // Draw main background
     this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
-    this.ctx.fillRect(leftStartX, leftStartY, leftSectionWidth, leftSectionHeight);
+    this.ctx.fillRect(startX, startY, sectionWidth, sectionHeight);
 
-    // Category tabs
-    const tabWidth = leftSectionWidth / Inventory.CATEGORIES.length;
-    const categoryY = leftStartY + padding + headerHeight;
+    // Draw category tabs
+    const tabWidth = sectionWidth / Inventory.CATEGORIES.length;
+    const categoryY = startY + padding + headerHeight;
 
     Inventory.CATEGORIES.forEach((category, index) => {
-      const categoryX = leftStartX + tabWidth * index;
+      const categoryX = startX + tabWidth * index;
       const isSelectedCategory = category === this.selectedCategory;
       const isNavigatingCategories = this.selectedSlot === -1;
 
@@ -294,22 +306,24 @@ export default class Inventory {
       this.ctx.font = `${Math.floor(12 * scale)}px Arial`;
       this.ctx.fillStyle = "black";
       this.ctx.textAlign = "center";
-      let categoryEmoji = "";
-      if (category === "Weapons") categoryEmoji = "⚔️";
-      else if (category === "Bows and Arrows") categoryEmoji = "🏹";
-      else if (category === "Shields") categoryEmoji = "🛡️";
-      else if (category === "Armor") categoryEmoji = "🥋";
-      else if (category === "Materials") categoryEmoji = "🪵";
-      else if (category === "Food") categoryEmoji = "🍎";
-      else if (category === "Key Items") categoryEmoji = "🔑";
 
-      this.ctx.fillText(categoryEmoji, categoryX + tabWidth / 2, categoryY + categoryHeight / 2 + 5);
+      const categoryEmojis = {
+        Weapons: "⚔️",
+        "Bows and Arrows": "🏹",
+        Shields: "🛡️",
+        Armor: "🥋",
+        Materials: "🪵",
+        Food: "🍎",
+        "Key Items": "🔑",
+      };
+
+      this.ctx.fillText(categoryEmojis[category], categoryX + tabWidth / 2, categoryY + categoryHeight / 2 + 5);
     });
 
-    // Inventory slots
+    // Draw inventory slots
     const slotsStartY = categoryY + categoryHeight + padding;
     const totalGridWidth = Inventory.SLOTS_PER_ROW * slotSize;
-    const slotsStartX = leftStartX + (leftSectionWidth - totalGridWidth) / 2; // Centering the grid
+    const slotsStartX = startX + (sectionWidth - totalGridWidth) / 2;
 
     for (let i = 0; i < Inventory.TOTAL_SLOTS; i++) {
       const row = Math.floor(i / Inventory.SLOTS_PER_ROW);
@@ -329,31 +343,70 @@ export default class Inventory {
         this.ctx.drawImage(item.imgPath, item.imgSourceX, item.imgSourceY, item.imgSourceWidth, item.imgSourceHeight, x + itemPadding, y + itemPadding, slotSize - itemPadding * 2, slotSize - itemPadding * 2);
       }
     }
+  }
 
-    // DRAW RIGHT SECTION
-    // Right Section Background
+  drawRightSection(rightStartX, rightStartY, rightSectionWidth, rightSectionHeight, scale, filteredItems, padding, slotSize) {
+    // Draw main background
     this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
     this.ctx.fillRect(rightStartX, rightStartY, rightSectionWidth, rightSectionHeight);
 
+    // Get selected item if any
+    const selectedItem = this.selectedSlot >= 0 && this.selectedSlot < filteredItems.length ? filteredItems[this.selectedSlot] : null;
+
     if (selectedItem) {
-      // Determine the maximum Y position above the inventory grid
-      const descriptionAreaHeight = fontSize + smallerFontSize + 10; // Space needed for name and description
-      const gridTopY = slotsStartY; // Top Y position of the inventory grid
-      const textStartY = gridTopY - descriptionAreaHeight - padding; // Place text above grid
+      const fontSize = Math.floor(20 * scale);
+      const smallerFontSize = Math.floor(14 * scale);
+
+      // Calculate positions for item display
+      const imageSize = slotSize * 2;
+      const imageX = rightStartX + (rightSectionWidth - imageSize) / 2;
+      const imageY = rightStartY + padding * 2;
+
+      // Draw large item image
+      this.ctx.fillStyle = "white";
+      this.ctx.fillRect(imageX, imageY, imageSize, imageSize);
+      this.ctx.strokeStyle = "gray";
+      this.ctx.strokeRect(imageX, imageY, imageSize, imageSize);
+
+      // Draw item sprite scaled up
+      const itemPadding = imageSize * 0.1;
+      this.ctx.drawImage(selectedItem.imgPath, selectedItem.imgSourceX, selectedItem.imgSourceY, selectedItem.imgSourceWidth, selectedItem.imgSourceHeight, imageX + itemPadding, imageY + itemPadding, imageSize - itemPadding * 2, imageSize - itemPadding * 2);
 
       // Draw item name
-      drawText(
-        this.ctx,
-        selectedItem.name,
-        rightStartX + rightSectionWidth / 2,
-        textStartY, // Position for item name
-        `${fontSize}px Arial`,
-        "black",
-        "center"
-      );
+      const nameY = imageY + imageSize + padding * 2;
+      drawText(this.ctx, selectedItem.name, rightStartX + rightSectionWidth / 2, nameY, `${fontSize}px Arial`, "black", "center");
 
       // Draw item description
-      drawText(this.ctx, selectedItem.description || "No description available.", rightStartX + padding, textStartY + fontSize + 5, `${smallerFontSize}px Arial`, "black", "left");
+      const descriptionY = nameY + fontSize + padding;
+      const descriptionWidth = rightSectionWidth - padding * 2;
+      const description = selectedItem.description || "No description available.";
+
+      this.ctx.font = `${smallerFontSize}px Arial`;
+      const words = description.split(" ");
+      let line = "";
+      let y = descriptionY;
+
+      // Word wrap the description
+      words.forEach((word) => {
+        const testLine = line + word + " ";
+        const metrics = this.ctx.measureText(testLine);
+        if (metrics.width > descriptionWidth) {
+          drawText(this.ctx, line, rightStartX + padding, y, `${smallerFontSize}px Arial`, "black", "left");
+          line = word + " ";
+          y += smallerFontSize * 1.2;
+        } else {
+          line = testLine;
+        }
+      });
+      drawText(this.ctx, line, rightStartX + padding, y, `${smallerFontSize}px Arial`, "black", "left");
+
+      // Draw controls hint at the bottom
+      const controlsY = rightStartY + rightSectionHeight - padding * 2;
+      drawText(this.ctx, "Press 'D' to drop item", rightStartX + rightSectionWidth / 2, controlsY, `${smallerFontSize}px Arial`, "black", "center");
+    } else {
+      // Draw "No item selected" message when no item is selected
+      const fontSize = Math.floor(16 * scale);
+      drawText(this.ctx, "No item selected", rightStartX + rightSectionWidth / 2, rightStartY + rightSectionHeight / 2, `${fontSize}px Arial`, "gray", "center");
     }
   }
 }
