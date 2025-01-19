@@ -227,7 +227,7 @@ export default class Inventory {
     const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedItemCategory);
 
     this.drawBackground();
-    this.drawTopSection();
+    this.drawTopSection(scale);
     this.drawLeftSection(sectionDimensions.left, scale, filteredItems, padding, headerHeight, slotSize, itemCategoryHeight);
     this.drawRightSection(sectionDimensions.right, scale, filteredItems, padding, slotSize);
   }
@@ -265,11 +265,7 @@ export default class Inventory {
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
-  drawTopSection() {
-    const scaleX = this.canvas.width / Inventory.BASE_RESOLUTION.width;
-    const scaleY = this.canvas.height / Inventory.BASE_RESOLUTION.height;
-    const scale = Math.min(scaleX, scaleY);
-
+  drawTopSection(scale) {
     const padding = Inventory.INVENTORY_PADDING * scale;
     const fontSize = Math.floor(20 * scale);
     const smallerFontSize = Math.floor(14 * scale);
