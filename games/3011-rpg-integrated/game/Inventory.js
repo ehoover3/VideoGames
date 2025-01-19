@@ -218,34 +218,46 @@ export default class Inventory {
   }
 
   draw() {
-    const scaleX = this.canvas.width / Inventory.BASE_RESOLUTION.width;
-    const scaleY = this.canvas.height / Inventory.BASE_RESOLUTION.height;
-    const scale = Math.min(scaleX, scaleY);
+    const { scale, padding, fontSize, smallerFontSize } = this.calculateDrawScale();
+    const sectionDimensions = this.calculateSectionDimensions(padding, fontSize);
 
-    const padding = Inventory.INVENTORY_PADDING * scale;
     const slotSize = Inventory.SLOT_SIZE * scale;
-    const fontSize = Math.floor(20 * scale);
-    const smallerFontSize = Math.floor(14 * scale);
     const headerHeight = fontSize + smallerFontSize + 15;
     const itemCategoryHeight = 40 * scale;
-
-    // Setup sections
-    const leftSectionWidth = this.canvas.width * 0.5;
-    const leftStartX = padding;
-    const leftStartY = padding + fontSize * 2;
-    const leftSectionHeight = this.canvas.height - (padding * 2 + fontSize * 2);
-
-    const rightSectionWidth = this.canvas.width * 0.5;
-    const rightStartX = leftSectionWidth + padding;
-    const rightStartY = padding + fontSize * 2;
-    const rightSectionHeight = this.canvas.height - (padding * 2 + fontSize * 2);
-
     const filteredItems = this.items.filter((item) => item.itemCategory === this.selectedItemCategory);
 
     this.drawBackground();
     this.drawTopSection();
-    this.drawLeftSection(leftStartX, leftStartY, leftSectionWidth, leftSectionHeight, scale, filteredItems, padding, headerHeight, slotSize, itemCategoryHeight);
-    this.drawRightSection(rightStartX, rightStartY, rightSectionWidth, rightSectionHeight, scale, filteredItems, padding, slotSize);
+    this.drawLeftSection(sectionDimensions.left, scale, filteredItems, padding, headerHeight, slotSize, itemCategoryHeight);
+    this.drawRightSection(sectionDimensions.right, scale, filteredItems, padding, slotSize);
+  }
+
+  calculateDrawScale() {
+    const scaleX = this.canvas.width / Inventory.BASE_RESOLUTION.width;
+    const scaleY = this.canvas.height / Inventory.BASE_RESOLUTION.height;
+    const scale = Math.min(scaleX, scaleY);
+    return {
+      scale,
+      padding: Inventory.INVENTORY_PADDING * scale,
+      fontSize: Math.floor(20 * scale),
+      smallerFontSize: Math.floor(14 * scale),
+    };
+  }
+
+  calculateSectionDimensions(padding, fontSize) {
+    const leftSection = {
+      x: padding,
+      y: padding + fontSize * 2,
+      width: this.canvas.width * 0.5,
+      height: this.canvas.height - (padding * 2 + fontSize * 2),
+    };
+    const rightSection = {
+      x: leftSection.width + padding,
+      y: leftSection.y,
+      width: this.canvas.width * 0.5,
+      height: leftSection.height,
+    };
+    return { left: leftSection, right: rightSection };
   }
 
   drawBackground() {
@@ -283,17 +295,19 @@ export default class Inventory {
     });
   }
 
-  drawLeftSection(startX, startY, sectionWidth, sectionHeight, scale, filteredItems, padding, headerHeight, slotSize, itemCategoryHeight) {
+  drawLeftSection(sectionDimension, scale, filteredItems, padding, headerHeight, slotSize, itemCategoryHeight) {
+    let { x, y, width, height } = sectionDimension;
+
     // Draw main background
     this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
-    this.ctx.fillRect(startX, startY, sectionWidth, sectionHeight);
+    this.ctx.fillRect(x, y, width, height);
 
     // Draw itemCategory tabs
-    const tabWidth = sectionWidth / Inventory.ITEM_CATEGORIES.length;
-    const itemCategoryY = startY + padding + headerHeight;
+    const tabWidth = width / Inventory.ITEM_CATEGORIES.length;
+    const itemCategoryY = y + padding + headerHeight;
 
     Inventory.ITEM_CATEGORIES.forEach((itemCategory, index) => {
-      const itemCategoryX = startX + tabWidth * index;
+      const itemCategoryX = x + tabWidth * index;
       const isSelectedCategory = itemCategory === this.selectedItemCategory;
       const isNavigatingCategories = this.selectedSlot === -1;
 
@@ -323,7 +337,7 @@ export default class Inventory {
     // Draw inventory slots
     const slotsStartY = itemCategoryY + itemCategoryHeight + padding;
     const totalGridWidth = Inventory.SLOTS_PER_ROW * slotSize;
-    const slotsStartX = startX + (sectionWidth - totalGridWidth) / 2;
+    const slotsStartX = x + (width - totalGridWidth) / 2;
 
     for (let i = 0; i < Inventory.TOTAL_SLOTS; i++) {
       const row = Math.floor(i / Inventory.SLOTS_PER_ROW);
@@ -345,10 +359,12 @@ export default class Inventory {
     }
   }
 
-  drawRightSection(rightStartX, rightStartY, rightSectionWidth, rightSectionHeight, scale, filteredItems, padding, slotSize) {
+  drawRightSection(sectionDimension, scale, filteredItems, padding, slotSize) {
+    let { x, y, width, height } = sectionDimension;
+
     // Draw main background
     this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
-    this.ctx.fillRect(rightStartX, rightStartY, rightSectionWidth, rightSectionHeight);
+    this.ctx.fillRect(x, y, width, height);
 
     // Get selected item if any
     const selectedItem = this.selectedSlot >= 0 && this.selectedSlot < filteredItems.length ? filteredItems[this.selectedSlot] : null;
@@ -359,8 +375,8 @@ export default class Inventory {
 
       // Calculate positions for item display
       const imageSize = slotSize * 2;
-      const imageX = rightStartX + (rightSectionWidth - imageSize) / 2;
-      const imageY = rightStartY + padding * 2;
+      const imageX = x + (width - imageSize) / 2;
+      const imageY = y + padding * 2;
 
       // Draw large item image
       this.ctx.fillStyle = "white";
@@ -374,39 +390,39 @@ export default class Inventory {
 
       // Draw item name
       const nameY = imageY + imageSize + padding * 2;
-      drawText(this.ctx, selectedItem.name, rightStartX + rightSectionWidth / 2, nameY, `${fontSize}px Arial`, "black", "center");
+      drawText(this.ctx, selectedItem.name, x + width / 2, nameY, `${fontSize}px Arial`, "black", "center");
 
       // Draw item description
       const descriptionY = nameY + fontSize + padding;
-      const descriptionWidth = rightSectionWidth - padding * 2;
+      const descriptionWidth = width - padding * 2;
       const description = selectedItem.description || "No description available.";
 
       this.ctx.font = `${smallerFontSize}px Arial`;
       const words = description.split(" ");
       let line = "";
-      let y = descriptionY;
+      let currentY = descriptionY; // Changed from 'y' to 'currentY' to avoid scope issues
 
       // Word wrap the description
       words.forEach((word) => {
         const testLine = line + word + " ";
         const metrics = this.ctx.measureText(testLine);
         if (metrics.width > descriptionWidth) {
-          drawText(this.ctx, line, rightStartX + padding, y, `${smallerFontSize}px Arial`, "black", "left");
+          drawText(this.ctx, line, x + padding, currentY, `${smallerFontSize}px Arial`, "black", "left");
           line = word + " ";
-          y += smallerFontSize * 1.2;
+          currentY += smallerFontSize * 1.2;
         } else {
           line = testLine;
         }
       });
-      drawText(this.ctx, line, rightStartX + padding, y, `${smallerFontSize}px Arial`, "black", "left");
+      drawText(this.ctx, line, x + padding, currentY, `${smallerFontSize}px Arial`, "black", "left");
 
       // Draw controls hint at the bottom
-      const controlsY = rightStartY + rightSectionHeight - padding * 2;
-      drawText(this.ctx, "Press 'D' to drop item", rightStartX + rightSectionWidth / 2, controlsY, `${smallerFontSize}px Arial`, "black", "center");
+      const controlsY = sectionDimension.y + height - padding * 2; // Fixed to use sectionDimension.y
+      drawText(this.ctx, "Press 'D' to drop item", x + width / 2, controlsY, `${smallerFontSize}px Arial`, "black", "center");
     } else {
       // Draw "No item selected" message when no item is selected
       const fontSize = Math.floor(16 * scale);
-      drawText(this.ctx, "No item selected", rightStartX + rightSectionWidth / 2, rightStartY + rightSectionHeight / 2, `${fontSize}px Arial`, "gray", "center");
+      drawText(this.ctx, "No item selected", x + width / 2, y + height / 2, `${fontSize}px Arial`, "gray", "center");
     }
   }
 }
