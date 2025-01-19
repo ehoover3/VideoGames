@@ -31,36 +31,29 @@ export default class System {
   load() {
     this.update();
     this.draw();
-    const game = window.gameInstance;
-    if (game) {
-      game.hud.draw(this.gameState.currentState);
+  }
+
+  update() {
+    if (this.keys["x"] || this.keys["X"]) {
+      this.gameState.currentState = STATES.OVERWORLD;
+      this.keys["x"] = false;
+      this.keys["X"] = false;
     }
+
+    // Handle L key shortcut for Inventory
+    if (this.keys["l"] || this.keys["L"]) {
+      this.handleMenuSelection("Inventory");
+      this.keys["l"] = false;
+      this.keys["L"] = false;
+    }
+
+    this.handleArrowNavigation();
   }
 
   handleMenuSelection(selectedMenu) {
     switch (selectedMenu) {
       case "Inventory":
         this.gameState.currentState = STATES.INVENTORY;
-        break;
-    }
-  }
-
-  handleMenuOptionSelection() {
-    switch (System.MENU_OPTIONS[this.selectedOption]) {
-      case "Save":
-        console.log("Save game");
-        break;
-      case "Load":
-        console.log("Load game");
-        break;
-      case "Options":
-        console.log("Open options");
-        break;
-      case "Special Controls":
-        console.log("Show controls");
-        break;
-      case "To Title Screen":
-        this.gameState.currentState = STATES.MAIN_MENU;
         break;
     }
   }
@@ -110,21 +103,24 @@ export default class System {
     if (!this.keys.Enter) this.keyStates.Enter = false;
   }
 
-  update() {
-    if (this.keys["x"] || this.keys["X"]) {
-      this.gameState.currentState = STATES.OVERWORLD;
-      this.keys["x"] = false;
-      this.keys["X"] = false;
+  handleMenuOptionSelection() {
+    switch (System.MENU_OPTIONS[this.selectedOption]) {
+      case "Save":
+        console.log("Save game");
+        break;
+      case "Load":
+        console.log("Load game");
+        break;
+      case "Options":
+        console.log("Open options");
+        break;
+      case "Special Controls":
+        console.log("Show controls");
+        break;
+      case "To Title Screen":
+        this.gameState.currentState = STATES.MAIN_MENU;
+        break;
     }
-
-    // Handle L key shortcut for Inventory
-    if (this.keys["l"] || this.keys["L"]) {
-      this.handleMenuSelection("Inventory");
-      this.keys["l"] = false;
-      this.keys["L"] = false;
-    }
-
-    this.handleArrowNavigation();
   }
 
   draw() {

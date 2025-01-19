@@ -30,10 +30,24 @@ export default class AdventureLog {
   load() {
     this.update();
     this.draw();
-    const game = window.gameInstance;
-    if (game) {
-      game.hud.draw(this.gameState.currentState);
+  }
+
+  update() {
+    // Handle navigation keys
+    if (this.keys["x"] || this.keys["X"]) {
+      this.gameState.currentState = STATES.OVERWORLD;
+      this.keys["x"] = false;
+      this.keys["X"] = false;
     }
+
+    // Handle R key shortcut for Inventory
+    if (this.keys["r"] || this.keys["R"]) {
+      this.handleMenuSelection("Inventory");
+      this.keys["r"] = false;
+      this.keys["R"] = false;
+    }
+
+    this.handleArrowNavigation();
   }
 
   handleMenuSelection(selectedMenu) {
@@ -74,22 +88,15 @@ export default class AdventureLog {
     if (!this.keys.Enter) this.keyStates.Enter = false;
   }
 
-  update() {
-    // Handle navigation keys
-    if (this.keys["x"] || this.keys["X"]) {
-      this.gameState.currentState = STATES.OVERWORLD;
-      this.keys["x"] = false;
-      this.keys["X"] = false;
-    }
+  addQuest(quest) {
+    this.quests.push(quest);
+  }
 
-    // Handle R key shortcut for Inventory
-    if (this.keys["r"] || this.keys["R"]) {
-      this.handleMenuSelection("Inventory");
-      this.keys["r"] = false;
-      this.keys["R"] = false;
+  completeQuest(questId) {
+    const quest = this.quests.find((q) => q.id === questId);
+    if (quest) {
+      quest.completed = true;
     }
-
-    this.handleArrowNavigation();
   }
 
   draw() {
@@ -176,17 +183,6 @@ export default class AdventureLog {
         drawText(this.ctx, `✓ ${quest.title}`, startX + padding * 2, currentY, `${smallerFontSize}px Arial`, "darkgreen", "left");
         currentY += smallerFontSize + 15;
       });
-    }
-  }
-
-  addQuest(quest) {
-    this.quests.push(quest);
-  }
-
-  completeQuest(questId) {
-    const quest = this.quests.find((q) => q.id === questId);
-    if (quest) {
-      quest.completed = true;
     }
   }
 }

@@ -24,7 +24,6 @@ export default class Inventory {
     this.selectedItemCategory = "Weapons";
     this.selectedNavbarItem = 1; // Start with Inventory selected
 
-    // Add key state tracking to prevent continuous movement while holding keys
     this.keyStates = {
       ArrowLeft: false,
       ArrowRight: false,
@@ -37,20 +36,6 @@ export default class Inventory {
   load() {
     this.update();
     this.draw();
-  }
-
-  addItem(item) {
-    if (this.items.length < Inventory.TOTAL_SLOTS) {
-      this.items.push(item);
-      return {
-        success: true,
-        message: `Picked up ${item.name || "item"}!`,
-      };
-    }
-    return {
-      success: false,
-      message: "Inventory is full! Drop something first.",
-    };
   }
 
   update() {
@@ -149,6 +134,20 @@ export default class Inventory {
     if (!this.keys.ArrowRight) this.keyStates.ArrowRight = false;
     if (!this.keys.ArrowUp) this.keyStates.ArrowUp = false;
     if (!this.keys.ArrowDown) this.keyStates.ArrowDown = false;
+  }
+
+  addItem(item) {
+    if (this.items.length < Inventory.TOTAL_SLOTS) {
+      this.items.push(item);
+      return {
+        success: true,
+        message: `Picked up ${item.name || "item"}!`,
+      };
+    }
+    return {
+      success: false,
+      message: "Inventory is full! Drop something first.",
+    };
   }
 
   dropItem(slotIndex) {

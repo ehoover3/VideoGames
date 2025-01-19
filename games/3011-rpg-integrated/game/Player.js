@@ -101,21 +101,6 @@ class Player extends GameObject {
     return true;
   }
 
-  draw(canvas, ctx) {
-    const { FRAME_WIDTH, FRAME_HEIGHT } = Player.FRAME_SETTINGS;
-    const spriteRow = Player.DIRECTIONS[this.movement.direction];
-
-    this.imgSourceX = this.sprite.frame * FRAME_WIDTH;
-    this.imgSourceY = spriteRow * FRAME_HEIGHT;
-
-    const scale = {
-      x: canvas.width / 640,
-      y: canvas.height / 360,
-    };
-
-    super.draw(ctx, scale.x, scale.y);
-  }
-
   update({ keys, gameState, gameObjects }) {
     const { WALK_FRAMES, ANIMATION_SPEED } = Player.FRAME_SETTINGS;
     const { ball, coin, dog, mri } = gameObjects;
@@ -274,6 +259,21 @@ class Player extends GameObject {
       return this.changeGameState(currentState, STATES.MAIN_MENU);
     }
     return { currentState, previousState, savedPlayerPosition };
+  }
+
+  draw(canvas, ctx) {
+    const { FRAME_WIDTH, FRAME_HEIGHT } = Player.FRAME_SETTINGS;
+    const spriteRow = Player.DIRECTIONS[this.movement.direction];
+
+    this.imgSourceX = this.sprite.frame * FRAME_WIDTH;
+    this.imgSourceY = spriteRow * FRAME_HEIGHT;
+
+    const scale = {
+      x: canvas.width / 640,
+      y: canvas.height / 360,
+    };
+
+    super.draw(ctx, scale.x, scale.y);
   }
 }
 
