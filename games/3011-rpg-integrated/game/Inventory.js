@@ -199,18 +199,25 @@ export default class Inventory {
   }
 
   calculateDrawSectionDimensions(padding, fontSize) {
+    // Calculate navbar dimensions
+    const navbarPadding = padding;
+    const navbarFontSize = fontSize;
+    const navbarHeight = navbarPadding + navbarFontSize * 1.5; // Account for padding + text height
+
     const leftSection = {
-      x: 0, // Start flush with the left edge
-      y: padding + fontSize * 2,
-      width: this.canvas.width * 0.5, // 50% of the screen
-      height: this.canvas.height - (padding * 2 + fontSize * 2),
+      x: 0,
+      y: navbarHeight, // Start right after navbar
+      width: this.canvas.width * 0.5,
+      height: this.canvas.height - navbarHeight, // Subtract navbar height from total height
     };
+
     const rightSection = {
-      x: leftSection.width, // Start where the left section ends
-      y: leftSection.y,
-      width: this.canvas.width * 0.5, // Remaining 50% of the screen
-      height: leftSection.height,
+      x: leftSection.width,
+      y: navbarHeight, // Start right after navbar
+      width: this.canvas.width * 0.5,
+      height: this.canvas.height - navbarHeight, // Subtract navbar height from total height
     };
+
     return { left: leftSection, right: rightSection };
   }
 
@@ -220,21 +227,28 @@ export default class Inventory {
   }
 
   drawTopSection(scale) {
-    const padding = Inventory.INVENTORY_PADDING * scale;
     const fontSize = Math.floor(20 * scale);
     const smallerFontSize = Math.floor(14 * scale);
-
-    const navbarWidth = this.canvas.width / Inventory.NAVBAR_ITEMS.length;
+    const padding = Inventory.INVENTORY_PADDING * scale;
+    const menuWidth = this.canvas.width / Inventory.NAVBAR_ITEMS.length;
 
     Inventory.NAVBAR_ITEMS.forEach((item, index) => {
-      const x = navbarWidth * index + navbarWidth / 2;
+      const x = menuWidth * index + menuWidth / 2;
       const y = padding + fontSize;
       const isInventory = item === "Inventory";
 
+      // Highlight selected menu item if in navbar
+      if (this.isInNavbar && index === this.selectedNavbarItem) {
+        this.ctx.fillStyle = "rgba(255, 165, 0, 0.3)";
+        this.ctx.fillRect(menuWidth * index, padding, menuWidth, fontSize * 1.5);
+      }
+
+      // Draw the label (L or R) if it exists
       if (Inventory.NAVBAR_LABELS[index]) {
         drawText(this.ctx, Inventory.NAVBAR_LABELS[index], x, padding + fontSize * 0.5, `${smallerFontSize}px Arial`, "white", "center");
       }
 
+      // Draw the menu item text with different sizes for Inventory vs other items
       const itemFontSize = isInventory ? fontSize : smallerFontSize;
       drawText(this.ctx, item, x, y + (isInventory ? 0 : fontSize * 0.2), `${itemFontSize}px Arial`, "white", "center");
     });
@@ -249,7 +263,7 @@ export default class Inventory {
 
     // Draw itemCategory tabs
     const tabWidth = width / Inventory.ITEM_CATEGORIES.length;
-    const itemCategoryY = y + padding + headerHeight;
+    const itemCategoryY = y + padding;
 
     // Draw category background
     this.ctx.fillStyle = "rgba(255,252,228,255)";
