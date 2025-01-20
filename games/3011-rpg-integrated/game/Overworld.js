@@ -61,19 +61,30 @@ export default class Overworld {
   }
 
   drawGameObjects() {
-    const { ball, coin, dog, mri } = this.gameObjects;
+    const { ball, coin, dog, mri, tree } = this.gameObjects;
     const scaleX = this.canvas.width / 640;
     const scaleY = this.canvas.height / 360;
 
-    if (!ball.isPickedUp) {
-      ball.draw(this.ctx, scaleX, scaleY);
-    }
+    Object.assign(ball, { x: 76, y: 130 });
+    Object.assign(coin, { x: 130, y: 70 });
+    Object.assign(dog, { x: 50, y: 50 });
+    Object.assign(mri, { x: 570, y: 5 });
+    Object.assign(tree, { x: 50, y: 0 });
 
-    if (!coin.isPickedUp) {
-      coin.draw(this.ctx, scaleX, scaleY);
-    }
+    if (!ball.isPickedUp) ball.draw(this.ctx, scaleX, scaleY);
+    if (!coin.isPickedUp) coin.draw(this.ctx, scaleX, scaleY);
 
     dog.draw(this.ctx, scaleX, scaleY);
     mri.draw(this.ctx, scaleX, scaleY);
+    tree.draw(this.ctx, scaleX, scaleY);
+
+    // Draw a border around the tree
+    // const treeWidth = tree.width * scaleX;
+    // const treeHeight = tree.height * scaleY;
+    // const treeX = tree.x * scaleX;
+    // const treeY = tree.y * scaleY;
+    // this.ctx.strokeStyle = "red"; // Set the color of the border
+    // this.ctx.lineWidth = 3; // Set the thickness of the border
+    // this.ctx.strokeRect(treeX, treeY, treeWidth, treeHeight); // Draw the border
   }
 }

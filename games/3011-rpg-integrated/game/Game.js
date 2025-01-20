@@ -71,6 +71,7 @@ export default class Game {
       dog: loadImage("assets/images/overworld/dog.png"),
       mri: loadImage("assets/images/overworld/mri.png"),
       player: loadImage("assets/images/overworld/player.png"),
+      tree: loadImage("assets/images/overworld/tree.png"),
     };
   }
 
@@ -83,8 +84,6 @@ export default class Game {
       imgSourceY: 0,
       imgSourceWidth: 155,
       imgSourceHeight: 155,
-      x: 76,
-      y: 130,
       width: 16,
       height: 16,
       name: "Tennis Ball",
@@ -99,8 +98,6 @@ export default class Game {
       imgSourceY: 80,
       imgSourceWidth: 100,
       imgSourceHeight: 130,
-      x: 130,
-      y: 70,
       width: 16,
       height: 16,
       name: "Coin",
@@ -115,8 +112,6 @@ export default class Game {
       imgSourceY: 0,
       imgSourceWidth: 489,
       imgSourceHeight: 510,
-      x: 50,
-      y: 50,
       width: 32,
       height: 32,
       interactionText: "Woof woof!",
@@ -128,14 +123,22 @@ export default class Game {
       imgSourceY: 0,
       imgSourceWidth: 556,
       imgSourceHeight: 449,
-      x: 130,
-      y: 130,
       width: 64,
       height: 64,
       name: "MRI Machine",
     });
 
-    return { ball, coin, dog, mri, player };
+    const tree = new NPC({
+      imgPath: this.images["tree"],
+      imgSourceX: 32,
+      imgSourceY: 23,
+      imgSourceWidth: 64,
+      imgSourceHeight: 78,
+      width: 64,
+      height: 64,
+    });
+
+    return { ball, coin, dog, mri, player, tree };
   }
 
   startGameComponents() {
