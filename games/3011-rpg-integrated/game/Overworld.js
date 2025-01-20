@@ -23,7 +23,7 @@ export default class Overworld {
     this.gameState.previousState = update.previousState;
     this.gameState.savedPlayerPosition = update.savedPlayerPosition;
 
-    this.draw(update.interactionMessage);
+    this.draw();
 
     // Update movement state
     this.isPlayerMoving = Boolean(this.keys["ArrowUp"] || this.keys["ArrowDown"] || this.keys["ArrowLeft"] || this.keys["ArrowRight"]);
@@ -33,7 +33,6 @@ export default class Overworld {
 
     if (!this.isPlayerMoving) {
       if (update.isInteracting && this.gameObjects.dog) {
-        // Show dog during conversation
         displayObject = this.gameObjects.dog;
         displayMessage = update.interactionMessage;
       }
@@ -43,9 +42,17 @@ export default class Overworld {
   }
 
   draw() {
+    // Clear the canvas first
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // Draw the world background
     this.drawWorld();
+
+    // Draw all game objects
     this.drawGameObjects();
-    this.gameObjects.player.draw(this.canvas, this.ctx, this.gameState.currentFrame);
+
+    // Draw the player
+    this.gameObjects.player.draw(this.canvas, this.ctx);
   }
 
   drawWorld() {
@@ -58,7 +65,16 @@ export default class Overworld {
     const scaleX = this.canvas.width / 640;
     const scaleY = this.canvas.height / 360;
 
-    if (!ball.isPickedUp) {
+    // Draw thrown ball if throwing animation is active
+    if (this.gameObjects.player.throwState.isThrowing) {
+      const { ballPosition } = this.gameObjects.player.throwState;
+
+      this.ctx.save();
+      this.ctx.translate(ballPosition.x * scaleX, ballPosition.y * scaleY);
+      this.ctx.scale(scaleX, scaleY);
+      ball.draw(this.ctx, 1, 1, true);
+      this.ctx.restore();
+    } else if (!ball.isPickedUp) {
       ball.draw(this.ctx, scaleX, scaleY);
     }
 
