@@ -72,7 +72,7 @@ export default class Overworld {
       this.ctx.save();
       this.ctx.translate(ballPosition.x * scaleX, ballPosition.y * scaleY);
       this.ctx.scale(scaleX, scaleY);
-      ball.draw(this.ctx, 1, 1, true);
+      ball.draw(this.ctx, 1, 1, true); // Custom ball drawing logic
       this.ctx.restore();
     } else if (!ball.isPickedUp) {
       ball.draw(this.ctx, scaleX, scaleY);

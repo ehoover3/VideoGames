@@ -128,10 +128,10 @@ class Player extends GameObject {
     const multiplier = directionMultiplier[this.#movement.direction];
 
     // Start from player's current position
-    const startX = this.x - 90 + this.width / 2; // Center of player
-    const startY = this.y - 118 + this.height / 2;
+    const startX = this.x + this.width / 2; // Center of the player sprite
+    const startY = this.y + this.height / 2;
 
-    // Calculate target position relative to player's position
+    // Calculate target position based on direction
     const targetX = startX + multiplier.x * throwDistance;
     const targetY = startY + multiplier.y * throwDistance;
 
@@ -155,16 +155,18 @@ class Player extends GameObject {
   }
 
   #updateThrow() {
-    // Use a smoother easing function for the throw progress
-    const easeOutQuad = (t) => t * (2 - t);
+    const now = Date.now();
+    const elapsed = now - this.throwState.lastThrowTime;
+    this.throwState.lastThrowTime = now;
 
-    this.throwState.throwProgress += Player.THROW_SETTINGS.THROW_SPEED;
+    const throwSpeed = Player.THROW_SETTINGS.THROW_SPEED * (elapsed / 9); // Adjust speed based on frame time
+    this.throwState.throwProgress += throwSpeed;
 
     if (this.throwState.throwProgress >= 100) {
       this.throwState.isThrowing = false;
       this.throwState.ballPosition = this.throwState.targetPosition;
 
-      // Update ball position in game objects, accounting for ball dimensions
+      // Update ball position in game objects
       const game = window.gameInstance;
       if (game?.gameObjects?.ball) {
         game.gameObjects.ball.x = this.throwState.targetPosition.x - game.gameObjects.ball.width / 2;
@@ -174,18 +176,12 @@ class Player extends GameObject {
       return;
     }
 
-    const rawProgress = this.throwState.throwProgress / 100;
-    const easedProgress = easeOutQuad(rawProgress);
-    const arcHeight = Player.THROW_SETTINGS.THROW_ARC_HEIGHT;
+    const progress = this.throwState.throwProgress / 100;
 
-    // Calculate horizontal and vertical positions with proper interpolation
-    const horizontalProgress = easedProgress;
-    const verticalProgress = Math.sin(rawProgress * Math.PI);
-
-    // Linear interpolation between start and target positions
+    // Interpolate between start and target positions
     this.throwState.ballPosition = {
-      x: this.throwState.startPosition.x + (this.throwState.targetPosition.x - this.throwState.startPosition.x) * horizontalProgress,
-      y: this.throwState.startPosition.y + (this.throwState.targetPosition.y - this.throwState.startPosition.y) * horizontalProgress - verticalProgress * arcHeight,
+      x: this.throwState.startPosition.x + (this.throwState.targetPosition.x - this.throwState.startPosition.x) * progress,
+      y: this.throwState.startPosition.y + (this.throwState.targetPosition.y - this.throwState.startPosition.y) * progress,
     };
   }
 
