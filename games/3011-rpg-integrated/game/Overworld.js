@@ -65,16 +65,7 @@ export default class Overworld {
     const scaleX = this.canvas.width / 640;
     const scaleY = this.canvas.height / 360;
 
-    // Draw thrown ball if throwing animation is active
-    if (this.gameObjects.player.throwState.isThrowing) {
-      const { ballPosition } = this.gameObjects.player.throwState;
-
-      this.ctx.save();
-      this.ctx.translate(ballPosition.x * scaleX, ballPosition.y * scaleY);
-      this.ctx.scale(scaleX, scaleY);
-      ball.draw(this.ctx, 1, 1, true); // Custom ball drawing logic
-      this.ctx.restore();
-    } else if (!ball.isPickedUp) {
+    if (!ball.isPickedUp) {
       ball.draw(this.ctx, scaleX, scaleY);
     }
 

@@ -29,13 +29,6 @@ class Player extends GameObject {
     Escape: STATES.SYSTEM,
   };
 
-  static THROW_SETTINGS = {
-    COOLDOWN: 500,
-    THROW_DISTANCE: 100,
-    THROW_SPEED: 3, // Reduced for smoother animation
-    THROW_ARC_HEIGHT: 50, // Increased for more visible arc
-  };
-
   #sprite;
   #movement;
   #interaction;
@@ -66,15 +59,6 @@ class Player extends GameObject {
     };
 
     this.#interaction = this.#createInitialInteractionState();
-
-    this.throwState = {
-      isThrowing: false,
-      lastThrowTime: 0,
-      ballPosition: null,
-      throwProgress: 0,
-      startPosition: null,
-      targetPosition: null,
-    };
   }
 
   #createInitialInteractionState() {
@@ -91,21 +75,6 @@ class Player extends GameObject {
     const menuUpdate = this.#handleMenuKeys(keys, gameState);
     if (menuUpdate) return menuUpdate;
 
-    // Handle throwing
-    if (keys["t"] || keys["T"]) {
-      const inventory = window.gameInstance?.getInventory();
-      const hasBall = inventory?.items.some((item) => item.name === "Tennis Ball");
-
-      if (hasBall && !this.throwState.isThrowing && Date.now() - this.throwState.lastThrowTime > Player.THROW_SETTINGS.COOLDOWN) {
-        this.#startThrow();
-      }
-    }
-
-    // Update throw animation if active
-    if (this.throwState.isThrowing) {
-      this.#updateThrow();
-    }
-
     const isMoving = this.#move(keys);
     this.#updateAnimation(isMoving);
 
@@ -114,75 +83,6 @@ class Player extends GameObject {
     if (isMoving) return this.#createGameState(gameState, this.#createInitialInteractionState());
 
     return this.#handleGameObjectInteractions(keys, gameState, gameObjects);
-  }
-
-  #startThrow() {
-    const throwDistance = Player.THROW_SETTINGS.THROW_DISTANCE;
-    const directionMultiplier = {
-      [DIRECTION.UP]: { x: 0, y: -1 },
-      [DIRECTION.DOWN]: { x: 0, y: 1 },
-      [DIRECTION.LEFT]: { x: -1, y: 0 },
-      [DIRECTION.RIGHT]: { x: 1, y: 0 },
-    };
-
-    const multiplier = directionMultiplier[this.#movement.direction];
-
-    // Start from player's current position
-    const startX = this.x + this.width / 2; // Center of the player sprite
-    const startY = this.y + this.height / 2;
-
-    // Calculate target position based on direction
-    const targetX = startX + multiplier.x * throwDistance;
-    const targetY = startY + multiplier.y * throwDistance;
-
-    this.throwState = {
-      isThrowing: true,
-      throwProgress: 0,
-      startPosition: { x: startX, y: startY },
-      targetPosition: { x: targetX, y: targetY },
-      ballPosition: { x: startX, y: startY },
-      lastThrowTime: Date.now(),
-    };
-
-    // Remove ball from inventory
-    const inventory = window.gameInstance?.getInventory();
-    if (inventory) {
-      const ballIndex = inventory.items.findIndex((item) => item.name === "Tennis Ball");
-      if (ballIndex !== -1) {
-        inventory.items.splice(ballIndex, 1);
-      }
-    }
-  }
-
-  #updateThrow() {
-    const now = Date.now();
-    const elapsed = now - this.throwState.lastThrowTime;
-    this.throwState.lastThrowTime = now;
-
-    const throwSpeed = Player.THROW_SETTINGS.THROW_SPEED * (elapsed / 9); // Adjust speed based on frame time
-    this.throwState.throwProgress += throwSpeed;
-
-    if (this.throwState.throwProgress >= 100) {
-      this.throwState.isThrowing = false;
-      this.throwState.ballPosition = this.throwState.targetPosition;
-
-      // Update ball position in game objects
-      const game = window.gameInstance;
-      if (game?.gameObjects?.ball) {
-        game.gameObjects.ball.x = this.throwState.targetPosition.x - game.gameObjects.ball.width / 2;
-        game.gameObjects.ball.y = this.throwState.targetPosition.y - game.gameObjects.ball.height / 2;
-        game.gameObjects.ball.isPickedUp = false;
-      }
-      return;
-    }
-
-    const progress = this.throwState.throwProgress / 100;
-
-    // Interpolate between start and target positions
-    this.throwState.ballPosition = {
-      x: this.throwState.startPosition.x + (this.throwState.targetPosition.x - this.throwState.startPosition.x) * progress,
-      y: this.throwState.startPosition.y + (this.throwState.targetPosition.y - this.throwState.startPosition.y) * progress,
-    };
   }
 
   #move(keys) {
