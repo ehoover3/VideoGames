@@ -297,16 +297,24 @@ export default class Inventory {
       this.ctx.filter = "none";
     });
 
-    // Draw inventory slots
     const slotsStartY = itemCategoryY + itemCategoryHeight + padding;
-    const totalGridWidth = Inventory.SLOTS_PER_ROW * slotSize;
-    const slotsStartX = x + (width - totalGridWidth) / 2;
+
+    // Recalculate slotsStartX to center slots within the container
+    const slotMargin = 9;
+    const totalGridWidth = Inventory.SLOTS_PER_ROW * slotSize + (Inventory.SLOTS_PER_ROW - 1) * slotMargin;
+    const slotsContainerWidth = width;
+    const slotsStartX = x + (slotsContainerWidth - totalGridWidth) / 2;
+    const slotsContainerHeight = Math.ceil(Inventory.TOTAL_SLOTS / Inventory.SLOTS_PER_ROW) * (slotSize + slotMargin) - slotMargin;
+
+    // Draw inventory slots container background
+    this.ctx.fillStyle = "rgba(19,26,23,255)";
+    this.ctx.fillRect(x, slotsStartY - slotMargin / 2, slotsContainerWidth, slotsContainerHeight + slotMargin);
 
     for (let i = 0; i < Inventory.TOTAL_SLOTS; i++) {
       const row = Math.floor(i / Inventory.SLOTS_PER_ROW);
       const col = i % Inventory.SLOTS_PER_ROW;
-      const slotX = slotsStartX + col * slotSize;
-      const slotY = slotsStartY + row * slotSize;
+      const slotX = slotsStartX + col * (slotSize + slotMargin);
+      const slotY = slotsStartY + row * (slotSize + slotMargin);
 
       // Draw slot background
       this.ctx.fillStyle = i === this.selectedSlot ? "rgba(0,190,239,255)" : "rgba(0,5,3,255)";
