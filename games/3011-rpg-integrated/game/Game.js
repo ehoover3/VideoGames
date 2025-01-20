@@ -132,7 +132,7 @@ export default class Game {
       imgPath: this.images["tree"],
       imgSourceX: 32,
       imgSourceY: 23,
-      imgSourceWidth: 64,
+      imgSourceWidth: 63,
       imgSourceHeight: 78,
       width: 64,
       height: 64,

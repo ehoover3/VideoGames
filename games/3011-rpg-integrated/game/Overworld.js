@@ -67,9 +67,9 @@ export default class Overworld {
 
     Object.assign(ball, { x: 76, y: 130 });
     Object.assign(coin, { x: 130, y: 70 });
-    Object.assign(dog, { x: 50, y: 50 });
+    Object.assign(dog, { x: 150, y: 150 });
     Object.assign(mri, { x: 570, y: 5 });
-    Object.assign(tree, { x: 50, y: 0 });
+    Object.assign(tree, { x: 50, y: 10 });
 
     if (!ball.isPickedUp) ball.draw(this.ctx, scaleX, scaleY);
     if (!coin.isPickedUp) coin.draw(this.ctx, scaleX, scaleY);

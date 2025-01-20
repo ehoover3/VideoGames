@@ -254,190 +254,6 @@ export default class Inventory {
     });
   }
 
-  // drawLeftSection(sectionDimension, scale, filteredItems, padding, headerHeight, slotSize, itemCategoryHeight) {
-  //   let { x, y, width, height } = sectionDimension;
-
-  //   // Draw main background
-  //   this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
-  //   this.ctx.fillRect(x, y, width, height);
-
-  //   // Draw itemCategory tabs
-  //   const tabWidth = width / Inventory.ITEM_CATEGORIES.length;
-  //   const itemCategoryY = y + padding;
-
-  //   // Draw category background with rounded top corners
-  //   this.ctx.fillStyle = "rgba(255,252,228,255)";
-  //   const radius = 10;
-  //   this.ctx.beginPath();
-  //   this.ctx.moveTo(x, itemCategoryY + radius); // Start at the top-left corner
-  //   this.ctx.arcTo(x, itemCategoryY, x + radius, itemCategoryY, radius); // Top-left corner
-  //   this.ctx.arcTo(x + width, itemCategoryY, x + width, itemCategoryY + radius, radius); // Top-right corner
-  //   this.ctx.lineTo(x + width, itemCategoryY + itemCategoryHeight); // Line down the right edge
-  //   this.ctx.lineTo(x, itemCategoryY + itemCategoryHeight); // Line back to the left edge
-  //   this.ctx.closePath();
-  //   this.ctx.fill();
-
-  //   Inventory.ITEM_CATEGORIES.forEach((itemCategory, index) => {
-  //     const itemCategoryX = x + tabWidth * index;
-  //     const isSelected = itemCategory === this.selectedItemCategory;
-
-  //     this.ctx.font = `${Math.floor(12 * scale)}px Arial`;
-  //     this.ctx.textAlign = "center";
-
-  //     const itemCategoryEmojis = {
-  //       Weapons: "⚔️",
-  //       "Bows and Arrows": "🏹",
-  //       Shields: "🛡️",
-  //       Armor: "🥋",
-  //       Materials: "🪵",
-  //       Food: "🍎",
-  //       "Key Items": "🔑",
-  //     };
-
-  //     // Apply darkening filter for non-selected categories
-  //     if (!isSelected) {
-  //       this.ctx.filter = "brightness(0.5) saturate(0)";
-  //     }
-
-  //     this.ctx.fillText(itemCategoryEmojis[itemCategory], itemCategoryX + tabWidth / 2, itemCategoryY + itemCategoryHeight / 2 + 5);
-
-  //     // Reset filter
-  //     this.ctx.filter = "none";
-  //   });
-
-  //   const slotsStartY = itemCategoryY + itemCategoryHeight; //+ padding;
-
-  //   // Adjust slotsContainerHeight to extend to the bottom of the screen
-  //   const slotsContainerHeight = this.canvas.height - slotsStartY;
-
-  //   // Recalculate slotsStartX to center slots within the container
-  //   const slotMargin = 9;
-  //   const totalGridWidth = Inventory.SLOTS_PER_ROW * slotSize + (Inventory.SLOTS_PER_ROW - 1) * slotMargin;
-  //   const slotsContainerWidth = width;
-  //   const slotsStartX = x + (slotsContainerWidth - totalGridWidth) / 2;
-
-  //   // Draw inventory slots container background
-  //   this.ctx.fillStyle = "rgba(19,26,23,255)";
-  //   this.ctx.fillRect(x, slotsStartY - slotMargin / 2, slotsContainerWidth, slotsContainerHeight);
-
-  //   for (let i = 0; i < Inventory.TOTAL_SLOTS; i++) {
-  //     const row = Math.floor(i / Inventory.SLOTS_PER_ROW);
-  //     const col = i % Inventory.SLOTS_PER_ROW;
-  //     const slotX = slotsStartX + col * (slotSize + slotMargin);
-  //     const slotY = slotsStartY + row * (slotSize + slotMargin) + padding;
-
-  //     // Draw slot background
-  //     this.ctx.fillStyle = i === this.selectedSlot ? "rgba(0,190,239,255)" : "rgba(0,5,3,255)";
-  //     this.ctx.fillRect(slotX, slotY, slotSize, slotSize);
-
-  //     // Draw slot border
-  //     this.ctx.strokeStyle = i === this.selectedSlot ? "rgba(250,203,86,255)" : "rgba(41,50,47,255)";
-  //     this.ctx.lineWidth = i === this.selectedSlot ? 3 : 1;
-  //     this.ctx.strokeRect(slotX, slotY, slotSize, slotSize);
-
-  //     const item = filteredItems[i];
-  //     if (item) {
-  //       const itemPadding = slotSize * 0.1;
-  //       this.ctx.drawImage(item.imgPath, item.imgSourceX, item.imgSourceY, item.imgSourceWidth, item.imgSourceHeight, slotX + itemPadding, slotY + itemPadding, slotSize - itemPadding * 2, slotSize - itemPadding * 2);
-  //     }
-  //   }
-  // }
-
-  // drawLeftSection(sectionDimension, scale, filteredItems, padding, headerHeight, slotSize, itemCategoryHeight) {
-  //   let { x, y, width, height } = sectionDimension;
-
-  //   // Define left margin
-  //   const leftMargin = 10;
-
-  //   // Draw main background (no margin here)
-  //   this.ctx.fillStyle = "rgba(211, 211, 211, 0.95)";
-  //   this.ctx.fillRect(x, y, width, height);
-
-  //   // Adjust x position by adding the left margin
-  //   const adjustedX = x + leftMargin;
-
-  //   // Draw itemCategory tabs
-  //   const tabWidth = width / Inventory.ITEM_CATEGORIES.length;
-  //   const itemCategoryY = y + padding;
-
-  //   // Draw category background with rounded top corners
-  //   this.ctx.fillStyle = "rgba(255,252,228,255)";
-  //   const radius = 10;
-  //   this.ctx.beginPath();
-  //   this.ctx.moveTo(adjustedX, itemCategoryY + radius); // Start at the top-left corner
-  //   this.ctx.arcTo(adjustedX, itemCategoryY, adjustedX + radius, itemCategoryY, radius); // Top-left corner
-  //   this.ctx.arcTo(adjustedX + width, itemCategoryY, adjustedX + width, itemCategoryY + radius, radius); // Top-right corner
-  //   this.ctx.lineTo(adjustedX + width, itemCategoryY + itemCategoryHeight); // Line down the right edge
-  //   this.ctx.lineTo(adjustedX, itemCategoryY + itemCategoryHeight); // Line back to the left edge
-  //   this.ctx.closePath();
-  //   this.ctx.fill();
-
-  //   Inventory.ITEM_CATEGORIES.forEach((itemCategory, index) => {
-  //     const itemCategoryX = adjustedX + tabWidth * index;
-  //     const isSelected = itemCategory === this.selectedItemCategory;
-
-  //     this.ctx.font = `${Math.floor(12 * scale)}px Arial`;
-  //     this.ctx.textAlign = "center";
-
-  //     const itemCategoryEmojis = {
-  //       Weapons: "⚔️",
-  //       "Bows and Arrows": "🏹",
-  //       Shields: "🛡️",
-  //       Armor: "🥋",
-  //       Materials: "🪵",
-  //       Food: "🍎",
-  //       "Key Items": "🔑",
-  //     };
-
-  //     // Apply darkening filter for non-selected categories
-  //     if (!isSelected) {
-  //       this.ctx.filter = "brightness(0.5) saturate(0)";
-  //     }
-
-  //     this.ctx.fillText(itemCategoryEmojis[itemCategory], itemCategoryX + tabWidth / 2, itemCategoryY + itemCategoryHeight / 2 + 5);
-
-  //     // Reset filter
-  //     this.ctx.filter = "none";
-  //   });
-
-  //   const slotsStartY = itemCategoryY + itemCategoryHeight; //+ padding;
-
-  //   // Adjust slotsContainerHeight to extend to the bottom of the screen
-  //   const slotsContainerHeight = this.canvas.height - slotsStartY;
-
-  //   // Recalculate slotsStartX to center slots within the container
-  //   const slotMargin = 9;
-  //   const totalGridWidth = Inventory.SLOTS_PER_ROW * slotSize + (Inventory.SLOTS_PER_ROW - 1) * slotMargin;
-  //   const slotsContainerWidth = width;
-  //   const slotsStartX = adjustedX + (slotsContainerWidth - totalGridWidth) / 2;
-
-  //   // Draw inventory slots container background
-  //   this.ctx.fillStyle = "rgba(19,26,23,255)";
-  //   this.ctx.fillRect(adjustedX, slotsStartY - slotMargin / 2, slotsContainerWidth, slotsContainerHeight);
-
-  //   for (let i = 0; i < Inventory.TOTAL_SLOTS; i++) {
-  //     const row = Math.floor(i / Inventory.SLOTS_PER_ROW);
-  //     const col = i % Inventory.SLOTS_PER_ROW;
-  //     const slotX = slotsStartX + col * (slotSize + slotMargin);
-  //     const slotY = slotsStartY + row * (slotSize + slotMargin) + padding;
-
-  //     // Draw slot background
-  //     this.ctx.fillStyle = i === this.selectedSlot ? "rgba(0,190,239,255)" : "rgba(0,5,3,255)";
-  //     this.ctx.fillRect(slotX, slotY, slotSize, slotSize);
-
-  //     // Draw slot border
-  //     this.ctx.strokeStyle = i === this.selectedSlot ? "rgba(250,203,86,255)" : "rgba(41,50,47,255)";
-  //     this.ctx.lineWidth = i === this.selectedSlot ? 3 : 1;
-  //     this.ctx.strokeRect(slotX, slotY, slotSize, slotSize);
-
-  //     const item = filteredItems[i];
-  //     if (item) {
-  //       const itemPadding = slotSize * 0.1;
-  //       this.ctx.drawImage(item.imgPath, item.imgSourceX, item.imgSourceY, item.imgSourceWidth, item.imgSourceHeight, slotX + itemPadding, slotY + itemPadding, slotSize - itemPadding * 2, slotSize - itemPadding * 2);
-  //     }
-  //   }
-  // }
-
   drawLeftSection(sectionDimension, scale, filteredItems, padding, headerHeight, slotSize, itemCategoryHeight) {
     let { x, y, width, height } = sectionDimension;
 
@@ -578,8 +394,38 @@ export default class Inventory {
     const fontSize = Math.floor(20 * scale);
     const playerSpace = slotSize * 3 + padding * 2;
     const nameY = y + playerSpace + padding;
+
+    // Add background for both name and description
+    const backgroundHeight = fontSize + Math.floor(14 * scale) + padding * 3; // Height for both sections plus padding
+    this.ctx.fillStyle = "rgba(19,26,23,255)";
+    this.ctx.fillRect(x + padding, nameY - fontSize, width - padding * 2, backgroundHeight);
+
+    // Draw the vertical line with rounded corners
+    const lineWidth = 4;
+    const cornerRadius = 5;
+    const lineStartY = nameY - fontSize;
+    const lineEndY = lineStartY + backgroundHeight;
+    const lineX = x + padding * 2;
+
+    this.ctx.beginPath();
+    this.ctx.fillStyle = "rgba(0,190,239,255)"; // blue
+
+    // Start from top
+    this.ctx.moveTo(lineX + lineWidth, lineStartY);
+    // Top left rounded corner
+    this.ctx.arc(lineX + lineWidth, lineStartY + cornerRadius, cornerRadius, -Math.PI / 2, Math.PI, true);
+    // Vertical line
+    this.ctx.lineTo(lineX, lineEndY - cornerRadius);
+    // Bottom left rounded corner
+    this.ctx.arc(lineX + lineWidth, lineEndY - cornerRadius, cornerRadius, Math.PI, Math.PI / 2, true);
+    // Bottom line
+    this.ctx.lineTo(lineX + lineWidth, lineEndY);
+    this.ctx.closePath();
+    this.ctx.fill();
+
+    // Draw the item name
     this.ctx.textAlign = "left";
-    drawText(this.ctx, selectedItem.name, x + padding, nameY, `${fontSize}px Arial`, "black", "left");
+    drawText(this.ctx, selectedItem.name, x + padding * 3, nameY, `${fontSize}px Arial`, "white", "left");
   }
 
   drawRightSection_ItemDescription(x, y, width, scale, padding, slotSize, selectedItem) {
@@ -587,6 +433,6 @@ export default class Inventory {
     const playerSpace = slotSize * 3 + padding * 2;
     const descY = y + playerSpace + 2 * padding;
     this.ctx.textAlign = "left";
-    drawText(this.ctx, selectedItem.description, x + padding, descY, `${fontSize}px Arial`, "black", "left");
+    drawText(this.ctx, selectedItem.description, x + padding * 3, descY + padding, `${fontSize}px Arial`, "white", "left");
   }
 }
