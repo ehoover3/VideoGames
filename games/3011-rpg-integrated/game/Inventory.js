@@ -251,19 +251,15 @@ export default class Inventory {
     const tabWidth = width / Inventory.ITEM_CATEGORIES.length;
     const itemCategoryY = y + padding + headerHeight;
 
+    // Draw category background
+    this.ctx.fillStyle = "rgba(255,252,228,255)";
+    this.ctx.fillRect(x, itemCategoryY, width, itemCategoryHeight);
+
     Inventory.ITEM_CATEGORIES.forEach((itemCategory, index) => {
       const itemCategoryX = x + tabWidth * index;
-      const isSelectedCategory = itemCategory === this.selectedItemCategory;
-      const isNavigatingCategories = this.selectedSlot === -1;
-
-      this.ctx.fillStyle = isSelectedCategory ? (isNavigatingCategories ? "rgba(255, 165, 0, 0.6)" : "rgba(255, 165, 0, 0.3)") : "white";
-      this.ctx.fillRect(itemCategoryX, itemCategoryY, tabWidth, itemCategoryHeight);
-
-      this.ctx.strokeStyle = isSelectedCategory ? (isNavigatingCategories ? "rgb(255, 140, 0)" : "orange") : "gray";
-      this.ctx.strokeRect(itemCategoryX, itemCategoryY, tabWidth, itemCategoryHeight);
+      const isSelected = itemCategory === this.selectedItemCategory;
 
       this.ctx.font = `${Math.floor(12 * scale)}px Arial`;
-      this.ctx.fillStyle = "black";
       this.ctx.textAlign = "center";
 
       const itemCategoryEmojis = {
@@ -276,7 +272,15 @@ export default class Inventory {
         "Key Items": "🔑",
       };
 
+      // Apply darkening filter for non-selected categories
+      if (!isSelected) {
+        this.ctx.filter = "brightness(0.5) saturate(0)";
+      }
+
       this.ctx.fillText(itemCategoryEmojis[itemCategory], itemCategoryX + tabWidth / 2, itemCategoryY + itemCategoryHeight / 2 + 5);
+
+      // Reset filter
+      this.ctx.filter = "none";
     });
 
     // Draw inventory slots
@@ -287,19 +291,22 @@ export default class Inventory {
     for (let i = 0; i < Inventory.TOTAL_SLOTS; i++) {
       const row = Math.floor(i / Inventory.SLOTS_PER_ROW);
       const col = i % Inventory.SLOTS_PER_ROW;
-      const x = slotsStartX + col * slotSize;
-      const y = slotsStartY + row * slotSize;
+      const slotX = slotsStartX + col * slotSize;
+      const slotY = slotsStartY + row * slotSize;
 
-      this.ctx.fillStyle = i === this.selectedSlot ? "rgba(255, 165, 0, 0.3)" : "white";
-      this.ctx.fillRect(x, y, slotSize, slotSize);
+      // Draw slot background
+      this.ctx.fillStyle = i === this.selectedSlot ? "rgba(0,190,239,255)" : "rgba(0,5,3,255)";
+      this.ctx.fillRect(slotX, slotY, slotSize, slotSize);
 
-      this.ctx.strokeStyle = i === this.selectedSlot ? "orange" : "gray";
-      this.ctx.strokeRect(x, y, slotSize, slotSize);
+      // Draw slot border
+      this.ctx.strokeStyle = i === this.selectedSlot ? "rgba(250,203,86,255)" : "rgba(41,50,47,255)";
+      this.ctx.lineWidth = i === this.selectedSlot ? 3 : 1;
+      this.ctx.strokeRect(slotX, slotY, slotSize, slotSize);
 
       const item = filteredItems[i];
       if (item) {
         const itemPadding = slotSize * 0.1;
-        this.ctx.drawImage(item.imgPath, item.imgSourceX, item.imgSourceY, item.imgSourceWidth, item.imgSourceHeight, x + itemPadding, y + itemPadding, slotSize - itemPadding * 2, slotSize - itemPadding * 2);
+        this.ctx.drawImage(item.imgPath, item.imgSourceX, item.imgSourceY, item.imgSourceWidth, item.imgSourceHeight, slotX + itemPadding, slotY + itemPadding, slotSize - itemPadding * 2, slotSize - itemPadding * 2);
       }
     }
   }
