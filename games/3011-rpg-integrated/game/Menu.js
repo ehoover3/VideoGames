@@ -16,8 +16,6 @@ const MENU_OPTIONS = {
 };
 
 const menuBackground = new Image();
-menuBackground.src = "assets/images/menu/menu.jpeg";
-
 const BASE_MENU = [MENU_OPTIONS.START_NEW_GAME, MENU_OPTIONS.LOAD_GAME, MENU_OPTIONS.SETTINGS, MENU_OPTIONS.EXIT];
 
 export default class Menu {
@@ -29,8 +27,18 @@ export default class Menu {
   }
 
   load() {
+    this.setBackground();
     this.updateMenu();
     this.drawMenu();
+  }
+
+  setBackground() {
+    const currentHour = new Date().getHours();
+    if (currentHour >= 6 && currentHour < 18) {
+      menuBackground.src = "assets/images/menu/menuDay.png";
+    } else {
+      menuBackground.src = "assets/images/menu/menuNight.png";
+    }
   }
 
   updateMenu() {
@@ -126,7 +134,7 @@ export default class Menu {
     ctx.drawImage(menuBackground, 0, 0, menuBackground.width, menuBackground.height, 0, 0, canvas.width, canvas.height);
 
     const titleFontSize = Math.round(canvas.height * UI_CONFIG.MENU.TITLE_HEIGHT_RATIO);
-    drawText(ctx, "Science Game", canvas.width / 2, canvas.height / 4, `${titleFontSize}px Arial`, "black");
+    drawText(ctx, "Human Again", canvas.width / 2, canvas.height / 4, `${titleFontSize}px Arial`, "black");
 
     const menu = isGameStarted ? [MENU_OPTIONS.RETURN_TO_GAME, ...BASE_MENU.slice(1)] : BASE_MENU;
 
