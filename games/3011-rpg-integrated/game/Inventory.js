@@ -278,13 +278,44 @@ export default class Inventory {
     this.ctx.fillStyle = "rgba(255,252,228,255)";
     const radius = 10;
     this.ctx.beginPath();
-    this.ctx.moveTo(adjustedX, itemCategoryY + radius); // Start at the top-left corner
-    this.ctx.arcTo(adjustedX, itemCategoryY, adjustedX + radius, itemCategoryY, radius); // Top-left corner
-    this.ctx.arcTo(adjustedX + adjustedWidth, itemCategoryY, adjustedX + adjustedWidth, itemCategoryY + radius, radius); // Top-right corner
-    this.ctx.lineTo(adjustedX + adjustedWidth, itemCategoryY + itemCategoryHeight); // Line down the right edge
-    this.ctx.lineTo(adjustedX, itemCategoryY + itemCategoryHeight); // Line back to the left edge
+    this.ctx.moveTo(adjustedX, itemCategoryY + radius);
+    this.ctx.arcTo(adjustedX, itemCategoryY, adjustedX + radius, itemCategoryY, radius);
+    this.ctx.arcTo(adjustedX + adjustedWidth, itemCategoryY, adjustedX + adjustedWidth, itemCategoryY + radius, radius);
+    this.ctx.lineTo(adjustedX + adjustedWidth, itemCategoryY + itemCategoryHeight);
+    this.ctx.lineTo(adjustedX, itemCategoryY + itemCategoryHeight);
     this.ctx.closePath();
     this.ctx.fill();
+
+    const itemCategoryEmojis = {
+      Weapons: {
+        light: "⚔️",
+        dark: "🗡️",
+      },
+      "Bows and Arrows": {
+        light: "🏹",
+        dark: "🎯",
+      },
+      Shields: {
+        light: "🛡️",
+        dark: "⚔️",
+      },
+      Armor: {
+        light: "🥋",
+        dark: "🥷",
+      },
+      Materials: {
+        light: "🪵",
+        dark: "🌲",
+      },
+      Food: {
+        light: "🍎",
+        dark: "🍏",
+      },
+      "Key Items": {
+        light: "🔑",
+        dark: "🗝️",
+      },
+    };
 
     Inventory.ITEM_CATEGORIES.forEach((itemCategory, index) => {
       const itemCategoryX = adjustedX + tabWidth * index;
@@ -293,28 +324,19 @@ export default class Inventory {
       this.ctx.font = `${Math.floor(12 * scale)}px Arial`;
       this.ctx.textAlign = "center";
 
-      const itemCategoryEmojis = {
-        Weapons: "⚔️",
-        "Bows and Arrows": "🏹",
-        Shields: "🛡️",
-        Armor: "🥋",
-        Materials: "🪵",
-        Food: "🍎",
-        "Key Items": "🔑",
-      };
+      // Calculate center position for the emoji
+      const centerX = itemCategoryX + tabWidth / 2;
+      const centerY = itemCategoryY + itemCategoryHeight / 2 + 5;
 
-      // Apply darkening filter for non-selected categories
-      if (!isSelected) {
-        this.ctx.filter = "brightness(0.5) saturate(0)";
-      }
+      // Choose the appropriate emoji based on selection state
+      const emoji = isSelected ? itemCategoryEmojis[itemCategory].light : itemCategoryEmojis[itemCategory].dark;
 
-      this.ctx.fillText(itemCategoryEmojis[itemCategory], itemCategoryX + tabWidth / 2, itemCategoryY + itemCategoryHeight / 2 + 5);
-
-      // Reset filter
-      this.ctx.filter = "none";
+      // Draw the emoji
+      this.ctx.fillStyle = "black";
+      this.ctx.fillText(emoji, centerX, centerY);
     });
 
-    const slotsStartY = itemCategoryY + itemCategoryHeight; //+ padding;
+    const slotsStartY = itemCategoryY + itemCategoryHeight;
 
     // Adjust slotsContainerHeight to extend to the bottom of the screen
     const slotsContainerHeight = this.canvas.height - slotsStartY;
@@ -389,6 +411,8 @@ export default class Inventory {
       );
     }
   }
+
+  drawRightSection_ItemNameAndDescriptionContainerBackground(x, y, width, scale, padding, slotSize, selectedItem) {}
 
   drawRightSection_ItemName(x, y, width, scale, padding, slotSize, selectedItem) {
     const fontSize = Math.floor(20 * scale);
