@@ -20,12 +20,8 @@ class Player extends GameObject {
   };
 
   static MENU_KEYS = {
-    l: STATES.ADVENTURE_LOG,
-    L: STATES.ADVENTURE_LOG,
     i: STATES.INVENTORY,
     I: STATES.INVENTORY,
-    s: STATES.SYSTEM,
-    S: STATES.SYSTEM,
     Escape: STATES.SYSTEM,
   };
 
@@ -74,21 +70,16 @@ class Player extends GameObject {
   update({ keys, gameState, gameObjects }) {
     const menuUpdate = this.#handleMenuKeys(keys, gameState);
     if (menuUpdate) return menuUpdate;
-
     const isMoving = this.#move(keys);
     this.#updateAnimation(isMoving);
-
     gameState.currentFrame = this.#sprite.frame;
-
     if (isMoving) return this.#createGameState(gameState, this.#createInitialInteractionState());
-
     return this.#handleGameObjectInteractions(keys, gameState, gameObjects);
   }
 
   #move(keys) {
     const movement = this.#calculateMovement(keys);
     if (!movement.isMoving) return false;
-
     this.#updatePosition(movement);
     this.#resetInteractionState();
     return true;
@@ -129,7 +120,6 @@ class Player extends GameObject {
   #updatePosition(movement) {
     const isDiagonal = movement.x !== 0 && movement.y !== 0;
     const speed = isDiagonal ? this.#movement.speed / Math.SQRT2 : this.#movement.speed;
-
     this.x += movement.x * speed;
     this.y += movement.y * speed;
     this.#movement.direction = movement.direction;
