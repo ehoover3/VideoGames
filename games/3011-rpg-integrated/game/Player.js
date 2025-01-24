@@ -19,6 +19,16 @@ class Player extends GameObject {
     [DIRECTION.RIGHT]: 3,
   };
 
+  static MENU_KEYS = {
+    i: STATES.INVENTORY,
+    I: STATES.INVENTORY,
+    Escape: STATES.SYSTEM,
+  };
+
+  #sprite;
+  #movement;
+  #interaction;
+
   constructor(image, x, y, width, height, speed, direction) {
     super({
       imgPath: image,
@@ -32,19 +42,23 @@ class Player extends GameObject {
       height,
     });
 
-    this.sprite = {
+    this.#sprite = {
       image,
       frame: 0,
       animationTimer: 0,
     };
 
-    this.movement = {
+    this.#movement = {
       speed,
       direction,
       isMoving: false,
     };
 
-    this.interaction = {
+    this.#interaction = this.#createInitialInteractionState();
+  }
+
+  #createInitialInteractionState() {
+    return {
       isInteracting: false,
       message: null,
       showPickupNotification: false,
@@ -53,11 +67,29 @@ class Player extends GameObject {
     };
   }
 
-  move(keys) {
+  update({ keys, gameState, gameObjects }) {
+    const menuUpdate = this.#handleMenuKeys(keys, gameState);
+    if (menuUpdate) return menuUpdate;
+    const isMoving = this.#move(keys);
+    this.#updateAnimation(isMoving);
+    gameState.currentFrame = this.#sprite.frame;
+    if (isMoving) return this.#createGameState(gameState, this.#createInitialInteractionState());
+    return this.#handleGameObjectInteractions(keys, gameState, gameObjects);
+  }
+
+  #move(keys) {
+    const movement = this.#calculateMovement(keys);
+    if (!movement.isMoving) return false;
+    this.#updatePosition(movement);
+    this.#resetInteractionState();
+    return true;
+  }
+
+  #calculateMovement(keys) {
     const movement = {
       x: 0,
       y: 0,
-      direction: this.movement.direction,
+      direction: this.#movement.direction,
       isMoving: false,
     };
 
@@ -82,150 +114,115 @@ class Player extends GameObject {
       movement.isMoving = true;
     }
 
-    if (!movement.isMoving) return false;
+    return movement;
+  }
 
-    // Reset all interaction states when moving
-    this.interaction.isInteracting = false;
-    this.interaction.message = null;
-    this.interaction.showPickupNotification = false;
-    this.interaction.lastPickedUpItem = null;
-
-    // Update position
+  #updatePosition(movement) {
     const isDiagonal = movement.x !== 0 && movement.y !== 0;
-    const speed = isDiagonal ? this.movement.speed / Math.SQRT2 : this.movement.speed;
-
+    const speed = isDiagonal ? this.#movement.speed / Math.SQRT2 : this.#movement.speed;
     this.x += movement.x * speed;
     this.y += movement.y * speed;
-
-    this.movement.direction = movement.direction;
-    return true;
+    this.#movement.direction = movement.direction;
   }
 
-  draw(canvas, ctx) {
-    const { FRAME_WIDTH, FRAME_HEIGHT } = Player.FRAME_SETTINGS;
-    const spriteRow = Player.DIRECTIONS[this.movement.direction];
-
-    this.imgSourceX = this.sprite.frame * FRAME_WIDTH;
-    this.imgSourceY = spriteRow * FRAME_HEIGHT;
-
-    const scale = {
-      x: canvas.width / 640,
-      y: canvas.height / 360,
-    };
-
-    super.draw(ctx, scale.x, scale.y);
+  #resetInteractionState() {
+    Object.assign(this.#interaction, this.#createInitialInteractionState());
   }
 
-  update({ keys, gameState, gameObjects }) {
+  #updateAnimation(isMoving) {
     const { WALK_FRAMES, ANIMATION_SPEED } = Player.FRAME_SETTINGS;
+
+    if (!isMoving) {
+      this.#sprite.frame = 0;
+      this.#sprite.animationTimer = 0;
+      return;
+    }
+
+    this.#sprite.animationTimer++;
+    if (this.#sprite.animationTimer >= ANIMATION_SPEED) {
+      this.#sprite.animationTimer = 0;
+      this.#sprite.frame = (this.#sprite.frame + 1) % WALK_FRAMES;
+    }
+  }
+
+  #handleGameObjectInteractions(keys, gameState, gameObjects) {
     const { ball, coin, dog, mri } = gameObjects;
 
-    // Handle inventory first
-    const inventoryUpdate = this.handleInventoryKey(keys, gameState);
-    if (inventoryUpdate) return inventoryUpdate;
-
-    // Handle movement and animation
-    const isMoving = this.move(keys);
-
-    // Update animation state
-    if (!isMoving) {
-      this.sprite.frame = 0;
-      this.sprite.animationTimer = 0;
-    } else {
-      this.sprite.animationTimer++;
-      if (this.sprite.animationTimer >= ANIMATION_SPEED) {
-        this.sprite.animationTimer = 0;
-        this.sprite.frame = (this.sprite.frame + 1) % WALK_FRAMES;
-      }
-    }
-
-    gameState.currentFrame = this.sprite.frame;
-
-    // If moving, reset interaction state
-    if (isMoving) {
-      return {
-        currentState: gameState.currentState,
-        previousState: gameState.previousState,
-        savedPlayerPosition: gameState.savedPlayerPosition,
-        interactionMessage: null,
-        showPickupNotification: false,
-        lastPickedUpItem: null,
-        isInteracting: false,
-        droppedItem: null,
-      };
-    }
-
-    // Handle interactions
-    const isWithinInteractionDistance = (object) => {
-      const dx = this.x - object.x;
-      const dy = this.y - object.y;
-      return Math.sqrt(dx * dx + dy * dy) <= Inventory.INTERACTION_DISTANCE;
-    };
-
-    // Check for MRI interaction
+    // Handle MRI interaction
     if (this.isColliding(mri) && keys[" "]) {
-      return this.changeGameState(gameState.currentState, STATES.MED_SCAN_GAME);
+      return this.#changeGameState(gameState.currentState, STATES.MED_SCAN_GAME);
     }
 
-    // Check for dog interaction if not showing pickup notification
-    if (!this.interaction.showPickupNotification && this.isColliding(dog) && keys[" "]) {
-      this.interaction.isInteracting = true;
-      this.interaction.message = dog.interact();
-      return this.changeGameState(gameState.currentState, gameState.currentState, this.interaction.message);
+    // Handle dog interaction
+    if (!this.#interaction.showPickupNotification && this.isColliding(dog) && keys[" "]) {
+      this.#interaction.isInteracting = true;
+      this.#interaction.message = dog.interact();
+      return this.#createGameState(gameState, this.#interaction);
     }
 
-    // Handle ball pickup
-    if (!ball.isPickedUp && keys[" "] && isWithinInteractionDistance(ball)) {
-      const game = window.gameInstance;
-      if (game?.getInventory()) {
-        const result = game.getInventory().addItem(ball);
-        if (result.success) {
-          ball.isPickedUp = true;
-          this.interaction.isInteracting = false;
-          this.interaction.showPickupNotification = true;
-          this.interaction.lastPickedUpItem = ball;
-          this.interaction.message = result.message;
-          return this.changeGameState(gameState.currentState, gameState.currentState, result.message);
-        }
-      }
-    }
+    // Handle item pickups
+    const itemInteractions = [this.#handleItemPickup(ball, keys, gameState), this.#handleItemPickup(coin, keys, gameState)];
 
-    // Handle coin pickup
-    if (!coin.isPickedUp && keys[" "] && isWithinInteractionDistance(coin)) {
-      const game = window.gameInstance;
-      if (game?.getInventory()) {
-        const result = game.getInventory().addItem(coin);
-        if (result.success) {
-          coin.isPickedUp = true;
-          this.interaction.isInteracting = false;
-          this.interaction.showPickupNotification = true;
-          this.interaction.lastPickedUpItem = coin;
-          this.interaction.message = result.message;
-          return this.changeGameState(gameState.currentState, gameState.currentState, result.message);
-        }
-      }
-    }
+    const successfulInteraction = itemInteractions.find((result) => result !== null);
+    if (successfulInteraction) return successfulInteraction;
 
-    // Handle enter key
-    if (this.handleEnterKey(keys)) {
-      return this.changeGameState(gameState.currentState, gameState.currentState, null);
-    }
+    // Return current state if no interactions occurred
+    return this.#createGameState(gameState, this.#interaction);
+  }
 
-    // Handle escape key
-    const escapeResult = this.handleEscapeKey(keys, gameState.currentState, gameState.previousState, gameState.savedPlayerPosition);
+  #handleItemPickup(item, keys, gameState) {
+    if (!this.#canPickupItem(item, keys)) return null;
 
-    // Return final state with current interaction status
+    const game = window.gameInstance;
+    if (!game?.getInventory()) return null;
+
+    const result = game.getInventory().addItem(item);
+    if (!result.success) return null;
+
+    item.isPickedUp = true;
+    this.#updateInteractionStateForPickup(item, result.message);
+    return this.#changeGameState(gameState.currentState, gameState.currentState, result.message);
+  }
+
+  #canPickupItem(item, keys) {
+    if (item.isPickedUp || !keys[" "]) return false;
+    const dx = this.x - item.x;
+    const dy = this.y - item.y;
+    return Math.sqrt(dx * dx + dy * dy) <= Inventory.INTERACTION_DISTANCE;
+  }
+
+  #updateInteractionStateForPickup(item, message) {
+    Object.assign(this.#interaction, {
+      isInteracting: false,
+      showPickupNotification: true,
+      lastPickedUpItem: item,
+      message: message,
+    });
+  }
+
+  #createGameState(gameState, interactionState) {
     return {
-      ...escapeResult,
-      interactionMessage: this.interaction.message,
-      showPickupNotification: this.interaction.showPickupNotification,
-      lastPickedUpItem: this.interaction.lastPickedUpItem,
-      isInteracting: this.interaction.isInteracting,
-      droppedItem: this.interaction.droppedItem,
+      currentState: gameState.currentState,
+      previousState: gameState.previousState,
+      savedPlayerPosition: gameState.savedPlayerPosition,
+      interactionMessage: interactionState.message,
+      showPickupNotification: interactionState.showPickupNotification,
+      lastPickedUpItem: interactionState.lastPickedUpItem,
+      isInteracting: interactionState.isInteracting,
+      droppedItem: interactionState.droppedItem,
     };
   }
 
-  changeGameState(currentState, newState, interactionMessage = null) {
+  #handleMenuKeys(keys, gameState) {
+    for (const [key, state] of Object.entries(Player.MENU_KEYS)) {
+      if (keys[key]) {
+        return this.#changeGameState(gameState.currentState, state);
+      }
+    }
+    return null;
+  }
+
+  #changeGameState(currentState, newState, interactionMessage = null) {
     return {
       savedPlayerPosition: { x: this.x, y: this.y },
       previousState: currentState,
@@ -234,35 +231,19 @@ class Player extends GameObject {
     };
   }
 
-  handleEnterKey(keys) {
-    if (keys["Enter"]) {
-      if (this.interaction.showPickupNotification) {
-        this.interaction.showPickupNotification = false;
-        this.interaction.lastPickedUpItem = null;
-        this.interaction.message = null;
-        return true;
-      }
-      if (this.interaction.isInteracting) {
-        this.interaction.isInteracting = false;
-        this.interaction.message = null;
-        return true;
-      }
-    }
-    return false;
-  }
+  draw(canvas, ctx) {
+    const { FRAME_WIDTH, FRAME_HEIGHT } = Player.FRAME_SETTINGS;
+    const spriteRow = Player.DIRECTIONS[this.#movement.direction];
 
-  handleInventoryKey(keys, gameState) {
-    if (keys["i"] || keys["I"]) {
-      return this.changeGameState(gameState.currentState, STATES.INVENTORY);
-    }
-    return null;
-  }
+    this.imgSourceX = this.#sprite.frame * FRAME_WIDTH;
+    this.imgSourceY = spriteRow * FRAME_HEIGHT;
 
-  handleEscapeKey(keys, currentState, previousState, savedPlayerPosition) {
-    if (keys["Escape"]) {
-      return this.changeGameState(currentState, STATES.MAIN_MENU);
-    }
-    return { currentState, previousState, savedPlayerPosition };
+    const scale = {
+      x: canvas.width / 640,
+      y: canvas.height / 360,
+    };
+
+    super.draw(ctx, scale.x, scale.y);
   }
 }
 

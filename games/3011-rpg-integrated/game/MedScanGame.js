@@ -1,4 +1,3 @@
-// game/MedScanGame.js
 import { drawText } from "./utils/drawText.js";
 import { STATES } from "../config/constants.js";
 import HUD from "./HUD.js";
@@ -21,6 +20,52 @@ export default class MedScanGame {
     this.mriImg = new Image();
     this.mriImg.src = "assets/images/scanGame/mri.png";
     this.mriImg.onerror = () => console.error("Failed to load image: mri.png");
+
+    this.quizQuestions = [
+      {
+        image: "brain.png",
+        question: "What organ is this?",
+        correctAnswer: "brain",
+        options: ["brain", "heart", "liver", "kidney"],
+      },
+      {
+        image: "heart.png",
+        question: "What organ is this?",
+        correctAnswer: "heart",
+        options: ["lungs", "heart", "stomach", "pancreas"],
+      },
+      {
+        image: "skull.png",
+        question: "What bone structure is this?",
+        correctAnswer: "skull",
+        options: ["ribcage", "spine", "skull", "pelvis"],
+      },
+      {
+        image: "handBones.png",
+        question: "What body part's bones are these?",
+        correctAnswer: "hand",
+        options: ["foot", "arm", "hand", "leg"],
+      },
+    ];
+    this.currentQuestionIndex = 0;
+    this.score = 0;
+    this.incorrectQuestions = [];
+    this.quizImages = {};
+    this.loadQuizImages();
+
+    this.lastKeyPressTime = 0;
+    this.KEY_PRESS_COOLDOWN = 300; // milliseconds
+    this.quizStarted = false;
+    this.quizCompleted = false;
+  }
+
+  loadQuizImages() {
+    this.quizQuestions.forEach((q) => {
+      const img = new Image();
+      img.src = `assets/images/scanGame/${q.image}`;
+      img.onerror = () => console.error(`Failed to load image: ${q.image}`);
+      this.quizImages[q.image] = img;
+    });
   }
 
   load() {
@@ -34,18 +79,22 @@ export default class MedScanGame {
       gameObjects: { player },
       gameState,
     } = this;
-    let { scanning, scanProgress, maxScanProgress, currentState, previousState, savedPlayerPosition } = gameState;
+    let { scanProgress, maxScanProgress, currentState, previousState, savedPlayerPosition } = gameState;
 
-    if (this.keys[" "]) {
-      scanning = true;
-      if (scanProgress < maxScanProgress) {
-        scanProgress++;
-      }
-    } else {
-      scanning = false;
+    const currentTime = Date.now();
+
+    if (!this.quizStarted && keys["Enter"]) {
+      this.quizStarted = true;
     }
 
-    if (this.keys["x"] || this.keys["X"] || (scanProgress >= maxScanProgress && this.keys[" "])) {
+    if (this.quizStarted && !this.quizCompleted) {
+      if ((keys["1"] || keys["2"] || keys["3"] || keys["4"]) && currentTime - this.lastKeyPressTime > this.KEY_PRESS_COOLDOWN) {
+        this.handleQuizAnswer(keys);
+        this.lastKeyPressTime = currentTime;
+      }
+    }
+
+    if (this.quizCompleted && keys["Enter"]) {
       currentState = STATES.OVERWORLD;
       player.x = savedPlayerPosition.x;
       player.y = savedPlayerPosition.y;
@@ -54,29 +103,58 @@ export default class MedScanGame {
 
     if (this.keys["Escape"]) {
       previousState = currentState;
-      currentState = STATES.MAIN_MENU;
+      currentState = STATES.SYSTEM;
     }
 
-    Object.assign(this.gameState, { currentState, previousState, scanProgress, scanning });
+    Object.assign(this.gameState, { currentState, previousState, scanProgress });
+  }
+
+  handleQuizAnswer(keys) {
+    const currentQuestion = this.quizQuestions[this.currentQuestionIndex];
+    let selectedAnswer = null;
+
+    if (keys["1"]) selectedAnswer = currentQuestion.options[0];
+    if (keys["2"]) selectedAnswer = currentQuestion.options[1];
+    if (keys["3"]) selectedAnswer = currentQuestion.options[2];
+    if (keys["4"]) selectedAnswer = currentQuestion.options[3];
+
+    if (selectedAnswer) {
+      if (selectedAnswer === currentQuestion.correctAnswer) {
+        this.score++;
+        this.gameState.scanProgress = Math.ceil((this.score / this.quizQuestions.length) * this.gameState.maxScanProgress);
+        this.currentQuestionIndex++;
+      } else {
+        this.incorrectQuestions.push(this.currentQuestionIndex);
+        this.currentQuestionIndex++;
+      }
+
+      if (this.currentQuestionIndex >= this.quizQuestions.length) {
+        if (this.incorrectQuestions.length > 0) {
+          this.currentQuestionIndex = this.incorrectQuestions.shift();
+        } else {
+          this.gameState.scanProgress = this.gameState.maxScanProgress;
+          this.quizCompleted = true;
+        }
+      }
+    }
   }
 
   draw() {
     this.clearCanvas();
     if (this.mriImg.complete) {
-      this.drawMRIImage();
-      this.drawProgressBar();
-      if (this.gameState.scanProgress >= this.gameState.maxScanProgress) {
-        this.drawScanCompleteMessage();
+      if (!this.quizStarted) {
+        this.drawStartScreen();
+      } else if (!this.quizCompleted) {
+        this.drawQuizQuestion();
+        // this.drawProgressBar();
+      } else {
+        this.drawFinishScreen();
       }
     }
-    this.hud.draw(this.gameState.currentState);
+    // this.hud.draw(this.gameState.currentState);
   }
 
-  clearCanvas() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-  }
-
-  drawMRIImage() {
+  drawStartScreen() {
     const scaleX = this.canvas.width / MedScanGame.BASE_RESOLUTION.width;
     const scaleY = this.canvas.height / MedScanGame.BASE_RESOLUTION.height;
     const imageWidth = MedScanGame.MRI_IMAGE_DIMENSIONS.width * scaleX;
@@ -84,7 +162,56 @@ export default class MedScanGame {
     const x = (this.canvas.width - imageWidth) / 2;
     const y = MedScanGame.MRI_IMAGE_Y_OFFSET * scaleY;
 
-    this.ctx.drawImage(this.mriImg, 0, 0, MedScanGame.MRI_IMAGE_DIMENSIONS.width, MedScanGame.MRI_IMAGE_DIMENSIONS.height, x, y, imageWidth, imageHeight);
+    this.ctx.drawImage(this.mriImg, 0, 0, this.mriImg.width, this.mriImg.height, x, y, imageWidth, imageHeight);
+
+    const scaledFontSize = Math.max(MedScanGame.MIN_FONT_SIZE * (this.canvas.height / MedScanGame.BASE_RESOLUTION.height), MedScanGame.MIN_FONT_SIZE) + "px Arial";
+    drawText(this.ctx, "Start Quiz - Press Enter to Start", this.canvas.width / 2, y + imageHeight + 50, "center", scaledFontSize);
+  }
+
+  drawFinishScreen() {
+    const scaleX = this.canvas.width / MedScanGame.BASE_RESOLUTION.width;
+    const scaleY = this.canvas.height / MedScanGame.BASE_RESOLUTION.height;
+    const imageWidth = MedScanGame.MRI_IMAGE_DIMENSIONS.width * scaleX;
+    const imageHeight = MedScanGame.MRI_IMAGE_DIMENSIONS.height * scaleY;
+    const x = (this.canvas.width - imageWidth) / 2;
+    const y = MedScanGame.MRI_IMAGE_Y_OFFSET * scaleY;
+
+    this.ctx.drawImage(this.mriImg, 0, 0, this.mriImg.width, this.mriImg.height, x, y, imageWidth, imageHeight);
+
+    const scaledFontSize = Math.max(MedScanGame.MIN_FONT_SIZE * (this.canvas.height / MedScanGame.BASE_RESOLUTION.height), MedScanGame.MIN_FONT_SIZE) + "px Arial";
+    drawText(this.ctx, `Finished Quiz! Final Score: ${this.score}/${this.quizQuestions.length}`, this.canvas.width / 2, y + imageHeight + 50, "center", scaledFontSize);
+    drawText(this.ctx, "Press Enter to Return to Overworld", this.canvas.width / 2, y + imageHeight + 100, "center", scaledFontSize);
+  }
+
+  drawQuizQuestion() {
+    const currentQuestion = this.quizQuestions[this.currentQuestionIndex];
+    const currentImage = this.quizImages[currentQuestion.image];
+
+    if (currentImage && currentImage.complete) {
+      const scaleX = this.canvas.width / MedScanGame.BASE_RESOLUTION.width;
+      const scaleY = this.canvas.height / MedScanGame.BASE_RESOLUTION.height;
+      const imageWidth = MedScanGame.MRI_IMAGE_DIMENSIONS.width * scaleX;
+      const imageHeight = MedScanGame.MRI_IMAGE_DIMENSIONS.height * scaleY;
+      const x = (this.canvas.width - imageWidth) / 2;
+      const y = MedScanGame.MRI_IMAGE_Y_OFFSET * scaleY;
+
+      this.ctx.drawImage(currentImage, 0, 0, currentImage.width, currentImage.height, x, y, imageWidth, imageHeight);
+
+      const questionY = y + imageHeight + 20;
+      const scaledFontSize = Math.max(MedScanGame.MIN_FONT_SIZE * (this.canvas.height / MedScanGame.BASE_RESOLUTION.height), MedScanGame.MIN_FONT_SIZE) + "px Arial";
+      drawText(this.ctx, currentQuestion.question, this.canvas.width / 2, questionY, "center", scaledFontSize);
+
+      currentQuestion.options.forEach((option, index) => {
+        const optionY = questionY + 40 + index * 30;
+        drawText(this.ctx, `${index + 1}. ${option}`, this.canvas.width / 2, optionY, "center", scaledFontSize);
+      });
+
+      drawText(this.ctx, `Score: ${this.score}/${this.quizQuestions.length}`, this.canvas.width - 100, 30, "right", "20px Arial");
+    }
+  }
+
+  clearCanvas() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
   drawProgressBar() {
@@ -95,17 +222,10 @@ export default class MedScanGame {
     const x = (this.canvas.width - barWidth) / 2;
     const y = MedScanGame.PROGRESS_BAR_Y_OFFSET * scaleY;
 
-    // Background
     this.ctx.fillStyle = "lightgray";
     this.ctx.fillRect(x, y, barWidth, barHeight);
 
-    // Progress fill
     this.ctx.fillStyle = "#13beec";
     this.ctx.fillRect(x, y, (this.gameState.scanProgress / this.gameState.maxScanProgress) * barWidth, barHeight);
-  }
-
-  drawScanCompleteMessage() {
-    const scaledFontSize = Math.max(MedScanGame.MIN_FONT_SIZE * (this.canvas.height / MedScanGame.BASE_RESOLUTION.height), MedScanGame.MIN_FONT_SIZE) + "px Arial";
-    drawText(this.ctx, "Scanning Complete! Press SPACE to return.", this.canvas.width / 2, MedScanGame.PROGRESS_BAR_Y_OFFSET * (this.canvas.height / MedScanGame.BASE_RESOLUTION.height), "center", scaledFontSize);
   }
 }

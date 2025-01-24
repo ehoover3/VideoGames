@@ -4,10 +4,13 @@ import MedScanGame from "./MedScanGame.js";
 import Menu from "./Menu.js";
 import Overworld from "./Overworld.js";
 import Inventory from "./Inventory.js";
+import System from "./System.js";
 import HUD from "./HUD.js";
 import Item from "./Item.js";
 import NPC from "./NPC.js";
 import Player from "./Player.js";
+import DogBallQuest from "./quests/DogBallQuest.js";
+import AdventureLog from "./AdventureLog.js";
 
 export default class Game {
   constructor(canvasId) {
@@ -16,8 +19,11 @@ export default class Game {
     this.keys = this.setupKeyboard();
     this.startGameState();
     this.loadImages();
-    this.inventory = new Inventory(this.canvas, this.ctx, this.keys, this.gameState);
     this.gameObjects = this.getGameObjects();
+    this.initializeQuests();
+    this.adventureLog = new AdventureLog(this.canvas, this.ctx, this.keys, this.gameState);
+    this.inventory = new Inventory(this.canvas, this.ctx, this.keys, this.gameState);
+    this.system = new System(this.canvas, this.ctx, this.keys, this.gameState);
     this.startGameComponents();
     this.bindEvents();
     window.gameInstance = this;
@@ -65,6 +71,7 @@ export default class Game {
       dog: loadImage("assets/images/overworld/dog.png"),
       mri: loadImage("assets/images/overworld/mri.png"),
       player: loadImage("assets/images/overworld/player.png"),
+      tree: loadImage("assets/images/overworld/tree.png"),
     };
   }
 
@@ -77,12 +84,12 @@ export default class Game {
       imgSourceY: 0,
       imgSourceWidth: 155,
       imgSourceHeight: 155,
-      x: 76,
-      y: 130,
       width: 16,
       height: 16,
       name: "Tennis Ball",
       isPickedUp: false,
+      itemCategory: "Key Items",
+      description: "A bouncy tennis ball.",
     });
 
     const coin = new Item({
@@ -91,12 +98,12 @@ export default class Game {
       imgSourceY: 80,
       imgSourceWidth: 100,
       imgSourceHeight: 130,
-      x: 130,
-      y: 70,
       width: 16,
       height: 16,
       name: "Coin",
       isPickedUp: false,
+      itemCategory: "Key Items",
+      description: "A shiny metal coin.",
     });
 
     const dog = new NPC({
@@ -105,8 +112,6 @@ export default class Game {
       imgSourceY: 0,
       imgSourceWidth: 489,
       imgSourceHeight: 510,
-      x: 50,
-      y: 50,
       width: 32,
       height: 32,
       interactionText: "Woof woof!",
@@ -118,14 +123,22 @@ export default class Game {
       imgSourceY: 0,
       imgSourceWidth: 556,
       imgSourceHeight: 449,
-      x: 130,
-      y: 130,
       width: 64,
       height: 64,
       name: "MRI Machine",
     });
 
-    return { ball, coin, dog, mri, player };
+    const tree = new NPC({
+      imgPath: this.images["tree"],
+      imgSourceX: 32,
+      imgSourceY: 23,
+      imgSourceWidth: 63,
+      imgSourceHeight: 78,
+      width: 64,
+      height: 64,
+    });
+
+    return { ball, coin, dog, mri, player, tree };
   }
 
   startGameComponents() {
@@ -138,7 +151,9 @@ export default class Game {
       [STATES.MAIN_MENU]: () => this.menu.load(),
       [STATES.OVERWORLD]: () => this.overworld.load(),
       [STATES.MED_SCAN_GAME]: () => this.medScanGame.load(),
+      [STATES.ADVENTURE_LOG]: () => this.adventureLog.load(),
       [STATES.INVENTORY]: () => this.inventory.load(),
+      [STATES.SYSTEM]: () => this.system.load(),
     };
   }
 
@@ -172,5 +187,17 @@ export default class Game {
 
   getInventory() {
     return this.inventory;
+  }
+
+  initializeQuests() {
+    // Create the dog quest instance
+    const dogQuest = new DogBallQuest();
+
+    // Assign the quest to the dog NPC
+    if (this.gameObjects.dog) {
+      this.gameObjects.dog.quest = dogQuest;
+    } else {
+      console.error("Dog NPC not found when initializing quests");
+    }
   }
 }
