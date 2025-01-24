@@ -88,9 +88,15 @@ export default class MedScanGame {
     }
 
     if (this.quizStarted && !this.quizCompleted) {
-      if ((keys["1"] || keys["2"] || keys["3"] || keys["4"]) && currentTime - this.lastKeyPressTime > this.KEY_PRESS_COOLDOWN) {
+      // Only allow answer selection if no feedback is shown
+      if (!this.answerFeedback && (keys["1"] || keys["2"] || keys["3"] || keys["4"]) && currentTime - this.lastKeyPressTime > this.KEY_PRESS_COOLDOWN) {
         this.handleQuizAnswer(keys);
         this.lastKeyPressTime = currentTime;
+      }
+
+      // Require Enter to proceed when feedback is shown
+      if (this.answerFeedback && keys["Enter"]) {
+        this.answerFeedback = null;
       }
     }
 
@@ -119,14 +125,20 @@ export default class MedScanGame {
     if (keys["4"]) selectedAnswer = currentQuestion.options[3];
 
     if (selectedAnswer) {
-      if (selectedAnswer === currentQuestion.correctAnswer) {
+      // Explicitly set answerFeedback
+      this.answerFeedback = {
+        isCorrect: selectedAnswer === currentQuestion.correctAnswer,
+        correctAnswer: currentQuestion.correctAnswer,
+      };
+
+      if (this.answerFeedback.isCorrect) {
         this.score++;
         this.gameState.scanProgress = Math.ceil((this.score / this.quizQuestions.length) * this.gameState.maxScanProgress);
-        this.currentQuestionIndex++;
       } else {
         this.incorrectQuestions.push(this.currentQuestionIndex);
-        this.currentQuestionIndex++;
       }
+
+      this.currentQuestionIndex++;
 
       if (this.currentQuestionIndex >= this.quizQuestions.length) {
         if (this.incorrectQuestions.length > 0) {
@@ -201,12 +213,23 @@ export default class MedScanGame {
       const scaledFontSize = Math.max(MedScanGame.MIN_FONT_SIZE * (this.canvas.height / MedScanGame.BASE_RESOLUTION.height), MedScanGame.MIN_FONT_SIZE) + "px Arial";
       drawText(this.ctx, currentQuestion.question, this.canvas.width / 2, questionY, "center", scaledFontSize);
 
-      currentQuestion.options.forEach((option, index) => {
-        const optionY = questionY + 40 + index * 30;
-        drawText(this.ctx, `${index + 1}. ${option}`, this.canvas.width / 2, optionY, "center", scaledFontSize);
-      });
-
+      // Only draw options if no feedback is shown
+      if (!this.answerFeedback) {
+        currentQuestion.options.forEach((option, index) => {
+          const optionY = questionY + 40 + index * 30;
+          drawText(this.ctx, `${index + 1}. ${option}`, this.canvas.width / 2, optionY, "center", scaledFontSize);
+        });
+      }
       drawText(this.ctx, `Score: ${this.score}/${this.quizQuestions.length}`, this.canvas.width - 100, 30, "right", "20px Arial");
+
+      // Add feedback display
+      if (this.answerFeedback) {
+        const feedbackY = questionY + 70;
+        const feedbackText = this.answerFeedback.isCorrect ? `Correct, the answer is ${this.answerFeedback.correctAnswer}. Press Enter to continue.` : `Incorrect, the answer is ${this.answerFeedback.correctAnswer}. Press Enter to continue.`;
+
+        this.ctx.fillStyle = this.answerFeedback.isCorrect ? "green" : "red";
+        drawText(this.ctx, feedbackText, this.canvas.width / 2, feedbackY, "center", scaledFontSize);
+      }
     }
   }
 
