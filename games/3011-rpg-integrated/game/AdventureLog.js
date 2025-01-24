@@ -6,7 +6,7 @@ import { drawText } from "./utils/drawText.js";
 export default class AdventureLog {
   static BASE_RESOLUTION = { width: 640, height: 360 };
   static TOP_MENU_ITEMS = ["", "Adventure Log", "Inventory"];
-  static TOP_MENU_LABELS = ["", null, "R"];
+  static TOP_MENU_LABELS = ["", null, "E"];
 
   constructor(canvas, ctx, keys, gameState) {
     this.canvas = canvas;
@@ -40,11 +40,11 @@ export default class AdventureLog {
       this.keys["X"] = false;
     }
 
-    // Handle R key shortcut for Inventory
-    if (this.keys["r"] || this.keys["R"]) {
+    // Handle E key shortcut for Inventory
+    if (this.keys["e"] || this.keys["E"]) {
       this.handleMenuSelection("Inventory");
-      this.keys["r"] = false;
-      this.keys["R"] = false;
+      this.keys["e"] = false;
+      this.keys["E"] = false;
     }
 
     this.handleArrowNavigation();

@@ -6,7 +6,7 @@ import { drawText } from "./utils/drawText.js";
 export default class System {
   static BASE_RESOLUTION = { width: 640, height: 360 };
   static TOP_MENU_ITEMS = ["Inventory", "System", ""];
-  static TOP_MENU_LABELS = ["L", null, ""];
+  static TOP_MENU_LABELS = ["Q", null, ""];
   static MENU_OPTIONS = ["Save", "Load", "Options", "Special Controls", "To Title Screen"];
 
   constructor(canvas, ctx, keys, gameState) {
@@ -41,10 +41,10 @@ export default class System {
     }
 
     // Handle L key shortcut for Inventory
-    if (this.keys["l"] || this.keys["L"]) {
+    if (this.keys["q"] || this.keys["Q"]) {
       this.handleMenuSelection("Inventory");
-      this.keys["l"] = false;
-      this.keys["L"] = false;
+      this.keys["q"] = false;
+      this.keys["Q"] = false;
     }
 
     this.handleArrowNavigation();

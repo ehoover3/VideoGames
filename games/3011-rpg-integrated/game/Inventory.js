@@ -12,7 +12,7 @@ export default class Inventory {
   static INTERACTION_DISTANCE = 40;
   static ITEM_CATEGORIES = ["Weapons", "Bows and Arrows", "Shields", "Armor", "Materials", "Food", "Key Items"];
   static NAVBAR_ITEMS = ["Adventure Log", "Inventory", "System"];
-  static NAVBAR_LABELS = ["L", null, "R"];
+  static NAVBAR_LABELS = ["Q", null, "E"];
 
   constructor(canvas, ctx, keys, gameState) {
     this.canvas = canvas;
@@ -46,16 +46,16 @@ export default class Inventory {
       this.keys["X"] = false;
     }
 
-    // Handle L and R key shortcuts
-    if (this.keys["l"] || this.keys["L"]) {
+    // Handle Q and E key shortcuts
+    if (this.keys["q"] || this.keys["Q"]) {
       this.handleNavbar("Adventure Log");
-      this.keys["l"] = false;
-      this.keys["L"] = false;
+      this.keys["q"] = false;
+      this.keys["Q"] = false;
     }
-    if (this.keys["r"] || this.keys["R"]) {
+    if (this.keys["e"] || this.keys["E"]) {
       this.handleNavbar("System");
-      this.keys["r"] = false;
-      this.keys["R"] = false;
+      this.keys["e"] = false;
+      this.keys["E"] = false;
     }
     this.handleInventorySelection();
 
