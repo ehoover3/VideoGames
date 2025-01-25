@@ -289,31 +289,31 @@ export default class Inventory {
     const itemCategoryEmojis = {
       Weapons: {
         light: "⚔️",
-        dark: "🗡️",
+        dark: "⚫",
       },
       "Bows and Arrows": {
         light: "🏹",
-        dark: "🎯",
+        dark: "⚫",
       },
       Shields: {
         light: "🛡️",
-        dark: "⚔️",
+        dark: "⚫",
       },
       Armor: {
         light: "🥋",
-        dark: "🥷",
+        dark: "⚫",
       },
       Materials: {
         light: "🪵",
-        dark: "🌲",
+        dark: "⚫",
       },
       Food: {
         light: "🍎",
-        dark: "🍏",
+        dark: "⚫",
       },
       "Key Items": {
         light: "🔑",
-        dark: "🗝️",
+        dark: "⚫",
       },
     };
 
