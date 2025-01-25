@@ -63,8 +63,10 @@ export default class MedScanGame {
     this.quizQuestions.forEach((q) => {
       const img = new Image();
       img.src = `assets/images/scanGame/${q.image}`;
+      img.onload = () => {
+        this.quizImages[q.image] = img;
+      };
       img.onerror = () => console.error(`Failed to load image: ${q.image}`);
-      this.quizImages[q.image] = img;
     });
   }
 
@@ -94,9 +96,9 @@ export default class MedScanGame {
         this.lastKeyPressTime = currentTime;
       }
 
-      // Require Enter to proceed when feedback is shown
+      // Process next question when feedback is shown and Enter is pressed
       if (this.answerFeedback && keys["Enter"]) {
-        this.answerFeedback = null;
+        this.processNextQuestion();
       }
     }
 
@@ -117,36 +119,74 @@ export default class MedScanGame {
 
   handleQuizAnswer(keys) {
     const currentQuestion = this.quizQuestions[this.currentQuestionIndex];
-    let selectedAnswer = null;
+    console.log("Current answerFeedback:", this.answerFeedback);
+    console.log("Enter key pressed:", keys["Enter"]);
 
-    if (keys["1"]) selectedAnswer = currentQuestion.options[0];
-    if (keys["2"]) selectedAnswer = currentQuestion.options[1];
-    if (keys["3"]) selectedAnswer = currentQuestion.options[2];
-    if (keys["4"]) selectedAnswer = currentQuestion.options[3];
+    // Early return if answer feedback is already shown
+    if (this.answerFeedback) {
+      if (keys["Enter"]) {
+        console.log("Processing next question");
+        this.processNextQuestion();
+      }
+      return;
+    }
+
+    // Determine selected answer based on key press
+    const selectedAnswer = this.getSelectedAnswer(keys, currentQuestion.options);
 
     if (selectedAnswer) {
-      // Explicitly set answerFeedback
-      this.answerFeedback = {
-        isCorrect: selectedAnswer === currentQuestion.correctAnswer,
-        correctAnswer: currentQuestion.correctAnswer,
-      };
+      this.processAnswer(selectedAnswer, currentQuestion);
+    }
+  }
 
-      if (this.answerFeedback.isCorrect) {
-        this.score++;
-        this.gameState.scanProgress = Math.ceil((this.score / this.quizQuestions.length) * this.gameState.maxScanProgress);
+  getSelectedAnswer(keys, options) {
+    const keyMap = {
+      1: 0,
+      2: 1,
+      3: 2,
+      4: 3,
+    };
+
+    for (const [key, index] of Object.entries(keyMap)) {
+      if (keys[key]) return options[index];
+    }
+
+    return null;
+  }
+
+  processAnswer(selectedAnswer, currentQuestion) {
+    const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
+
+    this.answerFeedback = {
+      isCorrect,
+      correctAnswer: currentQuestion.correctAnswer,
+    };
+
+    if (isCorrect) {
+      this.score++;
+      this.gameState.scanProgress = Math.ceil((this.score / this.quizQuestions.length) * this.gameState.maxScanProgress);
+    } else {
+      this.incorrectQuestions.push(this.currentQuestionIndex);
+    }
+  }
+
+  processNextQuestion() {
+    console.log("Before increment:", this.currentQuestionIndex);
+    this.currentQuestionIndex++;
+    this.answerFeedback = null;
+
+    console.log("After increment:", this.currentQuestionIndex);
+    console.log("Total questions:", this.quizQuestions.length);
+    console.log("Incorrect questions:", this.incorrectQuestions);
+
+    if (this.currentQuestionIndex >= this.quizQuestions.length) {
+      if (this.incorrectQuestions.length > 0) {
+        this.currentQuestionIndex = this.incorrectQuestions.shift();
+        console.log("Revisiting incorrect question");
       } else {
-        this.incorrectQuestions.push(this.currentQuestionIndex);
-      }
-
-      this.currentQuestionIndex++;
-
-      if (this.currentQuestionIndex >= this.quizQuestions.length) {
-        if (this.incorrectQuestions.length > 0) {
-          this.currentQuestionIndex = this.incorrectQuestions.shift();
-        } else {
-          this.gameState.scanProgress = this.gameState.maxScanProgress;
-          this.quizCompleted = true;
-        }
+        this.gameState.scanProgress = this.gameState.maxScanProgress;
+        this.quizCompleted = true;
+        console.log("Quiz completed");
       }
     }
   }
@@ -158,12 +198,10 @@ export default class MedScanGame {
         this.drawStartScreen();
       } else if (!this.quizCompleted) {
         this.drawQuizQuestion();
-        // this.drawProgressBar();
       } else {
         this.drawFinishScreen();
       }
     }
-    // this.hud.draw(this.gameState.currentState);
   }
 
   drawStartScreen() {
@@ -235,20 +273,5 @@ export default class MedScanGame {
 
   clearCanvas() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-  }
-
-  drawProgressBar() {
-    const scaleX = this.canvas.width / MedScanGame.BASE_RESOLUTION.width;
-    const scaleY = this.canvas.height / MedScanGame.BASE_RESOLUTION.height;
-    const barWidth = MedScanGame.PROGRESS_BAR_DIMENSIONS.width * scaleX;
-    const barHeight = MedScanGame.PROGRESS_BAR_DIMENSIONS.height * scaleY;
-    const x = (this.canvas.width - barWidth) / 2;
-    const y = MedScanGame.PROGRESS_BAR_Y_OFFSET * scaleY;
-
-    this.ctx.fillStyle = "lightgray";
-    this.ctx.fillRect(x, y, barWidth, barHeight);
-
-    this.ctx.fillStyle = "#13beec";
-    this.ctx.fillRect(x, y, (this.gameState.scanProgress / this.gameState.maxScanProgress) * barWidth, barHeight);
   }
 }
